@@ -1,0 +1,29 @@
+FLProg Network — общий релиз от 24.10.2026
+
+Основной продукт: библиотека FLProg Network.
+Редактор Web UI и OTA-менеджер входят в его состав.
+
+Библиотека/FLProg_Network — файлы библиотеки.
+Редактор — Web UI. Запуск: START_WEB_EDITOR.bat.
+OTA_Менеджер — запускайте FLProg_STM32_OTA_Manager.exe внутри этой папки
+или START_OTA_MANAGER.bat в корне. Переносите папку OTA_Менеджер целиком.
+Python не требуется; настройки хранятся рядом с EXE.
+Блоки_FLProg — блоки для импорта.
+Примеры — тестовая прошивка FLE4D 1.0.1.
+Исходники — материалы разработчика; Проверки — отчёты.
+
+Установка библиотек: INSTALL_LIBRARIES.bat.
+Для сборки нужна IDE FLProg, для ST-Link — STM32CubeProgrammer.
+Версии компонентов: менеджер 0.7.5, OTA-блок 0.4, тест FLE4D 1.0.1.
+Версия библиотеки указана в library.properties.
+Подробности и ограничения: README_RU.txt и CHECKS_RU.txt.
+
+Web-редактор: Редактор/FLProg_WebUI_Editor.exe — прямой запуск.
+Рядом есть ЗАПУСТИТЬ_РЕДАКТОР.bat и КАК_ЗАПУСТИТЬ.txt.
+Исходники Web UI перемещены в Исходники/WebUI.
+
+Библиотека/FLProg_WebUI — библиотека интерфейса редактора для контроллера. Устанавливается вместе с FLProg_Network через INSTALL_LIBRARIES.bat. Копия в Редактор/runtime необходима генератору пакетов и сохранена.
+
+Библиотека/Flprog_Modbus — текущая исправленная копия из C:\F-981\FLProg\ideV8\portable\sketchbook\libraries. Версия library.properties: 1.0.0. Сохранён FIX_MODBUS_TCP_ETHERNET_2026-09-20.txt. Исходники скопированы без изменений; повторные компиляция и аппаратные испытания Modbus при добавлении в выпуск не выполнялись. INSTALL_LIBRARIES.bat устанавливает также эту библиотеку.
+
+Полный состав библиотек: FLProg_Network, FLProg_WebUI, Flprog_Modbus. Общий BAT устанавливает все три. Блоки: OTA, W5500 Diagnostic, MQTT, WebUI. См. СОСТАВ_РЕЛИЗА.txt.

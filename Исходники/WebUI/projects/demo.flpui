@@ -1,0 +1,1132 @@
+{
+  "schema": "flprog.webui/1.0",
+  "project": {
+    "id": "demo_controller",
+    "title": "Демонстрационный контроллер"
+  },
+  "transport": {
+    "id": "wifi-http",
+    "port": 80
+  },
+  "theme": {
+    "background": "#111827",
+    "card": "#1f2937",
+    "text": "#e5e7eb",
+    "accent": "#6366f1"
+  },
+  "channels": [
+    {
+      "id": "temperature",
+      "label": "Температура",
+      "type": "float",
+      "direction": "publish"
+    },
+    {
+      "id": "light",
+      "label": "Свет",
+      "type": "bool",
+      "direction": "duplex"
+    },
+    {
+      "id": "brightness",
+      "label": "Яркость",
+      "type": "float",
+      "direction": "duplex"
+    },
+    {
+      "id": "network_ip",
+      "label": "IP-адрес",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgNetworkInterface::localIP"
+    },
+    {
+      "id": "network_ready",
+      "label": "Сеть",
+      "type": "bool",
+      "direction": "publish",
+      "source": "FLProgNetworkInterface::isReady"
+    },
+    {
+      "id": "wifi_rssi",
+      "label": "Сигнал Wi-Fi, dBm",
+      "type": "int32",
+      "direction": "publish",
+      "source": "FLProg Wi-Fi STA RSSI"
+    },
+    {
+      "id": "wifi_ssid",
+      "label": "SSID",
+      "type": "text",
+      "direction": "duplex",
+      "source": "FLProg Wi-Fi STA public configuration"
+    },
+    {
+      "id": "network_mac",
+      "label": "MAC-адрес",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgNetworkInterface::mac"
+    },
+    {
+      "id": "network_gateway",
+      "label": "Шлюз",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgNetworkInterface::gateway"
+    },
+    {
+      "id": "network_subnet",
+      "label": "Маска",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgNetworkInterface::subnet"
+    },
+    {
+      "id": "wifi_password",
+      "label": "Пароль Wi-Fi",
+      "type": "text",
+      "direction": "command",
+      "source": "FLProgNetworkInterface::setClientPassword",
+      "secret": true
+    },
+    {
+      "id": "network_dhcp",
+      "label": "DHCP",
+      "type": "bool",
+      "direction": "duplex",
+      "source": "FLProgNetworkInterface::isDhcp/dhcpMode"
+    },
+    {
+      "id": "network_ip_config",
+      "label": "Статический IP",
+      "type": "text",
+      "direction": "duplex",
+      "source": "FLProgNetworkInterface::localIP"
+    },
+    {
+      "id": "network_gateway_config",
+      "label": "Шлюз",
+      "type": "text",
+      "direction": "duplex",
+      "source": "FLProgNetworkInterface::gateway"
+    },
+    {
+      "id": "network_subnet_config",
+      "label": "Маска",
+      "type": "text",
+      "direction": "duplex",
+      "source": "FLProgNetworkInterface::subnet"
+    },
+    {
+      "id": "network_dns",
+      "label": "DNS",
+      "type": "text",
+      "direction": "duplex",
+      "source": "FLProgNetworkInterface::dns"
+    },
+    {
+      "id": "network_apply",
+      "label": "Применить и переподключить",
+      "type": "bool",
+      "direction": "command",
+      "source": "FLProgNetworkInterface::disconnect/connect"
+    },
+    {
+      "id": "ap_enabled",
+      "label": "Точка доступа включена",
+      "type": "bool",
+      "direction": "duplex",
+      "source": "FLProgNetworkInterface::accessPointMode"
+    },
+    {
+      "id": "ap_ready",
+      "label": "Точка доступа активна",
+      "type": "bool",
+      "direction": "publish",
+      "source": "FLProgNetworkInterface::accessPointIsReady"
+    },
+    {
+      "id": "ap_ssid",
+      "label": "Имя точки доступа",
+      "type": "text",
+      "direction": "duplex",
+      "source": "FLProgNetworkInterface::accessPointSsid"
+    },
+    {
+      "id": "ap_password",
+      "label": "Пароль точки доступа",
+      "type": "text",
+      "direction": "command",
+      "source": "FLProgNetworkInterface::setAccessPointPassword",
+      "secret": true
+    },
+    {
+      "id": "ap_channel",
+      "label": "Канал точки доступа",
+      "type": "int32",
+      "direction": "duplex",
+      "source": "FLProgNetworkInterface::accessPointChannel"
+    },
+    {
+      "id": "ap_hidden",
+      "label": "Скрыть SSID",
+      "type": "bool",
+      "direction": "duplex",
+      "source": "FLProgNetworkInterface::accessPointHidden"
+    },
+    {
+      "id": "ap_max_clients",
+      "label": "Максимум клиентов",
+      "type": "int32",
+      "direction": "duplex",
+      "source": "FLProgNetworkInterface::accessPointMaxClients"
+    },
+    {
+      "id": "ap_ip",
+      "label": "IP точки доступа",
+      "type": "text",
+      "direction": "duplex",
+      "source": "FLProgNetworkInterface::accessPointConfiguredIP"
+    },
+    {
+      "id": "ap_gateway",
+      "label": "Шлюз точки доступа",
+      "type": "text",
+      "direction": "duplex",
+      "source": "FLProgNetworkInterface::accessPointConfiguredGateway"
+    },
+    {
+      "id": "ap_subnet",
+      "label": "Маска точки доступа",
+      "type": "text",
+      "direction": "duplex",
+      "source": "FLProgNetworkInterface::accessPointConfiguredSubnet"
+    },
+    {
+      "id": "ap_station_count",
+      "label": "Подключено клиентов",
+      "type": "int32",
+      "direction": "publish",
+      "source": "FLProgNetworkInterface::accessPointStationCount"
+    },
+    {
+      "id": "ap_live_ip",
+      "label": "Текущий IP точки доступа",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgNetworkInterface::accessPointIP"
+    },
+    {
+      "id": "ap_pending",
+      "label": "Настройки точки доступа применяются",
+      "type": "bool",
+      "direction": "publish",
+      "source": "FLProgNetworkInterface::accessPointConfigurationPending"
+    },
+    {
+      "id": "ap_error",
+      "label": "Ошибка точки доступа",
+      "type": "int32",
+      "direction": "publish",
+      "source": "FLProgNetworkInterface::accessPointLastError"
+    },
+    {
+      "id": "ap_apply",
+      "label": "Применить точку доступа",
+      "type": "bool",
+      "direction": "command",
+      "source": "FLProgNetworkInterface::accessPointMode"
+    },
+    {
+      "id": "wifi_scan",
+      "label": "Сканировать Wi-Fi",
+      "type": "bool",
+      "direction": "command",
+      "source": "FLProgNetworkInterface::startWifiScan"
+    },
+    {
+      "id": "demo_gauge",
+      "label": "Температура шкала",
+      "type": "float",
+      "direction": "publish"
+    },
+    {
+      "id": "demo_progress",
+      "label": "Заполнение",
+      "type": "float",
+      "direction": "publish"
+    },
+    {
+      "id": "demo_number",
+      "label": "Уставка",
+      "type": "float",
+      "direction": "duplex"
+    },
+    {
+      "id": "demo_check",
+      "label": "Разрешить работу",
+      "type": "bool",
+      "direction": "duplex"
+    },
+    {
+      "id": "demo_color",
+      "label": "Цвет",
+      "type": "text",
+      "direction": "duplex"
+    },
+    {
+      "id": "demo_date",
+      "label": "Дата",
+      "type": "text",
+      "direction": "duplex"
+    },
+    {
+      "id": "demo_time",
+      "label": "Время",
+      "type": "text",
+      "direction": "duplex"
+    },
+    {
+      "id": "demo_mode",
+      "label": "Режим",
+      "type": "text",
+      "direction": "duplex"
+    },
+    {
+      "id": "demo_days",
+      "label": "Расписание",
+      "type": "int32",
+      "direction": "duplex"
+    }
+  ],
+  "pages": [
+    {
+      "id": "main",
+      "title": "Главная",
+      "widgets": [
+        {
+          "id": "temperature",
+          "type": "indicator",
+          "label": "Температура",
+          "channel": "temperature",
+          "x": 1,
+          "y": 1,
+          "w": 4,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "id": "light",
+          "type": "switch",
+          "label": "Свет",
+          "channel": "light",
+          "x": 5,
+          "y": 1,
+          "w": 4,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "id": "brightness",
+          "type": "slider",
+          "label": "Яркость",
+          "channel": "brightness",
+          "icon": "☀",
+          "color": "#f59e0b",
+          "size": "wide",
+          "min": 0,
+          "max": 255,
+          "step": 1,
+          "x": 1,
+          "y": 3,
+          "w": 8,
+          "h": 2,
+          "options": ""
+        }
+      ]
+    },
+    {
+      "id": "wifi",
+      "title": "Wi-Fi",
+      "system": "wifi",
+      "widgets": [
+        {
+          "id": "network_ip",
+          "type": "text",
+          "channel": "network_ip",
+          "label": "IP-адрес",
+          "x": 1,
+          "y": 1,
+          "w": 4,
+          "h": 2
+        },
+        {
+          "id": "network_ready",
+          "type": "indicator",
+          "channel": "network_ready",
+          "label": "Сеть",
+          "x": 5,
+          "y": 1,
+          "w": 4,
+          "h": 2
+        },
+        {
+          "id": "wifi_rssi",
+          "type": "indicator",
+          "channel": "wifi_rssi",
+          "label": "Сигнал, dBm",
+          "x": 9,
+          "y": 1,
+          "w": 4,
+          "h": 2
+        },
+        {
+          "id": "wifi_ssid",
+          "type": "text-input",
+          "channel": "wifi_ssid",
+          "label": "SSID",
+          "x": 1,
+          "y": 3,
+          "w": 6,
+          "h": 2
+        },
+        {
+          "id": "network_mac",
+          "type": "text",
+          "channel": "network_mac",
+          "label": "MAC-адрес",
+          "x": 7,
+          "y": 3,
+          "w": 6,
+          "h": 2
+        },
+        {
+          "id": "network_gateway",
+          "type": "text",
+          "channel": "network_gateway",
+          "label": "Шлюз",
+          "x": 1,
+          "y": 5,
+          "w": 6,
+          "h": 2
+        },
+        {
+          "id": "network_subnet",
+          "type": "text",
+          "channel": "network_subnet",
+          "label": "Маска",
+          "x": 7,
+          "y": 5,
+          "w": 6,
+          "h": 2
+        },
+        {
+          "id": "wifi_password",
+          "type": "password-input",
+          "channel": "wifi_password",
+          "label": "Новый пароль Wi-Fi",
+          "x": 1,
+          "y": 7,
+          "w": 6,
+          "h": 2
+        },
+        {
+          "id": "network_dhcp",
+          "type": "switch",
+          "channel": "network_dhcp",
+          "label": "Автоматический IP (DHCP)",
+          "x": 7,
+          "y": 7,
+          "w": 6,
+          "h": 2
+        },
+        {
+          "id": "network_ip_config",
+          "type": "text-input",
+          "channel": "network_ip_config",
+          "label": "Статический IP",
+          "x": 1,
+          "y": 9,
+          "w": 3,
+          "h": 2
+        },
+        {
+          "id": "network_gateway_config",
+          "type": "text-input",
+          "channel": "network_gateway_config",
+          "label": "Шлюз",
+          "x": 4,
+          "y": 9,
+          "w": 3,
+          "h": 2
+        },
+        {
+          "id": "network_subnet_config",
+          "type": "text-input",
+          "channel": "network_subnet_config",
+          "label": "Маска",
+          "x": 7,
+          "y": 9,
+          "w": 3,
+          "h": 2
+        },
+        {
+          "id": "network_dns",
+          "type": "text-input",
+          "channel": "network_dns",
+          "label": "DNS",
+          "x": 10,
+          "y": 9,
+          "w": 3,
+          "h": 2
+        },
+        {
+          "id": "network_apply",
+          "type": "button",
+          "channel": "network_apply",
+          "label": "Применить и переподключить",
+          "x": 1,
+          "y": 11,
+          "w": 12,
+          "h": 2
+        }
+      ]
+    },
+    {
+      "id": "access-point",
+      "title": "Точка доступа",
+      "system": "access-point",
+      "widgets": [
+        {
+          "id": "ap_ready",
+          "type": "indicator",
+          "label": "Точка доступа",
+          "channel": "ap_ready",
+          "x": 1,
+          "y": 1,
+          "w": 4,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "id": "ap_station_count",
+          "type": "text",
+          "label": "Подключено клиентов",
+          "channel": "ap_station_count",
+          "x": 5,
+          "y": 1,
+          "w": 4,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "id": "ap_live_ip",
+          "type": "text",
+          "label": "Текущий IP",
+          "channel": "ap_live_ip",
+          "x": 9,
+          "y": 1,
+          "w": 4,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "id": "ap_enabled",
+          "type": "switch",
+          "label": "Включить точку доступа",
+          "channel": "ap_enabled",
+          "x": 1,
+          "y": 3,
+          "w": 6,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "id": "ap_pending",
+          "type": "indicator",
+          "label": "Настройки применяются",
+          "channel": "ap_pending",
+          "x": 7,
+          "y": 3,
+          "w": 6,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "id": "ap_ssid",
+          "type": "text-input",
+          "label": "Имя сети (SSID)",
+          "channel": "ap_ssid",
+          "x": 1,
+          "y": 5,
+          "w": 6,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "id": "ap_password",
+          "type": "password-input",
+          "label": "Новый пароль точки доступа",
+          "channel": "ap_password",
+          "x": 7,
+          "y": 5,
+          "w": 6,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "id": "ap_channel",
+          "type": "slider",
+          "label": "Канал Wi-Fi",
+          "channel": "ap_channel",
+          "min": 1,
+          "max": 13,
+          "step": 1,
+          "x": 1,
+          "y": 7,
+          "w": 4,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": ""
+        },
+        {
+          "id": "ap_hidden",
+          "type": "switch",
+          "label": "Скрыть имя сети",
+          "channel": "ap_hidden",
+          "x": 5,
+          "y": 7,
+          "w": 4,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "id": "ap_max_clients",
+          "type": "slider",
+          "label": "Максимум клиентов",
+          "channel": "ap_max_clients",
+          "min": 1,
+          "max": 8,
+          "step": 1,
+          "x": 9,
+          "y": 7,
+          "w": 4,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": ""
+        },
+        {
+          "id": "ap_ip",
+          "type": "text-input",
+          "label": "IP точки доступа",
+          "channel": "ap_ip",
+          "x": 1,
+          "y": 9,
+          "w": 4,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "id": "ap_gateway",
+          "type": "text-input",
+          "label": "Шлюз",
+          "channel": "ap_gateway",
+          "x": 5,
+          "y": 9,
+          "w": 4,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "id": "ap_subnet",
+          "type": "text-input",
+          "label": "Маска",
+          "channel": "ap_subnet",
+          "x": 9,
+          "y": 9,
+          "w": 4,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "id": "ap_error",
+          "type": "indicator",
+          "label": "Код ошибки",
+          "channel": "ap_error",
+          "x": 1,
+          "y": 11,
+          "w": 3,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "id": "ap_apply",
+          "type": "button",
+          "label": "Применить точку доступа",
+          "channel": "ap_apply",
+          "x": 4,
+          "y": 11,
+          "w": 9,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        }
+      ]
+    },
+    {
+      "id": "wifi-scanner",
+      "title": "Сканер Wi-Fi",
+      "system": "wifi-scanner",
+      "widgets": [
+        {
+          "id": "wifi_scan",
+          "type": "wifi-scan",
+          "label": "Доступные сети Wi-Fi",
+          "channel": "wifi_scan",
+          "x": 1,
+          "y": 1,
+          "w": 12,
+          "h": 8,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        }
+      ]
+    },
+    {
+      "id": "widgets",
+      "title": "Виджеты",
+      "widgets": [
+        {
+          "id": "demo_gauge",
+          "type": "radial-gauge",
+          "label": "Температура, °C",
+          "channel": "demo_gauge",
+          "min": -40,
+          "max": 125,
+          "step": 0.1,
+          "x": 1,
+          "y": 1,
+          "w": 4,
+          "h": 2
+        },
+        {
+          "id": "demo_progress",
+          "type": "progress",
+          "label": "Заполнение, %",
+          "channel": "demo_progress",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "x": 5,
+          "y": 1,
+          "w": 4,
+          "h": 2
+        },
+        {
+          "id": "demo_number",
+          "type": "number-input",
+          "label": "Уставка",
+          "channel": "demo_number",
+          "min": 0,
+          "max": 100,
+          "step": 0.5,
+          "x": 9,
+          "y": 1,
+          "w": 4,
+          "h": 2
+        },
+        {
+          "id": "demo_check",
+          "type": "checkbox",
+          "label": "Разрешить работу",
+          "channel": "demo_check",
+          "x": 1,
+          "y": 3,
+          "w": 4,
+          "h": 2
+        },
+        {
+          "id": "demo_color",
+          "type": "color-input",
+          "label": "Цвет подсветки",
+          "channel": "demo_color",
+          "x": 5,
+          "y": 3,
+          "w": 4,
+          "h": 2
+        },
+        {
+          "id": "demo_mode",
+          "type": "select",
+          "label": "Режим работы",
+          "channel": "demo_mode",
+          "options": "Авто;Ручной;Ночь",
+          "x": 9,
+          "y": 3,
+          "w": 4,
+          "h": 2
+        },
+        {
+          "id": "demo_date",
+          "type": "date-input",
+          "label": "Дата",
+          "channel": "demo_date",
+          "x": 1,
+          "y": 5,
+          "w": 4,
+          "h": 2
+        },
+        {
+          "id": "demo_time",
+          "type": "time-input",
+          "label": "Время",
+          "channel": "demo_time",
+          "x": 5,
+          "y": 5,
+          "w": 4,
+          "h": 2
+        },
+        {
+          "id": "demo_days",
+          "type": "weekdays",
+          "label": "Дни расписания",
+          "channel": "demo_days",
+          "x": 9,
+          "y": 5,
+          "w": 4,
+          "h": 2
+        }
+      ]
+    },
+    {
+      "id": "oled-panel",
+      "title": "OLED-панель",
+      "widgets": [
+        {
+          "id": "oled_temperature",
+          "type": "radial-gauge",
+          "label": "Температура, °C",
+          "channel": "demo_gauge",
+          "min": -40,
+          "max": 125,
+          "step": 0.1,
+          "icon": "◉",
+          "color": "#d1d5db",
+          "x": 1,
+          "y": 1,
+          "w": 4,
+          "h": 3
+        },
+        {
+          "id": "oled_load",
+          "type": "progress",
+          "label": "Нагрузка, %",
+          "channel": "demo_progress",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "icon": "▰",
+          "color": "#9ca3af",
+          "x": 5,
+          "y": 1,
+          "w": 4,
+          "h": 3
+        },
+        {
+          "id": "oled_signal",
+          "type": "indicator",
+          "label": "Сеть / статус",
+          "channel": "network_ready",
+          "icon": "●",
+          "color": "#e5e7eb",
+          "x": 9,
+          "y": 1,
+          "w": 4,
+          "h": 3
+        },
+        {
+          "id": "oled_light",
+          "type": "switch",
+          "label": "Подсветка",
+          "channel": "light",
+          "icon": "☼",
+          "color": "#d1d5db",
+          "x": 1,
+          "y": 4,
+          "w": 4,
+          "h": 2
+        },
+        {
+          "id": "oled_brightness",
+          "type": "slider",
+          "label": "Яркость",
+          "channel": "brightness",
+          "min": 0,
+          "max": 255,
+          "step": 1,
+          "icon": "▤",
+          "color": "#9ca3af",
+          "x": 5,
+          "y": 4,
+          "w": 4,
+          "h": 2
+        },
+        {
+          "id": "oled_ip",
+          "type": "text",
+          "label": "IP-адрес",
+          "channel": "network_ip",
+          "icon": "›",
+          "color": "#e5e7eb",
+          "x": 9,
+          "y": 4,
+          "w": 4,
+          "h": 2
+        },
+        {
+          "id": "oled_title",
+          "type": "text",
+          "label": "OLED-style compact panel",
+          "channel": "network_mac",
+          "icon": "▣",
+          "color": "#6b7280",
+          "x": 1,
+          "y": 6,
+          "w": 12,
+          "h": 2
+        }
+      ]
+    },
+    {
+      "id": "alternatives",
+      "title": "Альтернативные",
+      "widgets": [
+        {
+          "id": "alt_radial",
+          "type": "radial-gauge",
+          "label": "Круговой прибор",
+          "channel": "demo_gauge",
+          "min": -40,
+          "max": 125,
+          "step": 0.1,
+          "color": "#22d3ee",
+          "x": 1,
+          "y": 1,
+          "w": 3,
+          "h": 4,
+          "icon": "",
+          "options": ""
+        },
+        {
+          "id": "alt_battery",
+          "type": "battery",
+          "label": "Батарея / ресурс",
+          "channel": "demo_progress",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "color": "#a3e635",
+          "x": 4,
+          "y": 1,
+          "w": 5,
+          "h": 2,
+          "icon": "",
+          "options": ""
+        },
+        {
+          "id": "alt_segment",
+          "type": "segment-display",
+          "label": "Сегментный дисплей",
+          "channel": "brightness",
+          "min": 0,
+          "max": 255,
+          "step": 1,
+          "color": "#7cff9c",
+          "x": 9,
+          "y": 1,
+          "w": 4,
+          "h": 2,
+          "icon": "",
+          "options": ""
+        },
+        {
+          "id": "alt_signal",
+          "type": "traffic-light",
+          "label": "Светофор состояния",
+          "channel": "network_ready",
+          "color": "#f8fafc",
+          "x": 4,
+          "y": 3,
+          "w": 5,
+          "h": 2,
+          "icon": "",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "id": "alt_status",
+          "type": "indicator",
+          "label": "Стандартный индикатор для сравнения",
+          "channel": "network_ready",
+          "color": "#818cf8",
+          "x": 9,
+          "y": 3,
+          "w": 4,
+          "h": 2,
+          "icon": "",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "id": "alt_chart",
+          "type": "chart",
+          "label": "График яркости — двигайте ползунок",
+          "channel": "brightness",
+          "min": 0,
+          "max": 255,
+          "step": 1,
+          "color": "#f59e0b",
+          "x": 1,
+          "y": 5,
+          "w": 12,
+          "h": 3,
+          "icon": "",
+          "options": ""
+        },
+        {
+          "id": "alt_chart_slider",
+          "type": "slider",
+          "label": "Яркость для графика",
+          "channel": "brightness",
+          "min": 0,
+          "max": 255,
+          "step": 1,
+          "color": "#f59e0b",
+          "x": 1,
+          "y": 8,
+          "w": 12,
+          "h": 2,
+          "icon": "",
+          "options": ""
+        },
+        {
+          "id": "alt_sector",
+          "type": "sector-gauge",
+          "label": "Секторный прибор с зонами",
+          "channel": "demo_gauge",
+          "min": -40,
+          "max": 125,
+          "step": 0.1,
+          "color": "#38bdf8",
+          "x": 1,
+          "y": 10,
+          "w": 6,
+          "h": 3,
+          "icon": "",
+          "options": ""
+        },
+        {
+          "id": "alt_bars",
+          "type": "bar-meter",
+          "label": "Столбцовый уровень",
+          "channel": "demo_progress",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "color": "#a3e635",
+          "x": 7,
+          "y": 10,
+          "w": 6,
+          "h": 3,
+          "icon": "",
+          "options": ""
+        }
+      ]
+    }
+  ]
+}

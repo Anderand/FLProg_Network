@@ -1,0 +1,2 @@
+
+Библиотека/Flprog_Modbus — текущая исправленная копия из C:\F-981\FLProg\ideV8\portable\sketchbook\libraries. Версия library.properties: 1.0.0. Сохранён FIX_MODBUS_TCP_ETHERNET_2026-09-20.txt. Исходники скопированы без изменений; повторные компиляция и аппаратные испытания Modbus при добавлении в выпуск не выполнялись. INSTALL_LIBRARIES.bat устанавливает также эту библиотеку.

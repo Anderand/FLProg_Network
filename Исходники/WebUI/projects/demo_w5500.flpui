@@ -1,0 +1,14 @@
+{
+  "schema": "flprog.webui/1.0",
+  "project": {"id": "demo_w5500", "title": "Демонстрационный W5500 Web UI"},
+  "transport": {"id": "w5500-http-1", "port": 80},
+  "theme": {"background": "#111827", "card": "#1f2937", "text": "#e5e7eb", "accent": "#6366f1"},
+  "channels": [
+    {"id": "temperature", "label": "Температура", "type": "float", "direction": "publish"},
+    {"id": "relay", "label": "Реле", "type": "bool", "direction": "duplex"}
+  ],
+  "pages": [{"id": "main", "title": "Главная", "widgets": [
+    {"id": "temperature", "type": "indicator", "channel": "temperature", "x": 1, "y": 1, "w": 4, "h": 2},
+    {"id": "relay", "type": "switch", "channel": "relay", "color": "#22c55e", "x": 5, "y": 1, "w": 4, "h": 2}
+  ]}]
+}

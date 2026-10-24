@@ -1,0 +1,16 @@
+{
+  "python_syntax": 26,
+  "xml_blocks": 24,
+  "manager_profiles": 21,
+  "bootloaders": 20,
+  "ota_block_contract": "PASS",
+  "tools/verify_release.py": {
+    "exit": 0,
+    "output": "FLProg Web UI static release verification: OK\n"
+  },
+  "tools/test_audit_fixes.py": {
+    "exit": 0,
+    "output": ".....\n----------------------------------------------------------------------\nRan 5 tests in 0.027s\n\nOK\n"
+  },
+  "javascript_syntax": 1
+}

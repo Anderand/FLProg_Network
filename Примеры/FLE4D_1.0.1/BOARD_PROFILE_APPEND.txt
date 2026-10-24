@@ -1,0 +1,13 @@
+GenFLProgF4.menu.pnum.FLProg_FLE4D_30MT_OTA=FLProg PLC FLE4D-30MT (W5500 OTA experimental)
+GenFLProgF4.menu.pnum.FLProg_FLE4D_30MT_OTA.upload.maximum_size=458752
+GenFLProgF4.menu.pnum.FLProg_FLE4D_30MT_OTA.upload.maximum_data_size=131072
+GenFLProgF4.menu.pnum.FLProg_FLE4D_30MT_OTA.build.flash_offset=0x10000
+GenFLProgF4.menu.pnum.FLProg_FLE4D_30MT_OTA.build.board=BLACK_F407VG
+GenFLProgF4.menu.pnum.FLProg_FLE4D_30MT_OTA.build.product_line=STM32F407xx
+GenFLProgF4.menu.pnum.FLProg_FLE4D_30MT_OTA.build.variant_h=variant_BLACK_F407VX.h
+GenFLProgF4.menu.pnum.FLProg_FLE4D_30MT_OTA.build.variant=STM32F4xx/F407V(E-G)T_F417V(E-G)T
+GenFLProgF4.menu.pnum.FLProg_FLE4D_30MT_OTA.build.peripheral_pins=-DCUSTOM_PERIPHERAL_PINS
+GenFLProgF4.menu.pnum.FLProg_FLE4D_30MT_OTA.debug.svd_file={runtime.tools.STM32_SVD.path}/svd/STM32F4xx/STM32F407.svd
+GenFLProgF4.menu.pnum.FLProg_FLE4D_30MT_OTA.build.flprog=PLC_FLE4C_30MT
+GenFLProgF4.menu.pnum.FLProg_FLE4D_30MT_OTA.build.flprog_ota=FLE4D_W5500
+GenFLProgF4.menu.pnum.FLProg_FLE4D_30MT_OTA.build.extra_flags=-DFLPROG_FLE4D_30MT_OTA_PROFILE=1

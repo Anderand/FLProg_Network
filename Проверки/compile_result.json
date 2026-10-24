@@ -1,0 +1,13 @@
+{
+  "result": "PASS with compile-time constants differing",
+  "bytes": 85144,
+  "different_offsets": [
+    2368,
+    2369,
+    2371,
+    2392
+  ],
+  "function": "RT_HW_BASE::unixSetSystemTimeDate",
+  "original_sha256": "7b91d259bcce08768ed08533ca69ab3c78aae406a4106754223db251683e61c0",
+  "rebuild_sha256": "522e441e57279fba26bfd7404fb67f506a7bdebd61253970245a351c3088fee9"
+}

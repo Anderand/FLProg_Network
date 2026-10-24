@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.exe
+*.dll
+*.pyd
+*.bin
+*.elf
+*.o
+*.a
+*.zip
+*.fwpkg
+*.bak*
+settings.json
+build_env*/
+_build*/
