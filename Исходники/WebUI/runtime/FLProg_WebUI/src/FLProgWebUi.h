@@ -11,7 +11,7 @@
 #include <string.h>
 
 #ifndef FLPROG_WEBUI_RUNTIME_VERSION
-#define FLPROG_WEBUI_RUNTIME_VERSION "1.6.2-20261015"
+#define FLPROG_WEBUI_RUNTIME_VERSION "1.6.3-20261024"
 #endif
 
 // WPA2 passwords may contain up to 63 characters. Keep one terminating byte

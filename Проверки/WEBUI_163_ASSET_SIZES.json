@@ -1,0 +1,15 @@
+{
+  "limit": 2048,
+  "handlers": 14,
+  "responses": {
+    "/": 1213,
+    "/flprog-webui/app.css": 1613,
+    "/flprog-webui/scan.js": 811,
+    "/flprog-webui/widgets.js": 1887,
+    "/flprog-webui/controls.js": 1967,
+    "/flprog-webui/boot.js": 1616,
+    "/flprog-webui/boot-view.js": 852,
+    "/flprog-webui/elements.js": 1128,
+    "/flprog-webui/boot-init.js": 1052
+  }
+}

@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parent.parent
 import sys
 sys.path.insert(0, str(ROOT / "tools"))
 from build_project_package import build, validate
+from check_http_assets import check as check_http_assets
 
 
 def require(condition, message):
@@ -17,6 +18,7 @@ def require(condition, message):
 
 
 def main():
+    check_http_assets()
     catalog = json.loads((ROOT / "integration" / "flprog_network_api_catalog.json").read_text(encoding="utf-8"))
     transport_ids = {entry["id"] for entry in catalog["transports"]}
     require({"wifi-http", "w5500-http-1", "w5500-http-2"} <= transport_ids, "transport catalog incomplete")
