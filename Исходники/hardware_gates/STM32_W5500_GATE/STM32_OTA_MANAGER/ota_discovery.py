@@ -2,6 +2,7 @@
 import concurrent.futures
 import ipaddress
 import socket
+import select
 import struct
 import time
 
@@ -85,26 +86,65 @@ def mdns_records(packet, source):
     return result
 
 def browse_mdns(network, found, stop, warning, seconds=4):
-    query=struct.pack('!6H',0,0,1,0,0,0)+b'\x08_arduino\x04_tcp\x05local\0'+struct.pack('!HH',12,1)
+    # QM listens for multicast replies; QU also asks for a unicast response.
+    # A separate ephemeral socket avoids sharing Windows UDP 5353 delivery
+    # with Arduino IDE/Bonjour. Direct DNS-SD queries work when multicast
+    # responses do not reach this process. No OTA upload packets are sent.
+    question=b'\x08_arduino\x04_tcp\x05local\0'
+    header=struct.pack('!6H',0,0,1,0,0,0)
+    multicast_query=header+question+struct.pack('!HH',12,1)
+    unicast_query=header+question+struct.pack('!HH',12,0x8001)
+    sockets=[];seen=set()
     try:
-        with socket.socket(socket.AF_INET,socket.SOCK_DGRAM,socket.IPPROTO_UDP) as sock:
-            sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
-            sock.bind(('',5353));sock.settimeout(0.25)
-            addresses={entry[4][0] for entry in socket.getaddrinfo(socket.gethostname(),None,socket.AF_INET)}
-            addresses.add('0.0.0.0')
-            for address in addresses:
+        direct=socket.socket(socket.AF_INET,socket.SOCK_DGRAM,socket.IPPROTO_UDP)
+        sockets.append(direct);direct.bind(('',0))
+        direct.setsockopt(socket.IPPROTO_IP,socket.IP_MULTICAST_TTL,255)
+        addresses={'0.0.0.0'}
+        try:
+            addresses.update(entry[4][0] for entry in socket.getaddrinfo(socket.gethostname(),None,socket.AF_INET)
+                             if ipaddress.ip_address(entry[4][0]) in network)
+        except OSError:pass
+        multicast=None
+        try:
+            multicast=socket.socket(socket.AF_INET,socket.SOCK_DGRAM,socket.IPPROTO_UDP)
+            multicast.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
+            multicast.bind(('',5353));sockets.append(multicast)
+        except OSError as exc:
+            if multicast is not None:multicast.close()
+            multicast=None
+            warning('Multicast mDNS недоступен; выполняется прямой поиск: '+str(exc))
+        for address in sorted(addresses):
+            if multicast is not None:
                 try:
-                    sock.setsockopt(socket.IPPROTO_IP,socket.IP_ADD_MEMBERSHIP,socket.inet_aton('224.0.0.251')+socket.inet_aton(address))
-                    sock.setsockopt(socket.IPPROTO_IP,socket.IP_MULTICAST_IF,socket.inet_aton(address))
-                    sock.sendto(query,('224.0.0.251',5353))
-                except OSError: pass
-            deadline=time.monotonic()+seconds
-            while not stop.is_set() and time.monotonic()<deadline:
-                try: packet,source=sock.recvfrom(4096)
-                except socket.timeout: continue
-                if ipaddress.ip_address(source[0]) in network:
-                    for row in mdns_records(packet,source[0]): found(row)
-    except OSError as exc: warning('mDNS недоступен: '+str(exc))
+                    multicast.setsockopt(socket.IPPROTO_IP,socket.IP_ADD_MEMBERSHIP,
+                                         socket.inet_aton('224.0.0.251')+socket.inet_aton(address))
+                    multicast.setsockopt(socket.IPPROTO_IP,socket.IP_MULTICAST_IF,socket.inet_aton(address))
+                    multicast.sendto(multicast_query,('224.0.0.251',5353))
+                except OSError:pass
+            try:
+                direct.setsockopt(socket.IPPROTO_IP,socket.IP_MULTICAST_IF,socket.inet_aton(address))
+                direct.sendto(unicast_query,('224.0.0.251',5353))
+            except OSError:pass
+        # Restore normal routing after sending on each multicast interface.
+        direct.setsockopt(socket.IPPROTO_IP,socket.IP_MULTICAST_IF,socket.inet_aton('0.0.0.0'))
+        for host in network.hosts():
+            if stop.is_set():return
+            try:direct.sendto(unicast_query,(str(host),5353))
+            except OSError:pass
+        deadline=time.monotonic()+seconds
+        while not stop.is_set() and time.monotonic()<deadline:
+            ready,_,_=select.select(sockets,[],[],min(0.25,max(0,deadline-time.monotonic())))
+            for sock in ready:
+                try:packet,source=sock.recvfrom(9000)
+                except OSError:continue
+                if ipaddress.ip_address(source[0]) not in network:continue
+                for row in mdns_records(packet,source[0]):
+                    key=(row['ip'],row['port'],row['detail'])
+                    if key not in seen:
+                        seen.add(key);found(row)
+    except OSError as exc:warning('mDNS недоступен: '+str(exc))
+    finally:
+        for sock in sockets:sock.close()
 
 def scan(network, port, found, progress, stop, warning):
     network=ipaddress.ip_network(network,strict=False)

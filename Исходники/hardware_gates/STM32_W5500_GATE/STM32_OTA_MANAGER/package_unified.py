@@ -57,7 +57,7 @@ def main():
     shutil.copytree(block_source/'src',block/'src',dirs_exist_ok=True)
     for name in ['README_RU.txt']:
         shutil.copy2(block_source/name,block/name)
-    with ZipFile(ROOT/'FLProg_STM32_OTA_Manager_v0_7_6_portable.zip','w',ZIP_DEFLATED) as archive:
+    with ZipFile(ROOT/'FLProg_STM32_OTA_Manager_v0_7_7_portable.zip','w',ZIP_DEFLATED) as archive:
         for path in release.rglob('*'):
             if path.is_file() and not any(part in ('build','logs','__pycache__') for part in path.relative_to(release).parts):
                 archive.write(path,str(path.relative_to(release)))
