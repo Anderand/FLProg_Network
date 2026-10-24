@@ -1,4 +1,4 @@
-# FLProg STM32 OTA Manager v0.7.5
+# FLProg STM32 OTA Manager v0.7.6
 
 Запустите FLProg_STM32_OTA_Manager.exe. Переносите всю папку целиком.
 Python отдельно не нужен. EXE Windows x64; Windows 7 отдельно не проверялась.

@@ -34,6 +34,7 @@ if str(_UPLOADER_DIR) not in sys.path:
 from upload_fle4d_ota import check_ota_ready, upload_image  # noqa: E402
 sys.path.insert(0, str(_PROJECT_DIR.parent / 'STM32_OTA_PORTABILITY'))
 from manager_extensions import attach as attach_extensions, event as extension_event
+from profile_policy import is_verified, is_visible
 
 
 def app_directory():
@@ -205,13 +206,14 @@ def import_package(archive_path, profiles_dir):
 class ManagerApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("FLProg — менеджер STM32 OTA v0.7.5")
+        self.root.title("FLProg — менеджер STM32 OTA v0.7.6")
         self.root.geometry("940x680")
         self.root.minsize(820, 600)
         self.events = queue.Queue()
         self.busy = False
         self.settings_file = settings_path()
         self.settings = self._load_settings()
+        self.show_unverified = tk.BooleanVar(value=False)
         self.profiles_dir = app_directory() / "profiles"
         self.profiles = {}
         self._build_ui()
@@ -242,10 +244,12 @@ class ManagerApp:
         self.profile_box.bind("<<ComboboxSelected>>", self._show_profile)
         ttk.Button(outer, text="Импорт пакета…", command=self._import_package).grid(row=0, column=2, sticky="ew", pady=4)
 
+        profile_details = ttk.Frame(outer)
+        profile_details.grid(row=1, column=0, columnspan=3, sticky="ew", pady=(2, 10))
+        ttk.Checkbutton(profile_details, text="Показать непроверенные платы и профили",
+                        variable=self.show_unverified, command=self._toggle_unverified).pack(anchor="w")
         self.profile_info = tk.StringVar(value="Пакеты прошивок не найдены.")
-        ttk.Label(outer, textvariable=self.profile_info, justify="left", wraplength=800).grid(
-            row=1, column=0, columnspan=3, sticky="w", pady=(2, 10)
-        )
+        ttk.Label(profile_details, textvariable=self.profile_info, justify="left", wraplength=800).pack(anchor="w")
 
         ttk.Separator(outer).grid(row=2, column=0, columnspan=3, sticky="ew", pady=5)
         ttk.Label(outer, text="IP контроллера:").grid(row=3, column=0, sticky="w", pady=4)
@@ -298,7 +302,7 @@ class ManagerApp:
         self.log.configure(yscrollcommand=scrollbar.set)
         ttk.Label(outer, text="Если BIN не выбран, используется приложение из профиля. Для первичной установки нужен ST-Link/SWD.",
                   wraplength=880).grid(row=11, column=0, columnspan=3, sticky="w", pady=(8, 0))
-        self._log("Менеджер v0.7.5: прошивка, сборка плат и поиск OTA в одном окне.")
+        self._log("Менеджер v0.7.6: по умолчанию доступен проверенный профиль FLE4D-30MT 1.0.1.")
         attach_extensions(self, self.notebook, app_directory())
 
     def _log(self, message):
@@ -318,8 +322,18 @@ class ManagerApp:
         self.log.delete("1.0", "end")
         self.log.configure(state="disabled")
 
+    def _toggle_unverified(self):
+        if self.busy:
+            self.show_unverified.set(not self.show_unverified.get())
+            return
+        self._refresh_profiles()
+        if hasattr(self, 'refresh_board_choices'):
+            self.refresh_board_choices()
+
     def _refresh_profiles(self, select_id=None):
+        previous = self.profile_var.get()
         self.profiles = {}
+        self.all_profiles = {}
         self.profiles_dir.mkdir(parents=True, exist_ok=True)
         errors = []
         for folder in sorted(self.profiles_dir.iterdir()):
@@ -327,7 +341,9 @@ class ManagerApp:
                 continue
             try:
                 data, files = load_profile(folder)
-                self.profiles[data["id"]] = (folder, data, files)
+                self.all_profiles[data["id"]] = (folder, data, files)
+                if is_visible(data, self.show_unverified.get()):
+                    self.profiles[data["id"]] = (folder, data, files)
             except (OSError, ValueError, KeyError, TypeError) as error:
                 errors.append("{}: {}".format(folder.name, error))
         ids = list(self.profiles)
@@ -336,12 +352,15 @@ class ManagerApp:
             self.profile_var.set(self.profiles[select_id][1]["label"])
         elif ids:
             preferred = self.settings.get("profile")
+            preferred = next((key for key in ids if self.profiles[key][1]['label'] == previous), preferred)
             profile_id = preferred if preferred in self.profiles else ids[0]
             self.profile_var.set(self.profiles[profile_id][1]["label"])
         else:
             self.profile_var.set("")
-            self.profile_info.set("Пакеты прошивок не найдены. Импортируйте файл .fwpkg.")
+            self.profile_info.set("Нет проверенного профиля. Импортируйте пакет или включите показ непроверенных плат.")
         self._show_profile()
+        if previous and previous != self.profile_var.get():
+            self.bin_var.set("")
         for error in errors:
             self._log("Пакет пропущен: " + error)
 
@@ -349,6 +368,8 @@ class ManagerApp:
         label = self.profile_var.get()
         for profile_id, item in self.profiles.items():
             if item[1]["label"] == label:
+                if not is_visible(item[1], self.show_unverified.get()):
+                    raise ValueError("Профиль скрыт. Включите показ непроверенных плат для его выбора.")
                 return profile_id, item[0], item[1], item[2]
         raise ValueError("Сначала выберите установленный пакет платы.")
 
@@ -373,6 +394,8 @@ class ManagerApp:
         self.profile_info.set(info)
         if profile.get("loader_only"):
             self.profile_info.set(info.replace("SHA-256 обоих файлов проверен.", "SHA-256 загрузчика проверен."))
+        status = "Проверенный профиль FLE4D-30MT, прошивка 1.0.1." if is_verified(profile) else "НЕ ПРОВЕРЕН НА ПЛАТЕ: используется только для испытаний."
+        self.profile_info.set(status + "\n" + self.profile_info.get())
 
     def _import_package(self):
         filename = filedialog.askopenfilename(
@@ -383,7 +406,10 @@ class ManagerApp:
         try:
             target = import_package(filename, self.profiles_dir)
             self._refresh_profiles(target.name)
-            self._log("Выбран профиль: {}".format(self.profiles[target.name][1]["label"]))
+            if target.name in self.profiles:
+                self._log("Выбран профиль: {}".format(self.profiles[target.name][1]["label"]))
+            else:
+                self._log("Пакет импортирован, но скрыт. Для его выбора включите «Показать непроверенные платы и профили».")
             self._save_settings()
         except (OSError, ValueError, KeyError, TypeError, zipfile.BadZipFile) as error:
             messagebox.showerror("Не удалось импортировать пакет", str(error), parent=self.root)

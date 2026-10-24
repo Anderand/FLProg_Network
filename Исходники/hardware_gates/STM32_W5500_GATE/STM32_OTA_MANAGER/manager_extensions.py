@@ -22,9 +22,11 @@ def attach(app, notebook, home):
     build=ttk.Frame(notebook,padding=14); notebook.add(build,text='Плата и сборка')
     build.columnconfigure(1,weight=1)
     board=ttk.Combobox(build,state='readonly',values=[rows[n]['label']+' / '+str(rows[n]['flash']//1024)+' KiB' for n in names])
-    board.current(names.index('FLProg_FLE4_24_1'))
     ttk.Label(build,text='Плата FLProg:').grid(row=0,column=0,sticky='w')
     board.grid(row=0,column=1,columnspan=2,sticky='ew',pady=5)
+    ttk.Checkbutton(build,text='Показать непроверенные платы и профили',
+                    variable=app.show_unverified,command=app._toggle_unverified).grid(row=9,column=0,columnspan=3,sticky='w')
+    visible_names=[]
     ide=tk.StringVar(value=app.settings.get('builder_ide',str(builder.IDE)))
     sketch=tk.StringVar(value=app.settings.get('builder_sketch',''))
     app.builder_ide_var=ide; app.builder_sketch_var=sketch
@@ -59,6 +61,9 @@ def attach(app, notebook, home):
         now=time.time();counts={key:0 for key in ('queued','building','success','failed')}
         active=[]
         for n in names:
+            if n not in visible_names:
+                if listing.exists(n):listing.delete(n)
+                continue
             item=items.get(n);file=builder.ROOT/'output'/n/'bootloader.bin'
             status='Есть файл (не эта сборка)' if file.exists() else 'Не собран'
             elapsed='';size=file.stat().st_size if file.exists() else ''
@@ -90,7 +95,9 @@ def attach(app, notebook, home):
     listing.bind('<Double-1>',show_log)
     def start(kind):
         if app.busy: return
-        folder=Path(ide.get());source=sketch.get(); selected=names[board.current()]; action=mode.current()
+        if not app.show_unverified.get() or board.current()<0:
+            messagebox.showinfo('Платы для испытаний','В каталоге сборки находятся непроверенные платы. Включите их показ. Проверенный FLE4D-30MT 1.0.1 доступен на вкладке «Прошивка».',parent=app.root);return
+        folder=Path(ide.get());source=sketch.get(); selected=visible_names[board.current()]; action=mode.current()
         if not (folder/'arduino-builder.exe').exists():
             messagebox.showerror('IDE','Не найден arduino-builder.exe.',parent=app.root);return
         if kind=='package' and (not source or not Path(source).is_file()):
@@ -101,7 +108,7 @@ def attach(app, notebook, home):
             try:
                 with contextlib.redirect_stdout(Writer(app)):
                     builder.install_profiles()
-                    targets=names if kind=='all' else [selected]
+                    targets=list(visible_names) if kind=='all' else [selected]
                     report=loader_batch.run(builder,targets,source if kind=='package' else None,
                         lambda value:app.events.put(('build_report',value)))
                 failed=[n for n,item in report['rows'].items() if item['status']=='failed']
@@ -119,16 +126,27 @@ def attach(app, notebook, home):
     for text,kind in [('Собрать загрузчик','loader'),('Собрать BIN и пакет','package'),('Собрать все загрузчики','all')]:
         ttk.Button(buttons,text=text,command=lambda k=kind:start(k)).pack(side='left',padx=3)
     def open_output():
-        folder=builder.ROOT/'output'/names[board.current()];folder.mkdir(parents=True,exist_ok=True);os.startfile(str(folder))
+        if board.current()<0:return
+        folder=builder.ROOT/'output'/visible_names[board.current()];folder.mkdir(parents=True,exist_ok=True);os.startfile(str(folder))
     ttk.Button(buttons,text='Файлы платы',command=open_output).pack(side='left',padx=3)
     def select_board_profile():
-        if app.busy:return
-        profile_id='board_'+names[board.current()].lower()
+        if app.busy or board.current()<0 or not app.show_unverified.get():return
+        profile_id='board_'+visible_names[board.current()].lower()
         app._refresh_profiles(profile_id)
         app.bin_var.set('');app._save_settings();notebook.select(0)
         app._log('Выбран профиль платы. Загрузчик готов; выберите OTA BIN вашего проекта или соберите пакет на вкладке «Плата и сборка».')
     ttk.Button(buttons,text='Выбрать профиль платы',command=select_board_profile).pack(side='left',padx=3)
-    ttk.Label(build,text='Новые профили требуют испытаний на платах. SPI/Ethernet задаются в проекте FLProg.',wraplength=850).grid(row=8,column=0,columnspan=3,sticky='w',pady=8)
+    ttk.Label(build,text='Проверенный FLE4D-30MT 1.0.1 — на вкладке «Прошивка». Каталог сборки содержит платы для испытаний; включите галочку, чтобы их выбрать. SPI/Ethernet задаются в проекте FLProg.',wraplength=850).grid(row=8,column=0,columnspan=3,sticky='w',pady=8)
+    def refresh_board_choices():
+        previous=visible_names[board.current()] if 0<=board.current()<len(visible_names) else None
+        visible_names[:]=names if app.show_unverified.get() else []
+        board['values']=[rows[n]['label']+' / '+str(rows[n]['flash']//1024)+' KiB — не проверена' for n in visible_names]
+        if visible_names:board.current(visible_names.index(previous) if previous in visible_names else 0)
+        else:board.set('')
+        for button in buttons.winfo_children():button.configure(state='normal' if visible_names else 'disabled')
+        refresh_loaders()
+    app.refresh_board_choices=refresh_board_choices
+    refresh_board_choices()
 
     scanner=ttk.Frame(notebook,padding=14);notebook.add(scanner,text='Поиск OTA')
     subnet=tk.StringVar(value='192.168.100.0/24');port=tk.StringVar(value='3233')
@@ -197,6 +215,10 @@ def event(app,kind,payload,import_package):
         if package:
             folder=import_package(package,app.profiles_dir)
             app._refresh_profiles(folder.name);app.bin_var.set('');app._save_settings()
+            if folder.name not in app.profiles:
+                app.build_status.set('Пакет собран и импортирован. Для выбора включите показ непроверенных плат.')
+                app._set_result('Пакет собран; автоматическая прошивка не выполнялась.', '#176b2c')
+                return
             app.build_status.set('Готово. Пакет выбран на вкладке «Прошивка».')
             app._set_result('УСПЕХ: загрузчик и приложение собраны; пакет выбран.', '#176b2c')
             app._log('Сборка завершена, выбран пакет: '+package)

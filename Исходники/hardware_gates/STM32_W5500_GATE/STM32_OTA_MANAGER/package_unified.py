@@ -10,9 +10,13 @@ ROOT=Path(__file__).resolve().parent
 PORTING=ROOT.parent.parent/'STM32_OTA_PORTABILITY'
 sys.path.insert(0,str(PORTING))
 import build_stm32_ota as builder
+from profile_policy import OBSOLETE_IDS
 
 def main():
     release=ROOT/'portable_v6';data=release/'build_tools';data.mkdir(parents=True,exist_ok=True)
+    for profile_id in OBSOLETE_IDS:
+        old=release/'profiles'/profile_id
+        if old.exists():shutil.rmtree(old)
     for name in ['boards_catalog.json','PORTING_STATUS_RU.md','VALIDATION_RU.md']:
         shutil.copy2(PORTING/name,data/name)
     shutil.copytree(PORTING/'STM32_OTA_BOOTLOADER',data/'STM32_OTA_BOOTLOADER',dirs_exist_ok=True)
@@ -53,7 +57,7 @@ def main():
     shutil.copytree(block_source/'src',block/'src',dirs_exist_ok=True)
     for name in ['README_RU.txt']:
         shutil.copy2(block_source/name,block/name)
-    with ZipFile(ROOT/'FLProg_STM32_OTA_Manager_v0_7_5_portable.zip','w',ZIP_DEFLATED) as archive:
+    with ZipFile(ROOT/'FLProg_STM32_OTA_Manager_v0_7_6_portable.zip','w',ZIP_DEFLATED) as archive:
         for path in release.rglob('*'):
             if path.is_file() and not any(part in ('build','logs','__pycache__') for part in path.relative_to(release).parts):
                 archive.write(path,str(path.relative_to(release)))
