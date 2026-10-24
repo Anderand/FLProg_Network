@@ -1,9 +1,4 @@
-Комплект содержит три библиотеки.
-Скопируйте папки библиотек в portable/sketchbook/libraries вашей IDE FLProg
-или запустите INSTALL_LIBRARIES.bat из корня релиза.
-После установки перезапустите FLProg.
-Пакеты конкретных страниц создаются отдельно в редакторе.
-
-Библиотека/Flprog_Modbus — текущая исправленная копия из C:\F-981\FLProg\ideV8\portable\sketchbook\libraries. Версия library.properties: 1.0.0. Сохранён FIX_MODBUS_TCP_ETHERNET_2026-09-20.txt. Исходники скопированы без изменений; повторные компиляция и аппаратные испытания Modbus при добавлении в выпуск не выполнялись. INSTALL_LIBRARIES.bat устанавливает также эту библиотеку.
-
-Полный состав библиотек: FLProg_Network, FLProg_WebUI, Flprog_Modbus. Общий BAT устанавливает все три. Блоки: OTA, W5500 Diagnostic, MQTT, WebUI. См. СОСТАВ_РЕЛИЗА.txt.
+Закройте FLProg и Arduino IDE.
+Скопируйте папки FLProg_Network, FLProg_WebUI и Flprog_Modbus из этой папки
+в portable/sketchbook/libraries реальной IDE FLProg с заменой файлов.
+Откройте FLProg заново. Не создавайте лишний уровень вложенности.

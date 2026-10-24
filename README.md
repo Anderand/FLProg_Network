@@ -31,23 +31,12 @@
 - **FLProg_WebUI** — библиотека интерфейса контроллера;
 - **Flprog_Modbus** — исправленная библиотека Modbus.
 
-### Через установщик
-
 1. Закройте FLProg и Arduino IDE.
-2. Если IDE находится в **`C:\F-981\FLProg\ideV8`**, запустите **`INSTALL_LIBRARIES.bat`** из корня распакованного комплекта двойным щелчком.
-3. Для другого расположения IDE передайте путь к её папке. Пример для PowerShell:
+2. Откройте папку `Библиотека` в распакованном комплекте.
+3. Скопируйте **три папки целиком** — `FLProg_Network`, `FLProg_WebUI`, `Flprog_Modbus` — в `<папка IDE>\portable\sketchbook\libraries`. При обновлении подтвердите замену файлов этих трёх библиотек.
+4. Заново откройте FLProg.
 
-   ```powershell
-   & 'C:\FLProg_Network\INSTALL_LIBRARIES.bat' 'D:\FLProg\ideV8'
-   ```
-
-4. Дождитесь сообщения `Installed` и заново откройте FLProg.
-
-Установщик копирует файлы трёх библиотек в `<папка IDE>\portable\sketchbook\libraries`, заменяя совпадающие файлы этих библиотек. **Штатные RT_HW_00_BASE, Flprog_Utilites, Wire и другие библиотеки он не заменяет.**
-
-### Вручную
-
-Скопируйте три папки из `Библиотека` в `<папка IDE>\portable\sketchbook\libraries` с заменой файлов. Правильная структура:
+Правильная структура:
 
 ```text
 portable/sketchbook/libraries/
@@ -56,7 +45,7 @@ portable/sketchbook/libraries/
 └── Flprog_Modbus/library.properties
 ```
 
-Не создавайте дополнительный уровень `FLProg_Network/FLProg_Network`. Если FLProg использует виртуальный диск `Z:`, устанавливайте в реальную папку IDE и перезапускайте FLProg для обновления виртуальной копии.
+Не создавайте дополнительный уровень `FLProg_Network/FLProg_Network`. Если FLProg использует виртуальный диск `Z:`, копируйте в реальную папку IDE и перезапускайте FLProg для обновления виртуальной копии.
 
 ## 3. Добавить блоки в FLProg
 

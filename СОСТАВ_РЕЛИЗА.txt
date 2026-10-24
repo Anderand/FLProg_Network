@@ -1,6 +1,6 @@
 FLProg Network — полный состав 24.10.2026
 
-БИБЛИОТЕКИ (все устанавливаются INSTALL_LIBRARIES.bat)
+БИБЛИОТЕКИ (копируются вручную)
 FLProg_Network — актуальная сетевая библиотека.
 FLProg_WebUI — runtime редактора.
 Flprog_Modbus — исправленная рабочая копия из IDE.
