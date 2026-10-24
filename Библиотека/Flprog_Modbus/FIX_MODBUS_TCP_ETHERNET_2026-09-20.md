@@ -1,3 +1,5 @@
+# FIX MODBUS TCP ETHERNET 2026-09-20
+
 FLProg_Modbus 1.0.0 — diagnostic fix for Modbus TCP over Ethernet/Wiznet
 Date: 2026-09-20
 

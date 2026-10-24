@@ -1,7 +1,9 @@
+# README RU
+
 Исходники и воспроизведение сборки
 
 Библиотека: ../Библиотека/FLProg_Network.
-Web UI: ../Редактор/editor, tools, runtime, integration.
+Web UI: WebUI/editor, WebUI/tools, WebUI/runtime, WebUI/integration.
 Менеджер: hardware_gates/STM32_W5500_GATE/STM32_OTA_MANAGER.
 Сборщик и общий загрузчик: hardware_gates/STM32_OTA_PORTABILITY.
 OTA-блок: hardware_gates/FLProg_OTA_Block_v0_4.
@@ -16,7 +18,7 @@ BOARD_PROFILE_APPEND.txt. Сборка работает со смещением 
 1. Работайте с копией Исходники вне опубликованного выпуска.
 2. Python 3.8 x64; PyInstaller 5.13.2. Создайте venv в
    hardware_gates/STM32_W5500_GATE/OTA_APP_FLE4D/build_env_win7.
-3. Скопируйте Менеджер в
+3. Скопируйте OTA_Менеджер из готового архива в
    hardware_gates/STM32_W5500_GATE/STM32_OTA_MANAGER/portable_v6.
 4. Скопируйте OTA_Менеджер/build_tools/output в
    hardware_gates/STM32_OTA_PORTABILITY/output.
@@ -40,4 +42,8 @@ runtime->runtime и projects->projects через --add-data SOURCE;DEST.
 Архивы старых выпусков и пользовательские проекты не удалялись из
 E:\FLP\Flprog_network. Прототип web_ui_designer 0.1 исключён как устаревший.
 Сторонние RT_HW, Flprog_Utilites, Arduino IDE и toolchain не включены:
-нужна установленная FLProg IDE с ними. См. CHECKS_RU.txt для границ проверки.
+нужна установленная FLProg IDE с ними. См. CHECKS_RU.md для границ проверки.
+
+## Расширенные инструкции
+
+[Руководство разработчика](../Документация/РАЗРАБОТЧИКУ.md) · [Общий справочник](../Документация/README.md).

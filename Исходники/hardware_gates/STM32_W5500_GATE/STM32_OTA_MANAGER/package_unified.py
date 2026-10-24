@@ -55,7 +55,7 @@ def main():
     block_source=ROOT.parent.parent/'FLProg_OTA_Block_v0_4'
     shutil.copy2(block_source/'FLProg_OTA_Universal.ubi',block/'FLProg_OTA_Universal.ubi')
     shutil.copytree(block_source/'src',block/'src',dirs_exist_ok=True)
-    for name in ['README_RU.txt']:
+    for name in ['README_RU.md']:
         shutil.copy2(block_source/name,block/name)
     with ZipFile(ROOT/'FLProg_STM32_OTA_Manager_v0_7_7_portable.zip','w',ZIP_DEFLATED) as archive:
         for path in release.rglob('*'):

@@ -1,3 +1,5 @@
+# README RU
+
 FLE4D-30MT — тест блока FLProg OTA v0.4, версия 1.0.1
 
 Скетч использует FLProgOtaUniversalBlock. Код setup/loop блока взят

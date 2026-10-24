@@ -1,3 +1,5 @@
+# API COMPAT GATE 02 FIX3 RU EN
+
 RC6-A dev.16-fix3 — Legacy FLProgEthernetClient stop/connected compatibility
 
 Observed by API Compatibility Gate 0.2R-fix1 on ESP8266:
