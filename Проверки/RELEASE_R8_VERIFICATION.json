@@ -1,0 +1,9 @@
+{
+  "tests": 24,
+  "preserved_files": 407,
+  "only_three_libraries": true,
+  "git_unchanged": true,
+  "firmware": "1.0.7 unchanged",
+  "editor_exe_sha256": "e0bdad8018078b137e87e391b4ca253191084855b781d703edd61667a3794140",
+  "gui": "Project validation and offline preview tested in staged EXE; see release_r8_editor.png"
+}

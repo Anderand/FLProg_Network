@@ -1,0 +1,29 @@
+{
+  "firmware": "1.0.9-NOTICES",
+  "flash": 133840,
+  "static_ram": 16112,
+  "bin_bytes": 134324,
+  "sha256": "4dd7d62c6ca069cfa0a023cb2d309489e38d7e5aa69bdeeb53ddff773fa200d8",
+  "tests": 26,
+  "http_assets": 19,
+  "http_routes": 14,
+  "hardware": [
+    "field readback",
+    "cancel",
+    "busy/result",
+    "old result true",
+    "invalid input",
+    "five cards and scroll"
+  ],
+  "automated": [
+    "transport reject",
+    "missing ack",
+    "timeout",
+    "reset",
+    "offline/reconnect",
+    "queued cancellation",
+    "password hidden"
+  ],
+  "git_unchanged": true,
+  "release_r10_unchanged": true
+}

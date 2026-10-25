@@ -1,0 +1,35 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const assets=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+const node=()=>({dataset:{},children:[],setAttribute(){},append(...items){this.children.push(...items)}});
+async function tests(){
+ const c={v:{sp:25},document:{activeElement:null,createElement:node},commandBusy:false,lastMessage:'',TextEncoder,p:async()=>true};
+ vm.createContext(c);
+ vm.runInContext(assets['/flprog-webui/controls.js?part=form-state'].body,c);
+ vm.runInContext(assets['/flprog-webui/controls.js?part=form-apply'].body,c);
+ const d=node(),i={type:'number',value:'25',checkValidity:()=>true,reportValidity(){},blur(){}},b={};
+ c.T({label:'Уставка',channel:'sp',unit:'°C'},i,b,d,'sp');
+ assert.equal(d.dataset.fieldState,'Синхронизировано');
+ i.value='30.5';i.oninput();c.v.sp=26;d._sync(false);
+ assert.equal(i.value,'30.5');assert(d.children[1].textContent.includes('26'));
+ let resolve;c.p=()=>new Promise(r=>resolve=r);const pending=b.onclick();
+ assert.equal(d.dataset.fieldState,'Отправляется…');c.v.sp=30.5;resolve(true);await pending;
+ assert.equal(d.dataset.fieldState,'Принято контроллером');assert(!d.dataset.dirty);
+ c.v.sp=25;d._sync(true);assert.equal(i.value,25);assert.equal(d.dataset.fieldState,'Синхронизировано');
+ i.value='35';i.oninput();c.lastMessage='HTTP 409';c.p=async()=>false;await b.onclick();
+ assert(d.dataset.fieldState.startsWith('Ошибка:'));assert.equal(i.value,'35');
+ c.v.sp=21;d._sync(true);assert.equal(i.value,'35');assert(d.children[1].textContent.includes('21'));
+ i.onkeydown({key:'Escape'});assert.equal(i.value,21);assert(!d.dataset.dirty);
+ i.value='bad';i.checkValidity=()=>false;let sent=0;c.p=async()=>{sent++;return true};await b.onclick();
+ assert(d.dataset.fieldState.startsWith('Ошибка:'));assert.equal(sent,0);
+ const messages=node(),calls=[],resets=[];
+ const q={document:{querySelector:()=>messages},B:()=>{},setTimeout:()=>{},N:()=>{},R:x=>resets.push(x),encodeURIComponent};
+ vm.createContext(q);vm.runInContext(assets['/flprog-webui/boot.js'].body,q);
+ Object.assign(q,{loadedPage:'main',g:'main',rv:200,stamp:90000,needFull:false,v:{sp:30.5,old:1}});
+ const replies=[{revision:2,uptime:100,values:{}},{revision:2,uptime:100,values:{sp:25}}];
+ q.f=async u=>{calls.push(u);return replies.shift()};await q.q();
+ assert(calls[0].includes('since=200'));assert(!calls[1].includes('since='));assert.equal(q.v.sp,25);assert.equal(q.v.old,undefined);assert.equal(resets[0],true);
+ q.f=async()=>{throw Error('offline')};await q.q();assert.equal(q.needFull,true);
+ q.f=async u=>{assert(!u.includes('since='));return {revision:300,uptime:100000,values:{sp:20}}};await q.q();assert.equal(q.v.sp,20);
+ console.log('Field states and reboot/reconnect full synchronization: OK');
+}
+tests().catch(e=>{console.error(e);process.exit(1)});

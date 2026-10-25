@@ -18,6 +18,7 @@
  * - A stub stays inert: including its header neither registers a backend nor changes existing network behavior.
  */
 #pragma once
+#define FLPROG_HTTP_SERVER_HAS_FLASH_STREAM 1
 
 #include <Arduino.h>
 #include <IPAddress.h>
@@ -287,6 +288,12 @@ public:
     // Copy an immutable flash-resident asset into the existing bounded
     // response queue. On ESP8266 this avoids retaining Web UI assets in DRAM.
     bool sendProgmem(int statusCode, const char *contentType, const char *body);
+    // Native callbacks only. Data must remain immutable and valid until the
+    // connection closes (normally static PROGMEM). No network I/O here.
+    // Reuses request-line storage after parsing; no new per-client allocation.
+    bool sendStreamProgmem(int statusCode, const char *contentType,
+                          const void *data, uint32_t length,
+                          const char *contentEncoding = nullptr);
     bool send(int statusCode, const String &contentType, const String &body)
     {
         return send(statusCode, contentType.c_str(), body.c_str());
@@ -378,7 +385,16 @@ private:
         uint32_t observedRxBytes;
         uint32_t observedTxBytes;
 
-        char line[FLPROG_HTTP_SERVER_MAX_REQUEST_LINE + 1];
+        union {
+            char line[FLPROG_HTTP_SERVER_MAX_REQUEST_LINE + 1];
+            struct {
+                const uint8_t *data;
+                uint32_t length;
+                uint32_t offset;
+            } flash;
+        };
+        static_assert(sizeof(flash) <= FLPROG_HTTP_SERVER_MAX_REQUEST_LINE + 1,
+                      "Flash cursor must fit the existing request line");
         uint16_t lineLength;
         uint32_t headerBytes;
 
@@ -404,9 +420,12 @@ private:
         uint16_t responseLength;
         uint16_t responseOffset;
         bool responseOverflow;
-        bool responseStructured;
+        uint8_t responseStructured; // 0 raw, 1 bounded structured, 2 Flash stream
     };
 
+public:
+    static constexpr size_t clientContextBytes() { return sizeof(ClientContext); }
+private:
     static bool equalsIgnoreCase(const char *left, const char *right);
     static void copyBounded(char *destination, size_t capacity, const char *source);
     static int hexValue(char value);

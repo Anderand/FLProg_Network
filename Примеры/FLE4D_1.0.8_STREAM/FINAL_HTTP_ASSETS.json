@@ -1,0 +1,77 @@
+{
+  "/": {
+    "bytes": 766,
+    "sha256": "98285d7028ee7d5977d7156fd12fc98eb820d6d217a2a77ab7a5420a22dd39b2"
+  },
+  "/flprog-webui/app.css": {
+    "bytes": 738,
+    "sha256": "5fe6daf6248d9f2b1e6aa2112d9ffc456dde5d5bd7cff04c101c6719012ad392"
+  },
+  "/flprog-webui/scan.js": {
+    "bytes": 472,
+    "sha256": "ca1136233f2d7f6250e49de9d43641b00a05c784b1a8e1a8ade258d218075aac"
+  },
+  "/flprog-webui/widgets.js": {
+    "bytes": 568,
+    "sha256": "2774d69e93a9ecd65067e096aea6d5f2f0a23bc7754ede365386152ae48d7a56"
+  },
+  "/flprog-webui/controls.js?part=status": {
+    "bytes": 762,
+    "sha256": "4b4a95dbde13f500e1b1cccb92749150460c356f2eef9f4ad56610494f00ebe2"
+  },
+  "/flprog-webui/controls.js?part=commands": {
+    "bytes": 1075,
+    "sha256": "b1c9484a9d981344b18a33d0c9d28ec2cbe984fee02d082fc5f82462ed786c2c"
+  },
+  "/flprog-webui/controls.js?part=fields": {
+    "bytes": 370,
+    "sha256": "584ab663580c2d19e53f26cadec3c395721cb95da91ee371a875a513eb97bfc3"
+  },
+  "/flprog-webui/controls.js?part=groups": {
+    "bytes": 680,
+    "sha256": "eef8c7a9c9e567038617504a5446e2e7b2d738c3ef7764f1864ccd4070bbd7bb"
+  },
+  "/flprog-webui/controls.js?part=form-state": {
+    "bytes": 574,
+    "sha256": "166d9d690f2dbec211c2921761acb081a6ce9a0565048efbc39f73f906fedb54"
+  },
+  "/flprog-webui/controls.js?part=form-apply": {
+    "bytes": 457,
+    "sha256": "bf2061eb87675fc636c6fbaa91360d8b64b989582a1dda4efe24b9c52b1d15cd"
+  },
+  "/flprog-webui/controls.js": {
+    "bytes": 836,
+    "sha256": "c420a2e58b10412a3653845c6c9e9e788a60b130dbe49b4cf584cc13536ebea7"
+  },
+  "/flprog-webui/boot.js": {
+    "bytes": 664,
+    "sha256": "b8aca335f7eb8d24159c50eb3151073a7ac20550a398863b7b1800480859281c"
+  },
+  "/flprog-webui/boot-view.js": {
+    "bytes": 445,
+    "sha256": "ffdd24d76aad0270e1a763fe74c0c2068376b7d03fcfb6eaef2cdeb2778add3d"
+  },
+  "/flprog-webui/elements.js": {
+    "bytes": 601,
+    "sha256": "d31e3c82ccdd378ca488d073e61939e8bec542a40713be3b3ea2a4f53d4ff4a8"
+  },
+  "/flprog-webui/boot-init.js": {
+    "bytes": 552,
+    "sha256": "4f03d24089d4189ee637ef1e7522d492ac112d44d950640a164dca9324573c97"
+  },
+  "state": {
+    "uptime": 15264,
+    "revision": 18,
+    "values": {
+      "setpoint": 25.0,
+      "title": "FLE4D test",
+      "actual": 25.0,
+      "run": false,
+      "busy": false,
+      "result": false,
+      "running": false,
+      "commands": 0,
+      "uptime": 15
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "uptime": 99924,
+  "revision": 102,
+  "values": {
+    "setpoint": 25.0,
+    "title": "FLE4D test",
+    "actual": 25.0,
+    "run": false,
+    "busy": false,
+    "result": false,
+    "running": false,
+    "commands": 0,
+    "uptime": 99
+  }
+}

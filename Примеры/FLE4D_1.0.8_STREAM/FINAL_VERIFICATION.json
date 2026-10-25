@@ -1,0 +1,10 @@
+{
+  "version": "1.0.8-STREAM",
+  "stress_endpoint_removed": true,
+  "stress_arrays_absent": true,
+  "flash": 131136,
+  "static_ram": 16112,
+  "context_bytes": 6120,
+  "bin_bytes": 131620,
+  "sha256": "80758a0c42717844c093a1f7f82b233db18f7119177b83e7a1576c31f5632184"
+}

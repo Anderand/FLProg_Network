@@ -1,0 +1,26 @@
+{
+  "status": 409,
+  "body": "{\"error\":\"Команда уже выполняется\"}",
+  "before": {
+    "setpoint": 25.0,
+    "title": "FLE4D test",
+    "actual": 25.0,
+    "run": true,
+    "busy": false,
+    "result": true,
+    "running": false,
+    "commands": 2,
+    "uptime": 71
+  },
+  "started": {
+    "setpoint": 25.0,
+    "title": "FLE4D test",
+    "actual": 25.0,
+    "run": true,
+    "busy": true,
+    "result": false,
+    "running": false,
+    "commands": 2,
+    "uptime": 72
+  }
+}

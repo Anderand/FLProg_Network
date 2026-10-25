@@ -1,0 +1,27 @@
+# API COMPAT GATE 02 FIX3 RU EN
+
+RC6-A dev.16-fix3 — Legacy FLProgEthernetClient stop/connected compatibility
+
+Observed by API Compatibility Gate 0.2R-fix1 on ESP8266:
+- first connect: WAIT -> SUCCESS;
+- real TCP echo: PASS (3 lines);
+- stop() set the legacy status-change flag correctly;
+- however connected() could still return 1 in the same cycle after stop(),
+  because the native A3 socket closes asynchronously via requestClose().
+
+Reference legacy Flprog_Ethernet behavior:
+- FLProgAbstactEthernetChanel::stop() sets legacy status NOT_READY immediately;
+- FLProgEthernetClient::connected() returns 0 whenever legacy status != READY.
+
+Fix:
+- FLProgEthernetClient::connected() now checks _compatStatus first.
+- After stop(), connected() returns 0 immediately.
+- Native A3 close remains asynchronous and unchanged.
+- No NET_RESET is introduced.
+- No transport/generation logic is changed.
+
+Regression gate:
+Use API_COMPAT_GATE02R_FIX1_DEV16_FIX2.ino unchanged.
+Expected path:
+first WAIT/SUCCESS -> 3 echo lines -> stop -> SF1=1/SF2=0 ->
+native CLOSED -> second WAIT/SUCCESS -> 3 echo lines -> PASS.

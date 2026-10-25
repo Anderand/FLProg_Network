@@ -1,0 +1,13 @@
+{
+  "version": "1.0.6-WEBUI1.7",
+  "webui": "1.7.0",
+  "bytes": 135804,
+  "sha256": "189ad36a839d25f294dcc58407298f1bacaa1e1c51287de8cd1ca38c0776af88",
+  "app_address": "0x08010000",
+  "stack": "0x20020000",
+  "entry": "0x80257c5",
+  "uploaded": true,
+  "hardware_test": "BUSY_GUARD_RESULT.md",
+  "test_result": "PASS",
+  "reset": "automatic"
+}

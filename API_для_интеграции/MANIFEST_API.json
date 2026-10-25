@@ -1,0 +1,362 @@
+{
+  "C++/FLProg_Network/API_COMPAT_GATE_01_RU.md": {
+    "source": "Библиотека/FLProg_Network/API_COMPAT_GATE_01_RU.md",
+    "sha256": "4576bbad46ebce212550d941e09e840662278acf7e2718063c736cd876324cb6"
+  },
+  "C++/FLProg_Network/API_COMPAT_GATE_02_FIX3_RU_EN.md": {
+    "source": "Библиотека/FLProg_Network/API_COMPAT_GATE_02_FIX3_RU_EN.md",
+    "sha256": "619b5f0575bf1d4b0abcab74c0ce455719592d610e70a2857a5922f1ae330515"
+  },
+  "C++/FLProg_Network/API_COMPAT_GATE_02_RU.md": {
+    "source": "Библиотека/FLProg_Network/API_COMPAT_GATE_02_RU.md",
+    "sha256": "1f91d977018ceae01deef0fc4687d1a8757e6839dedb5c1c6f61937be5f16365"
+  },
+  "C++/FLProg_Network/API_COMPAT_GATE_03_UDP_RU.md": {
+    "source": "Библиотека/FLProg_Network/API_COMPAT_GATE_03_UDP_RU.md",
+    "sha256": "c7025bfbd72fa58b4ab1ec817081e7d197691926a1373ce1eb2d5b43879c1972"
+  },
+  "C++/FLProg_Network/API_COMPAT_GATE_04_DNS_FIX1_RU.md": {
+    "source": "Библиотека/FLProg_Network/API_COMPAT_GATE_04_DNS_FIX1_RU.md",
+    "sha256": "f91a678a998d108e6be5049084e46e6d5a6ed77401f4a8613d4b318ebe1f3179"
+  },
+  "C++/FLProg_Network/API_COMPAT_GATE_04_DNS_FIX2_RU.md": {
+    "source": "Библиотека/FLProg_Network/API_COMPAT_GATE_04_DNS_FIX2_RU.md",
+    "sha256": "318bb9a09429efeb3827ac5316084296c5ee3b1d609d72475d9990f87aa6fda4"
+  },
+  "C++/FLProg_Network/API_COMPAT_GATE_04_DNS_RU.md": {
+    "source": "Библиотека/FLProg_Network/API_COMPAT_GATE_04_DNS_RU.md",
+    "sha256": "62bb2bcdceca14e1fe64bee46fa14744bf9d52baebf0c9685e07b516dcc126b5"
+  },
+  "C++/FLProg_Network/API_FREEZE_DEV16_FIX4_RU.md": {
+    "source": "Библиотека/FLProg_Network/API_FREEZE_DEV16_FIX4_RU.md",
+    "sha256": "f538fc745d8e4d5a0ef9169597254024783df61331f415f50f36de1a27ed2538"
+  },
+  "C++/FLProg_Network/README.md": {
+    "source": "Библиотека/FLProg_Network/README.md",
+    "sha256": "68c321a5bd21e7515ad349ff44d41aaf97c46c2898044de656dd1e7d4057cad2"
+  },
+  "C++/FLProg_Network/README_EN.md": {
+    "source": "Библиотека/FLProg_Network/README_EN.md",
+    "sha256": "2acded2486b404b2b241bdbbc212ffa30e4a94e0c5266673b4d0894e229eeee3"
+  },
+  "C++/FLProg_Network/README_RU.md": {
+    "source": "Библиотека/FLProg_Network/README_RU.md",
+    "sha256": "ab16164f6ada45c747003f9cefdb7224880631c35eda647db9fce86e63a1a1b2"
+  },
+  "C++/FLProg_Network/docs/OTA_ETHERNET_RU.md": {
+    "source": "Библиотека/FLProg_Network/docs/OTA_ETHERNET_RU.md",
+    "sha256": "560c132444148649750d297925add631adac2ce6227a441d4158ab3d5c028863"
+  },
+  "C++/FLProg_Network/src/abstract/flprogAbstractTcpInterface.h": {
+    "source": "Библиотека/FLProg_Network/src/abstract/flprogAbstractTcpInterface.h",
+    "sha256": "85012bd4983129274c65be8f82e325d82553ea266980c8c7d11fac37d3459224"
+  },
+  "C++/FLProg_Network/src/device/flprogNetworkDeviceRegistry.h": {
+    "source": "Библиотека/FLProg_Network/src/device/flprogNetworkDeviceRegistry.h",
+    "sha256": "00c90d93e29a77ed1497449cb1da913f67b6f18e730e271b71494ad7ef9ce4c4"
+  },
+  "C++/FLProg_Network/src/flprogEthernet.h": {
+    "source": "Библиотека/FLProg_Network/src/flprogEthernet.h",
+    "sha256": "f6397f382300afb63c436d12d8e5544bd020d0ed1cc45cf224a6fc7380845cf2"
+  },
+  "C++/FLProg_Network/src/flprogMqttUserBlocks.h": {
+    "source": "Библиотека/FLProg_Network/src/flprogMqttUserBlocks.h",
+    "sha256": "80676a13aa3be69ca112b5a7c202eae59866e08c15c02e85ab5aecc15c569286"
+  },
+  "C++/FLProg_Network/src/flprogNTP.h": {
+    "source": "Библиотека/FLProg_Network/src/flprogNTP.h",
+    "sha256": "d81a785bf2c95ea48ec308c5938cdb64f07b7fe9d046f5a03b4ac715b64118b5"
+  },
+  "C++/FLProg_Network/src/flprogNetwork.h": {
+    "source": "Библиотека/FLProg_Network/src/flprogNetwork.h",
+    "sha256": "bcb9a30d40094ff2020099920eff01fe620d44649532f24a321d41559a424eb5"
+  },
+  "C++/FLProg_Network/src/flprogNetworkOpticalStub.h": {
+    "source": "Библиотека/FLProg_Network/src/flprogNetworkOpticalStub.h",
+    "sha256": "6c733e7ed6bd51a741e13e9a9f4e3e329f532b886a63cfcc8ecea49bdc8a27f9"
+  },
+  "C++/FLProg_Network/src/flprogNetworkPlatform.h": {
+    "source": "Библиотека/FLProg_Network/src/flprogNetworkPlatform.h",
+    "sha256": "2d91ef7b1215b851b39f446802bdedd71617a29724041dc4ba4bd8aa8a866aef"
+  },
+  "C++/FLProg_Network/src/flprogNetworkProfile.h": {
+    "source": "Библиотека/FLProg_Network/src/flprogNetworkProfile.h",
+    "sha256": "b12cf585a82552a0610989ea19ec592cc08bc78767e82f7469c8192e140aacf5"
+  },
+  "C++/FLProg_Network/src/flprogOTA.h": {
+    "source": "Библиотека/FLProg_Network/src/flprogOTA.h",
+    "sha256": "9f66e70f2153226c3ce8da9c97e6de7320699e032dbac60d71a25c2ee9bdadc5"
+  },
+  "C++/FLProg_Network/src/flprogOtaBoardIdentity.h": {
+    "source": "Библиотека/FLProg_Network/src/flprogOtaBoardIdentity.h",
+    "sha256": "e6b6e007c6f1172171e7c28400f3b6e0548f406c316c751692e1785b34a4f0ea"
+  },
+  "C++/FLProg_Network/src/flprogOtaUniversalBlock.h": {
+    "source": "Библиотека/FLProg_Network/src/flprogOtaUniversalBlock.h",
+    "sha256": "0a23846c062d8324558053852bd087dfc001af57b23e2b8e6fd573f202a29317"
+  },
+  "C++/FLProg_Network/src/flprogWebServer.h": {
+    "source": "Библиотека/FLProg_Network/src/flprogWebServer.h",
+    "sha256": "9d5286c1019bd035fd51afb554321d505b9327fe8f06bc4af644084a491cdb36"
+  },
+  "C++/FLProg_Network/src/hardware/flprogRmiiEthernet.h": {
+    "source": "Библиотека/FLProg_Network/src/hardware/flprogRmiiEthernet.h",
+    "sha256": "ebd672ee03f89cb071111c74e258bd3c0b9d79bb219a51cb105f6c2d4e3361a2"
+  },
+  "C++/FLProg_Network/src/hardware/flprogSpiArbiter.h": {
+    "source": "Библиотека/FLProg_Network/src/hardware/flprogSpiArbiter.h",
+    "sha256": "ce093e779c0b52bed8bea1579ef4ed7288d2d7b91554981d87f3f6ee9cbbb9eb"
+  },
+  "C++/FLProg_Network/src/hardware/flprogSpiBackend.h": {
+    "source": "Библиотека/FLProg_Network/src/hardware/flprogSpiBackend.h",
+    "sha256": "d4ec1c9d9adb88d2d09d16bfc6d78d53a759a5f76b190dcaf5824f77ed21bbc2"
+  },
+  "C++/FLProg_Network/src/hardware/flprogWiznetHardware.h": {
+    "source": "Библиотека/FLProg_Network/src/hardware/flprogWiznetHardware.h",
+    "sha256": "93e5ea11cb18a19939633c79bc6b4ad09bd34d8d38491872c8518e8bec2ac659"
+  },
+  "C++/FLProg_Network/src/protocol/flprogNetworkArpProbe.h": {
+    "source": "Библиотека/FLProg_Network/src/protocol/flprogNetworkArpProbe.h",
+    "sha256": "58f7cd21e6fa4fe55d47137eeb62c16470f12ffd00650a759663283bd0d3c936"
+  },
+  "C++/FLProg_Network/src/protocol/flprogNetworkDhcp.h": {
+    "source": "Библиотека/FLProg_Network/src/protocol/flprogNetworkDhcp.h",
+    "sha256": "3c5541f88a543cc5fd65e23c132d71b486df092e50384036dacf5abc02ae2451"
+  },
+  "C++/FLProg_Network/src/protocol/flprogNetworkDns.h": {
+    "source": "Библиотека/FLProg_Network/src/protocol/flprogNetworkDns.h",
+    "sha256": "8a4a6f598ae96b2ba04d6dd1f4a43a8d7d4d79991812e820097f3677c2fd30f6"
+  },
+  "C++/FLProg_Network/src/protocol/flprogNetworkMacRaw.h": {
+    "source": "Библиотека/FLProg_Network/src/protocol/flprogNetworkMacRaw.h",
+    "sha256": "48bb07976ea14998ee1c5b7305eb7366876110f2fd240466aa68a5b1af781975"
+  },
+  "C++/FLProg_Network/src/protocol/flprogNetworkTcpClient.h": {
+    "source": "Библиотека/FLProg_Network/src/protocol/flprogNetworkTcpClient.h",
+    "sha256": "f76268980d10c0e48e38031870a520ceb5fab23c9c0a48b18568ff109ebd683b"
+  },
+  "C++/FLProg_Network/src/protocol/flprogNetworkTcpServer.h": {
+    "source": "Библиотека/FLProg_Network/src/protocol/flprogNetworkTcpServer.h",
+    "sha256": "af710198a151c010a071c89cdddb93b543d91f46e16d8d45fb0fb2d12675b96c"
+  },
+  "C++/FLProg_Network/src/protocol/flprogNetworkUdp.h": {
+    "source": "Библиотека/FLProg_Network/src/protocol/flprogNetworkUdp.h",
+    "sha256": "8e8d082797ea716305d9fd14c237cc7ddfceedf9b99c9dd8d9a1e027f34082ee"
+  },
+  "C++/FLProg_Network/src/protocol/flprogStm32TcpBackend.h": {
+    "source": "Библиотека/FLProg_Network/src/protocol/flprogStm32TcpBackend.h",
+    "sha256": "e7e99c23db17f696487d39bbb45aa5a066d90fcd769e8e5af8b0b3fe99eb2726"
+  },
+  "C++/FLProg_Network/src/service/flprogNetworkHttpClient.h": {
+    "source": "Библиотека/FLProg_Network/src/service/flprogNetworkHttpClient.h",
+    "sha256": "2164bc5e0a179c7db9e0102b72dc994302267eca200380fc3bca313396cebbb8"
+  },
+  "C++/FLProg_Network/src/service/flprogNetworkHttpServer.h": {
+    "source": "Библиотека/FLProg_Network/src/service/flprogNetworkHttpServer.h",
+    "sha256": "e8bf8706317dbbdabc4564edf9952bc348c0035cce498ed3a7c8a9975a13d480"
+  },
+  "C++/FLProg_Network/src/service/flprogNetworkMqttBlockBridge.h": {
+    "source": "Библиотека/FLProg_Network/src/service/flprogNetworkMqttBlockBridge.h",
+    "sha256": "7fc042eb3f22557a4a10ee0457479ea940fdbaa0f555e22757e14aed24dbf483"
+  },
+  "C++/FLProg_Network/src/service/flprogNetworkMqttClient.h": {
+    "source": "Библиотека/FLProg_Network/src/service/flprogNetworkMqttClient.h",
+    "sha256": "a75d2399714717943dc07c32df3d6b1241d302dd1b897486a292c8e1d87b0082"
+  },
+  "C++/FLProg_Network/src/service/flprogNetworkNtp.h": {
+    "source": "Библиотека/FLProg_Network/src/service/flprogNetworkNtp.h",
+    "sha256": "382594a538154d28cdd1e315914fcada1a37f56970aed016ce118de3d0e79d88"
+  },
+  "C++/FLProg_Network/src/service/flprogNetworkOta.h": {
+    "source": "Библиотека/FLProg_Network/src/service/flprogNetworkOta.h",
+    "sha256": "75752b10eb19f06f5a645417f64b70b2b722205e2c0d3ae7cb49e686ffce8d3a"
+  },
+  "C++/FLProg_Network/src/service/flprogNetworkOtaSha256.h": {
+    "source": "Библиотека/FLProg_Network/src/service/flprogNetworkOtaSha256.h",
+    "sha256": "a0862b27421fe7b78ad0dcb93d37bea5dcd9306c07bf048f06ee837d7a7954bb"
+  },
+  "C++/FLProg_Network/src/service/flprogNetworkOtaStm32Wiznet.h": {
+    "source": "Библиотека/FLProg_Network/src/service/flprogNetworkOtaStm32Wiznet.h",
+    "sha256": "8d3350601bf6222872e82e6f5aa5457ded796b42d62cb8bf89dab5b6693186eb"
+  },
+  "C++/FLProg_Network/src/service/flprogNetworkOtaWiznet.h": {
+    "source": "Библиотека/FLProg_Network/src/service/flprogNetworkOtaWiznet.h",
+    "sha256": "1b2d2132e1f629df52e832d7aee7f58f70644c6290228a58d0047087b280766f"
+  },
+  "C++/FLProg_Network/src/service/flprogNetworkService.h": {
+    "source": "Библиотека/FLProg_Network/src/service/flprogNetworkService.h",
+    "sha256": "d9f22c1580ce1552c9b1c517682ded0635aa10f030b7ddc21025dd3b7f56ec30"
+  },
+  "C++/FLProg_Network/src/service/flprogStm32OtaFlash.h": {
+    "source": "Библиотека/FLProg_Network/src/service/flprogStm32OtaFlash.h",
+    "sha256": "327a4b32938ee88c08d6605d78cfede3ac4f69c64c55bb1ad374625619ca5364"
+  },
+  "C++/FLProg_Network/src/socket/flprogNetworkSocket.h": {
+    "source": "Библиотека/FLProg_Network/src/socket/flprogNetworkSocket.h",
+    "sha256": "e8847346cebdf4df94ac227e794f9c08bb380fe87076577d21538d13f2e1a323"
+  },
+  "C++/FLProg_Network/src/socket/flprogSocketBackends.h": {
+    "source": "Библиотека/FLProg_Network/src/socket/flprogSocketBackends.h",
+    "sha256": "f553c054d0b91ebeb0685368000b7aab33081d11948c63d654f9f49f00a5252c"
+  },
+  "C++/FLProg_Network/src/tcp/flprogEthernetClient.h": {
+    "source": "Библиотека/FLProg_Network/src/tcp/flprogEthernetClient.h",
+    "sha256": "a77a08ce4757ad990e8d7d3eead22629542dfd01d1ebb1200ba16fb8682ef234"
+  },
+  "C++/FLProg_Network/src/tcp/flprogEthernetServer.h": {
+    "source": "Библиотека/FLProg_Network/src/tcp/flprogEthernetServer.h",
+    "sha256": "ee136bbbabe7014754582ce7ee85357102d9b00bdff1cf9825730372734f328f"
+  },
+  "C++/FLProg_Network/src/transport/flprogNetworkOpticalStub.h": {
+    "source": "Библиотека/FLProg_Network/src/transport/flprogNetworkOpticalStub.h",
+    "sha256": "c7d0d00d84df7d4ff765879c759cf241abc55d7eac531044c8e02f2158072fcf"
+  },
+  "C++/FLProg_Network/src/transport/flprogNetworkTransport.h": {
+    "source": "Библиотека/FLProg_Network/src/transport/flprogNetworkTransport.h",
+    "sha256": "d3e7ecc3c2e9eba1d8b5ac22f4cd6b7a98d7a4b01f565dde7b514f5e9712a981"
+  },
+  "C++/FLProg_Network/src/udp/flprogDns.h": {
+    "source": "Библиотека/FLProg_Network/src/udp/flprogDns.h",
+    "sha256": "1fc899a8848d5682a6106b16c6492537530a5f5734aeea3cf10f39e7c29485fd"
+  },
+  "C++/FLProg_Network/src/udp/flprogUdp.h": {
+    "source": "Библиотека/FLProg_Network/src/udp/flprogUdp.h",
+    "sha256": "d0bf0860c3f0a9bc9eb01c21e588996e5ae94ffb4dcc7dc60cc841c41db08e9e"
+  },
+  "C++/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_1/README_EN.md": {
+    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_1/README_EN.md",
+    "sha256": "5a42b87a0a316031198658e22dfc34580bfbdc7137b3a9c23437b3bf1a873f9b"
+  },
+  "C++/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_1/README_RU.md": {
+    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_1/README_RU.md",
+    "sha256": "a5e4e3424deec654a540dca79c35280d585250adb3fa7e3ba632bbdbe789bd24"
+  },
+  "C++/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_1/flprogMqttUserBlocks.h": {
+    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_1/flprogMqttUserBlocks.h",
+    "sha256": "80676a13aa3be69ca112b5a7c202eae59866e08c15c02e85ab5aecc15c569286"
+  },
+  "C++/FLProg_WebUI/src/FLProgWebUi.h": {
+    "source": "Библиотека/FLProg_WebUI/src/FLProgWebUi.h",
+    "sha256": "1e9a0d90026aef4285cc543c85f406a972edddcf49d3904c72bd143c90f2c42e"
+  },
+  "C++/FLProg_WebUI/src/FLProgWebUiHttpProtocol.h": {
+    "source": "Библиотека/FLProg_WebUI/src/FLProgWebUiHttpProtocol.h",
+    "sha256": "b2182cca49d5f195872dfd3cf87117582c15ffba4c89c5467589d339c59aa7fd"
+  },
+  "C++/FLProg_WebUI/src/adapters/FLProgWebUiEsp8266Http.h": {
+    "source": "Библиотека/FLProg_WebUI/src/adapters/FLProgWebUiEsp8266Http.h",
+    "sha256": "a54704d3993d0e6e30a5be46ef7211e8041f74e027a813788eee0e7bb4c49a42"
+  },
+  "C++/FLProg_WebUI/src/adapters/FLProgWebUiFlprogNetworkHttp.h": {
+    "source": "Библиотека/FLProg_WebUI/src/adapters/FLProgWebUiFlprogNetworkHttp.h",
+    "sha256": "4c449d58e8e035109612e8a46a227390ee57495df12499eff51d0b4244382ce7"
+  },
+  "C++/FLProg_WebUI/src/adapters/FLProgWebUiFlprogNetworkPagedHttp.h": {
+    "source": "Библиотека/FLProg_WebUI/src/adapters/FLProgWebUiFlprogNetworkPagedHttp.h",
+    "sha256": "7a85ed6762523db7aad1cbfce2b714d72b44116cc2320a70211e048c2b41a41f"
+  },
+  "C++/FLProg_WebUI/src/adapters/FLProgWebUiGzipHttp.h": {
+    "source": "Библиотека/FLProg_WebUI/src/adapters/FLProgWebUiGzipHttp.h",
+    "sha256": "dc4d50b5a427aac2d408718c35b222da51d5d019e1843652a4aaffa86fc37c82"
+  },
+  "C++/FLProg_WebUI/user_blocks/README_EN.md": {
+    "source": "Библиотека/FLProg_WebUI/user_blocks/README_EN.md",
+    "sha256": "9b137e834fe199b42ff69c145d3fe0ca15171c42c64009b4eaef70dd56ad5498"
+  },
+  "C++/FLProg_WebUI/user_blocks/README_RU.md": {
+    "source": "Библиотека/FLProg_WebUI/user_blocks/README_RU.md",
+    "sha256": "6697c0a4853638cb5d94f710c36c99f5f4b52aff37da893a892fd09903dcc52b"
+  },
+  "C++/Flprog_Modbus/src/base/flprogModbus.h": {
+    "source": "Библиотека/Flprog_Modbus/src/base/flprogModbus.h",
+    "sha256": "9fc50a6c7515cdf6f8a455ec09de7979913abcd750fd1febe77630ba768b4f86"
+  },
+  "C++/Flprog_Modbus/src/base/flprogModbusData.h": {
+    "source": "Библиотека/Flprog_Modbus/src/base/flprogModbusData.h",
+    "sha256": "688d2301cda550fd93b629815ea13ae9aef8713028db329d3b1040b0af1ea792"
+  },
+  "C++/Flprog_Modbus/src/base/flprogModbusTCPSlaveServer.h": {
+    "source": "Библиотека/Flprog_Modbus/src/base/flprogModbusTCPSlaveServer.h",
+    "sha256": "c7304314cc974dd50f65526d839048a675f6fc363602d2fa48ca9a9140106a9a"
+  },
+  "C++/Flprog_Modbus/src/flprogModbusBridge.h": {
+    "source": "Библиотека/Flprog_Modbus/src/flprogModbusBridge.h",
+    "sha256": "ae7ddec0cef9e26fe1b1414d3c0a3ac279bca0476498ae31987337524b52f46d"
+  },
+  "C++/Flprog_Modbus/src/flprogModbusRTU.h": {
+    "source": "Библиотека/Flprog_Modbus/src/flprogModbusRTU.h",
+    "sha256": "a4f3c22d4ef60100dc4e06ffcb18c674d4975747bd42ae8837c3615640cdd617"
+  },
+  "C++/Flprog_Modbus/src/flprogModbusTCP.h": {
+    "source": "Библиотека/Flprog_Modbus/src/flprogModbusTCP.h",
+    "sha256": "e1d5a8667264263a6b3776fa19ecb90660b1f7cdcc0a4af58a21a994a4bee920"
+  },
+  "C++/Flprog_Modbus/src/flprogModbusUtilites.h": {
+    "source": "Библиотека/Flprog_Modbus/src/flprogModbusUtilites.h",
+    "sha256": "ecfcaa366e8c5104ed1d0459550413a6149f5f6afdd2a2170e70514547631237"
+  },
+  "C++/Flprog_Modbus/src/rtu/flprogModbusMasterRTU.h": {
+    "source": "Библиотека/Flprog_Modbus/src/rtu/flprogModbusMasterRTU.h",
+    "sha256": "add95ac26d7dec0d0479982805e80787e6fd65ddc90cacb8546705b4decc0a75"
+  },
+  "C++/Flprog_Modbus/src/rtu/flprogModbusSlaveRTU.h": {
+    "source": "Библиотека/Flprog_Modbus/src/rtu/flprogModbusSlaveRTU.h",
+    "sha256": "3160792e9162480375a84e4bf58103d6329acab1246ab519f6db54a2e2043a69"
+  },
+  "C++/Flprog_Modbus/src/tcp/flprogModbusMasterTCP.h": {
+    "source": "Библиотека/Flprog_Modbus/src/tcp/flprogModbusMasterTCP.h",
+    "sha256": "1c622650ee8602862de9e0a04e057ef580bd3fb2b91ce1aafe8a1800a65501b5"
+  },
+  "C++/Flprog_Modbus/src/tcp/flprogModbusSlaveTCP.h": {
+    "source": "Библиотека/Flprog_Modbus/src/tcp/flprogModbusSlaveTCP.h",
+    "sha256": "2bc5b4c923fcde9e7980cdea3adcff5cc6c1953f9c1f4d5222582569afbb541d"
+  },
+  "WebUI/Каталог/flprog_network_api_catalog.json": {
+    "source": "Исходники/WebUI/integration/flprog_network_api_catalog.json",
+    "sha256": "d9a08268a75c51a66c926e60e3ec661d31858d6698ae0e7013ed7e6eb722cd17"
+  },
+  "WebUI/Контракты/KWEB_REVIEW_RU.md": {
+    "source": "Исходники/WebUI/specification/KWEB_REVIEW_RU.md",
+    "sha256": "572b2227bc3265a31f26bb5bc4ad7a187d6cd6b3bb082f34d00bc8ac17dd97f4"
+  },
+  "WebUI/Контракты/WEB_UI_CONTRACT_RU.md": {
+    "source": "Исходники/WebUI/specification/WEB_UI_CONTRACT_RU.md",
+    "sha256": "c5acd929c4f43d405c97ff39c93506fe2c49efc9d749ffb8297965abf6ab9b2a"
+  },
+  "WebUI/Контракты/WIDGET_IO_CONTRACT_RU.md": {
+    "source": "Исходники/WebUI/specification/WIDGET_IO_CONTRACT_RU.md",
+    "sha256": "043ad2b0c69b3382081a49b7928ba5003d59445e3448a3163c020ea55d74dab7"
+  },
+  "WebUI/Контракты/busy_guard.md": {
+    "source": "Исходники/WebUI/specification/busy_guard.md",
+    "sha256": "f22b43bc90563f08668d8cea58da57701320725642a51bdc8f7e585ef4210480"
+  },
+  "WebUI/Контракты/field_sync.md": {
+    "source": "Исходники/WebUI/specification/field_sync.md",
+    "sha256": "360d209fea92dbf8855b2e15cbe4f0388b778851c483a8192af3aa9fc48b9cae"
+  },
+  "Справка/FLASH_STREAM_RU.md": {
+    "source": "Документация/FLASH_STREAM_RU.md",
+    "sha256": "c64ad6e37e5422be784d7e16364dcf898182841afd60e44f4cecb4bf10661d35"
+  },
+  "Справка/GZIP_RU.md": {
+    "source": "Документация/GZIP_RU.md",
+    "sha256": "9c8fb95ed3e30dad0453ead13de680a535b4b11f68bdbe723403cb7b396bf691"
+  },
+  "Справка/NOTIFICATIONS_RU.md": {
+    "source": "Документация/NOTIFICATIONS_RU.md",
+    "sha256": "2a0f50ff416fb73d7193e123bab19e114d4385c198c5b304d3b4cfa8a0afd181"
+  },
+  "Справка/OTA_МЕНЕДЖЕР.md": {
+    "source": "Документация/OTA_МЕНЕДЖЕР.md",
+    "sha256": "8dd66934bef060b658854e895b31fb197d723fb10b55126c0ecbffdfb4948ef0"
+  },
+  "Справка/БЛОКИ.md": {
+    "source": "Документация/БЛОКИ.md",
+    "sha256": "5b1b4319b2872d95007a024782f60ec65b0bc5c32e1583711b75356f7b1a058c"
+  },
+  "Справка/РАЗРАБОТЧИКУ.md": {
+    "source": "Документация/РАЗРАБОТЧИКУ.md",
+    "sha256": "b101bb4c54fd20c14f522f6ac541d571ea4770bbe9007ecd418e69e81c6f09f2"
+  }
+}

@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <title>FLProg Web UI Editor</title>
-  <link rel="stylesheet" href="style.css?v=20261015-widget-settings-37">
+  <title>FLProg Web UI Editor — проверка проекта</title>
+  <link rel="stylesheet" href="style.css?v=20261025-r6">
 </head>
 <body>
   <header class="app-header">
@@ -25,10 +25,20 @@
       <button id="undo" type="button" disabled title="Отменить последнее изменение">Отменить</button>
       <span class="header-actions-divider" aria-hidden="true"></span>
       <button id="save" type="button" title="Сохранить проект в файл .flpui">Сохранить</button>
+      <button id="validateProject" type="button">Проверить проект</button>
+      <button id="previewProject" type="button">Предпросмотр</button>
+      <button id="previewDemo" type="button" title="Открыть демопроект и запустить локальный предпросмотр">Демо: уставка и busy/result</button>
       <button class="primary" id="build" type="button" title="Создать пакет для FLProg и установить его">Собрать и установить</button>
     </div>
   </header>
 
+  <section id="projectValidation" class="project-validation" aria-label="Проверка проекта" hidden>
+    <div class="validation-heading"><h2>Проверка проекта</h2><button id="validationAgain" type="button">Проверить повторно</button><button id="validationClose" type="button">Закрыть список</button></div>
+    <p id="validationSummary" role="status" aria-live="polite"></p>
+    <p id="validationStale" hidden>Проект изменён — проверьте повторно перед переходом или сборкой.</p>
+    <ol id="validationIssues"></ol>
+    <button id="buildDespiteWarnings" type="button" hidden>Собрать с предупреждениями</button>
+  </section>
   <main class="editor-shell">
     <aside class="sidebar sidebar-project" aria-label="Настройки проекта">
       <details class="side-section collapsible" open>
@@ -148,6 +158,8 @@
           </nav>
           <details class="settings-section" data-settings-section="general" open><summary>Основное</summary><div class="settings-section-body">
           <label>Подпись<input id="widgetLabel"></label>
+          <label>Группа элементов<input id="widgetGroup" list="elementGroups" placeholder="Например: Насосная"><datalist id="elementGroups"></datalist></label>
+          <p class="hint">Одинаковое имя объединяет элементы в секцию. X/Y отсчитываются внутри группы; пустое имя — без группы.</p>
           <label>Описание<textarea id="widgetDescription" rows="2" placeholder="Что делает этот виджет"></textarea></label>
           <label>Значок<input id="widgetIcon" placeholder="например: ☀"></label>
           <label>Тип<select id="widgetType"><option value="heading">Элемент: заголовок</option><option value="static-text">Элемент: текст</option><option value="divider">Элемент: разделитель</option><option value="link">Элемент: ссылка</option><option value="status-row">Элемент: строка статуса</option><option value="indicator">Индикатор</option><option value="switch">Переключатель</option><option value="checkbox">Флажок</option><option value="slider">Ползунок</option><option value="number-input">Число</option><option value="progress">Прогресс</option><option value="chart">Тренд</option><option value="radial-gauge">Круговой индикатор</option><option value="sector-gauge">Секторный прибор</option><option value="bar-meter">Столбцы</option><option value="battery">Батарея</option><option value="segment-display">Сегментный дисплей</option><option value="traffic-light">Светофор</option><option value="text">Вывод текста</option><option value="text-input">Ввод текста</option><option value="password-input">Пароль</option><option value="color-input">Цвет</option><option value="date-input">Дата</option><option value="time-input">Время</option><option value="select">Выбор</option><option value="weekdays">Дни недели</option><option value="button">Кнопка</option><option value="wifi-scan">Сканер Wi‑Fi</option></select></label>
@@ -171,6 +183,11 @@
           </details>
           <details class="settings-section" data-settings-section="behavior"><summary>Поведение и диапазон</summary><div class="settings-section-body">
           <label id="optionsProps">Варианты выбора / текст <small>(выбор — через ;)</small><input id="widgetOptions" placeholder="Авто;Ручной;Ночь или обычный текст"></label>
+          <label>Подсказка поля<input id="widgetPlaceholder" placeholder="Например: задайте температуру"></label>
+          <label>Единица измерения<input id="widgetUnit" placeholder="°C, бар, об/мин"></label>
+          <label>Максимум байт текста (UTF-8)<input id="widgetMaxLength" type="number" min="1" max="63" value="63"></label>
+          <label>Подтверждение команды<input id="widgetConfirmation" placeholder="Пусто — без диалога; например: Запустить насос?"></label>
+          <p class="hint">Поля отправляются кнопкой «Применить» или Enter. Escape отменяет ввод. Приём команды подтверждается отдельно от результата FBD.</p>
           <div id="sliderProps" class="slider-props"><label>Минимум<input id="widgetMin" type="number"></label><label>Максимум<input id="widgetMax" type="number"></label><label>Шаг<input id="widgetStep" type="number" step="any"></label></div>
           </div></details>
           <details class="settings-section" data-settings-section="appearance"><summary>Внешний вид</summary><div class="settings-section-body"><label>Цвет рамки и акцента<input id="widgetColor" type="color" title="Цвет рамки виджета"></label><p class="settings-help">Текст и фон берутся из темы страницы. Цвет виджета используется для рамки, шкалы и акцентных деталей.</p></div></details>
@@ -208,6 +225,14 @@
       <div id="widgetSettingsMount"></div>
     </form>
   </dialog>
-  <script src="app.js?v=20261024-portable"></script>
+  <dialog id="previewDialog" aria-label="Предпросмотр без контроллера">
+    <div class="preview-heading"><h2>Предпросмотр без контроллера</h2><button id="previewClose" type="button">Закрыть предпросмотр</button></div>
+    <p>Локальная имитация: программа FBD не исполняется. Изменения здесь не сохраняются в проекте.</p>
+    <div class="preview-controls"><label><input id="previewOnline" type="checkbox" checked>Связь включена</label><button id="previewRestart" type="button">Перезапустить ПЛК</button><label><input id="previewAutomatic" type="checkbox" checked>Авто busy/result (2 секунды)</label></div>
+    <div class="preview-workspace"><section aria-label="Каналы предпросмотра"><h3>Значения каналов</h3><div id="previewChannels"></div><p id="previewStatus" role="status"></p><pre id="previewLog" aria-label="Журнал предпросмотра"></pre></section><iframe id="previewFrame" title="Веб-интерфейс предпросмотра" sandbox="allow-scripts"></iframe></div>
+  </dialog>
+  <script src="validation.js?v=validation-1"></script>
+  <script src="app.js?v=20261025-r6"></script>
+  <script src="preview.js?v=1"></script>
 </body>
 </html>

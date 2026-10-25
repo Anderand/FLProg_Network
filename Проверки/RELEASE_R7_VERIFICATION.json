@@ -1,0 +1,9 @@
+{
+  "tests": 23,
+  "preserved_files": 407,
+  "only_three_libraries": true,
+  "git_unchanged": true,
+  "firmware": "1.0.7 unchanged",
+  "editor_exe_sha256": "84ebef555e0bf09ec4c4ae2e3d1e81bbdd21621883b7fe7255652411088c2f8c",
+  "gui": "Project validation and offline preview tested in staged EXE; see release_r7_editor.png"
+}

@@ -1,0 +1,21 @@
+{
+  "limit": 2048,
+  "handlers": 14,
+  "responses": {
+    "/": 1410,
+    "/flprog-webui/app.css": 1807,
+    "/flprog-webui/scan.js": 811,
+    "/flprog-webui/widgets.js": 1161,
+    "/flprog-webui/controls.js?part=status": 1277,
+    "/flprog-webui/controls.js?part=commands": 1965,
+    "/flprog-webui/controls.js?part=fields": 674,
+    "/flprog-webui/controls.js?part=groups": 1430,
+    "/flprog-webui/controls.js?part=form-state": 1084,
+    "/flprog-webui/controls.js?part=form-apply": 738,
+    "/flprog-webui/controls.js": 1766,
+    "/flprog-webui/boot.js": 1202,
+    "/flprog-webui/boot-view.js": 852,
+    "/flprog-webui/elements.js": 1286,
+    "/flprog-webui/boot-init.js": 1052
+  }
+}

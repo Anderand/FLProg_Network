@@ -1,0 +1,211 @@
+{
+  "schema": "flprog.webui/1.0",
+  "project": {
+    "id": "fle4d_webui_test",
+    "title": "FLE4D WebUI 1.7.0"
+  },
+  "transport": {
+    "id": "w5500-http-1",
+    "port": 80
+  },
+  "theme": {
+    "background": "#111827",
+    "card": "#1f2937",
+    "text": "#e5e7eb",
+    "accent": "#6366f1"
+  },
+  "channels": [
+    {
+      "id": "setpoint",
+      "label": "setpoint",
+      "type": "float",
+      "direction": "duplex",
+      "index": 101,
+      "source": "user"
+    },
+    {
+      "id": "title",
+      "label": "title",
+      "type": "text",
+      "direction": "duplex",
+      "index": 102,
+      "source": "user"
+    },
+    {
+      "id": "run",
+      "label": "run",
+      "type": "bool",
+      "direction": "command",
+      "index": 103,
+      "source": "user"
+    },
+    {
+      "id": "actual",
+      "label": "actual",
+      "type": "float",
+      "direction": "publish",
+      "index": 104,
+      "source": "user"
+    },
+    {
+      "id": "busy",
+      "label": "busy",
+      "type": "bool",
+      "direction": "publish",
+      "index": 105,
+      "source": "user"
+    },
+    {
+      "id": "result",
+      "label": "result",
+      "type": "bool",
+      "direction": "publish",
+      "index": 106,
+      "source": "user"
+    },
+    {
+      "id": "commands",
+      "label": "commands",
+      "type": "int32",
+      "direction": "publish",
+      "index": 107,
+      "source": "user"
+    },
+    {
+      "id": "uptime",
+      "label": "uptime",
+      "type": "int32",
+      "direction": "publish",
+      "index": 108,
+      "source": "user"
+    },
+    {
+      "id": "running",
+      "label": "running",
+      "type": "bool",
+      "direction": "publish",
+      "index": 109,
+      "source": "user"
+    }
+  ],
+  "pages": [
+    {
+      "id": "main",
+      "title": "Тест WebUI 1.7.0",
+      "widgets": [
+        {
+          "id": "setpoint_field",
+          "type": "number-input",
+          "label": "Уставка",
+          "channel": "setpoint",
+          "group": "Поля ввода",
+          "x": 1,
+          "y": 1,
+          "w": 4,
+          "h": 2,
+          "min": 0,
+          "max": 100,
+          "step": 0.5,
+          "unit": "°C",
+          "placeholder": "От 0 до 100",
+          "maxLength": 20
+        },
+        {
+          "id": "title_field",
+          "type": "text-input",
+          "label": "Тестовое имя",
+          "channel": "title",
+          "group": "Поля ввода",
+          "x": 5,
+          "y": 1,
+          "w": 4,
+          "h": 2,
+          "placeholder": "Имя до 30 байт UTF-8",
+          "maxLength": 30
+        },
+        {
+          "id": "actual_value",
+          "type": "text",
+          "label": "Применённая уставка",
+          "channel": "actual",
+          "group": "Поля ввода",
+          "x": 9,
+          "y": 1,
+          "w": 4,
+          "h": 2,
+          "unit": "°C"
+        },
+        {
+          "id": "run_button",
+          "type": "button",
+          "label": "Тестовая команда",
+          "channel": "run",
+          "group": "Команды",
+          "x": 1,
+          "y": 1,
+          "w": 4,
+          "h": 2,
+          "confirmation": "Выполнить тестовую команду в памяти? Выходы ПЛК не меняются.",
+          "bindings": [
+            {
+              "role": "busy",
+              "channel": "busy",
+              "direction": "publish"
+            },
+            {
+              "role": "result",
+              "channel": "result",
+              "direction": "publish"
+            }
+          ]
+        },
+        {
+          "id": "running_value",
+          "type": "indicator",
+          "label": "Тестовый флаг",
+          "channel": "running",
+          "group": "Команды",
+          "x": 5,
+          "y": 1,
+          "w": 4,
+          "h": 2
+        },
+        {
+          "id": "count_value",
+          "type": "text",
+          "label": "Выполнено команд",
+          "channel": "commands",
+          "group": "Команды",
+          "x": 9,
+          "y": 1,
+          "w": 4,
+          "h": 2
+        },
+        {
+          "id": "uptime_value",
+          "type": "text",
+          "label": "Время работы",
+          "channel": "uptime",
+          "group": "Диагностика",
+          "x": 1,
+          "y": 1,
+          "w": 4,
+          "h": 2,
+          "unit": "с"
+        },
+        {
+          "id": "help",
+          "type": "static-text",
+          "label": "Проверка связи",
+          "channel": "",
+          "group": "Диагностика",
+          "x": 5,
+          "y": 1,
+          "w": 8,
+          "h": 2,
+          "options": "Отключите Ethernet на 10 с, затем подключите: проверьте статус связи."
+        }
+      ]
+    }
+  ]
+}

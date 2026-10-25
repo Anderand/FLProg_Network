@@ -848,7 +848,7 @@ bool FLProgNetworkHttpServer::feedByte(uint8_t slot, ClientContext &ctx, uint8_t
         ctx.line[ctx.lineLength] = 0;
         const bool result = consumeLine(slot, ctx);
         ctx.lineLength = 0;
-        ctx.line[0] = 0;
+        if (ctx.responseStructured != 2) ctx.line[0] = 0;
         return result;
     }
 
@@ -1058,6 +1058,16 @@ bool FLProgNetworkHttpServer::parseHeaderLine(ClientContext &ctx)
         copyBounded(pair.key, sizeof(pair.key), ctx.line);
         copyBounded(pair.value, sizeof(pair.value), value);
     }
+    else if (equalsIgnoreCase(ctx.line, "Accept-Encoding"))
+    {
+        // Keep content-negotiation even after Chromium fills the optional
+        // table. Reuse the last slot; no extra per-client RAM is allocated.
+        const uint8_t slot = ctx.headerCount < FLPROG_HTTP_SERVER_MAX_HEADERS ? ctx.headerCount++ : FLPROG_HTTP_SERVER_MAX_HEADERS - 1;
+        FLProgNetworkHttpServerPair &pair = ctx.headers[slot];
+        copyBounded(pair.key, sizeof(pair.key), ctx.line);
+        copyBounded(pair.value, sizeof(pair.value),
+            valueLength <= FLPROG_HTTP_SERVER_MAX_HEADER_VALUE_LENGTH ? value : "identity");
+    }
     else if (!_legacyAutoStart && !_browserHeaderCompatibility)
     {
         // Defensive fallback; native strict checks above should already have
@@ -1261,6 +1271,23 @@ void FLProgNetworkHttpServer::flushResponse(
     FLProgNetworkTcpServerClient &client,
     ClientContext &ctx)
 {
+    if (ctx.responseOffset >= ctx.responseLength && ctx.responseStructured == 2 &&
+        ctx.flash.offset < ctx.flash.length)
+    {
+        // Refill only the existing queue, and perform at most one bounded
+        // write per pool iteration. Partial/zero writes keep the same chunk.
+        size_t amount = ctx.flash.length - ctx.flash.offset;
+        if (amount > _writeBudget) amount = _writeBudget;
+        if (amount > 256U) amount = 256U;
+        if (amount > FLPROG_HTTP_SERVER_MAX_RESPONSE_BYTES) amount = FLPROG_HTTP_SERVER_MAX_RESPONSE_BYTES;
+        ctx.responseLength = 0;
+        ctx.responseOffset = 0;
+        if (!appendResponseProgmem(ctx, reinterpret_cast<const char *>(ctx.flash.data + ctx.flash.offset), amount))
+        {
+            client.stop(); ctx.state = FLPROG_HTTP_SERVER_STATE_CLOSING; return;
+        }
+        ctx.flash.offset += amount;
+    }
     if (ctx.responseOffset >= ctx.responseLength)
     {
         client.stop();
@@ -1593,6 +1620,33 @@ bool FLProgNetworkHttpServer::sendProgmem(
     return buildStructuredResponseProgmem(*ctx, statusCode, contentTypeValue, bodyValue, length, headRequest);
 }
 
+bool FLProgNetworkHttpServer::sendStreamProgmem(
+    int statusCode, const char *type, const void *data, uint32_t length,
+    const char *encoding)
+{
+    ClientContext *ctx = currentContext();
+    if (!ctx || _legacyAutoStart || (length && !data)) return false;
+    if (encoding && std::strcmp(encoding, "gzip") != 0) return false;
+    if (!type || !*type) type = "application/octet-stream";
+    ctx->responseLength = ctx->responseOffset = 0;
+    ctx->responseOverflow = false;
+    ctx->responseStructured = 1;
+    const size_t headerCapacity = sizeof(ctx->response) < 320U ? sizeof(ctx->response) : 320U;
+    const int count = std::snprintf(ctx->response, headerCapacity,
+        "HTTP/1.1 %d %s\r\nContent-Type: %s\r\nContent-Length: %lu\r\n%sConnection: close\r\n\r\n",
+        statusCode, reasonPhrase(statusCode), type, (unsigned long)length,
+        encoding ? "Content-Encoding: gzip\r\nVary: Accept-Encoding\r\n" : "");
+    if (count <= 0 || (size_t)count >= headerCapacity ||
+        (size_t)count > FLPROG_HTTP_SERVER_MAX_RESPONSE_BYTES) return false;
+    ctx->responseLength = (uint16_t)count;
+    if (ctx->method != FLPROG_WEB_SERVER_HEAD && length) {
+        ctx->flash.data = static_cast<const uint8_t *>(data);
+        ctx->flash.length = length; ctx->flash.offset = 0;
+        ctx->responseStructured = 2;
+    }
+    return true;
+}
+
 bool FLProgNetworkHttpServer::sendHeaderOnly(
     int statusCode,
     const char *contentTypeValue,
@@ -1780,7 +1834,7 @@ size_t FLProgNetworkHttpServer::write(const uint8_t *buffer, size_t size)
     }
 
     ClientContext *ctx = currentContext();
-    if (ctx == nullptr || buffer == nullptr || size == 0) return 0;
+    if (ctx == nullptr || buffer == nullptr || size == 0 || ctx->responseStructured == 2) return 0;
     return appendResponse(*ctx, buffer, size) ? size : 0;
 }
 

@@ -7,6 +7,7 @@ writes into FLProg_Network and never modifies the original .flpui document.
 import argparse
 import json
 import re
+import math
 from pathlib import Path
 from typing import Dict, List, Tuple
 
@@ -41,6 +42,12 @@ def c_string(value: str) -> str:
 def _widget_config(item: Dict, labels: Dict[str, str]) -> Dict:
     channel = str(item.get("channel", ""))
     return {
+        "id": str(item.get("id", "")),
+        "group": str(item.get("group", "")),
+        "placeholder": str(item.get("placeholder", "")),
+        "unit": str(item.get("unit", "")),
+        "maxLength": int(item.get("maxLength", 63)),
+        "confirmation": str(item.get("confirmation", "Отправить команду?" if item.get("type") == "button" else "")),
         "type": str(item.get("type", "")),
         "label": str(item.get("label") or labels.get(channel, channel)),
         "channel": channel,
@@ -78,7 +85,7 @@ def estimate_http_buffers(document: Dict, channels: List[Dict]) -> Tuple[int, in
     return config_bytes, state_bytes
 
 
-def validate(document: Dict) -> Tuple[str, List[Dict]]:
+def _validate_legacy(document: Dict) -> Tuple[str, List[Dict]]:
     if document.get("schema") != "flprog.webui/1.0":
         raise ValueError("Ожидается schema: flprog.webui/1.0")
     project_id = str(document.get("project", {}).get("id", "")).strip()
@@ -203,10 +210,20 @@ def validate(document: Dict) -> Tuple[str, List[Dict]]:
                 raise ValueError(f"weekdays требует int32-канал: {channel_id}")
             if kind == "select" and not str(widget.get("options", "")).strip():
                 raise ValueError(f"select требует options (варианты через ;): {channel_id}")
+            if not 1 <= int(widget.get("maxLength", 63)) <= 63:
+                raise ValueError("Длина поля: от 1 до 63 байт UTF-8")
+            numbers = [float(widget.get(k, d)) for k, d in (("min", 0), ("max", 100), ("step", 1))]
+            if not all(math.isfinite(v) for v in numbers) or numbers[0] > numbers[1] or numbers[2] <= 0:
+                raise ValueError("Диапазон: конечные min <= max и step > 0")
+            if kind == "number-input" and channel["type"] == "int32" and any(v != int(v) for v in numbers):
+                raise ValueError("Целочисленное поле требует целые min, max и step")
             x, y = int(widget.get("x", 1)), int(widget.get("y", 1))
             w, h = int(widget.get("w", 4)), int(widget.get("h", 2))
             if not (1 <= x <= 12 and y >= 1 and 1 <= w <= 12 and 1 <= h <= 12 and x + w <= 13):
                 raise ValueError(f"Некорректная сетка виджета {widget.get('id', channel_id)}")
+    widget_ids = [str(w.get("id", "")) for pg in pages for w in pg.get("widgets", [])]
+    if any(not wid for wid in widget_ids) or len(set(widget_ids)) != len(widget_ids):
+        raise ValueError("ID элементов должны быть непустыми и уникальными в проекте")
     if widget_count == 0:
         raise ValueError("Нужен хотя бы один виджет")
     if widget_count > 255:
@@ -218,7 +235,7 @@ def validate(document: Dict) -> Tuple[str, List[Dict]]:
         if len(str(page.get("id", "")).encode("utf-8")) > 120 or len(str(page.get("title") or page.get("id", "")).encode("utf-8")) > 180:
             raise ValueError("Слишком длинное имя страницы; id максимум 120, название максимум 180 байт")
         for widget in page.get("widgets", []):
-            fields = ("id", "type", "label", "channel", "icon", "color", "size", "options", "code")
+            fields = ("id", "type", "label", "channel", "icon", "color", "size", "options", "code", "group", "placeholder", "unit", "confirmation")
             if any(len(str(widget.get(key, "")).encode("utf-8")) > 180 for key in fields):
                 raise ValueError(f"Слишком длинное свойство виджета {widget.get('id', '?')}; максимум 180 байт")
     # Every descriptor is served separately by /item. Validate the complete
@@ -239,6 +256,15 @@ def validate(document: Dict) -> Tuple[str, List[Dict]]:
     if len(meta) > HTTP_ITEM_BYTES:
         raise ValueError("Слишком большая тема для безопасного HTTP-ответа")
     return project_id, channels
+
+
+def validate(document: Dict) -> Tuple[str, List[Dict]]:
+    from project_validation import validate_project
+    report = validate_project(document)
+    errors = [issue for issue in report["issues"] if issue["severity"] == "error"]
+    if errors:
+        raise ValueError(errors[0]["message"])
+    return _validate_legacy(document)
 
 
 def descriptor(project_id: str, channels: List[Dict], pages: List[Dict], theme: Dict) -> str:
@@ -282,7 +308,7 @@ def descriptor(project_id: str, channels: List[Dict], pages: List[Dict], theme: 
             layout = (max(1, min(12, int(item.get("x", 1)))), max(1, min(99, int(item.get("y", 1)))), max(1, min(12, int(item.get("w", 4)))), max(1, min(12, int(item.get("h", 2)))))
             bindings = item.get("bindings", [])
             binding_ref = "bindings_%d" % binding_index if bindings else "0"
-            rows.append("    {" + ", ".join(c_string(value) for value in values) + ", " + ", ".join(str(value) + "f" for value in numbers) + ", " + ", ".join(str(value) for value in layout) + ", " + c_string(str(page.get("id", "main"))) + ", " + c_string(str(item.get("options", ""))) + ", " + c_string(str(item.get("code", ""))) + ", " + binding_ref + ", " + str(len(bindings)) + "},")
+            rows.append("    {" + ", ".join(c_string(value) for value in values) + ", " + ", ".join(str(value) + "f" for value in numbers) + ", " + ", ".join(str(value) for value in layout) + ", " + c_string(str(page.get("id", "main"))) + ", " + c_string(str(item.get("options", ""))) + ", " + c_string(str(item.get("code", ""))) + ", " + binding_ref + ", " + str(len(bindings)) + ", " + ", ".join(c_string(str(item.get(k, ""))) for k in ("group", "placeholder", "unit")) + ", " + str(int(item.get("maxLength", 63))) + ", " + c_string(str(item.get("confirmation", "Отправить команду?" if item.get("type") == "button" else ""))) + "},")
             binding_index += 1
     rows += [
         "};",

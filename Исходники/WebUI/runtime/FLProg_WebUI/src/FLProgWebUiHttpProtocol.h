@@ -6,6 +6,8 @@
 #include "FLProgWebUi.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <math.h>
 
 class FLProgWebUiHttpProtocol {
 public:
@@ -42,11 +44,23 @@ public:
     }
     bool write(const char *channel, const char *value) {
         const int16_t index=_model.indexOf(channel); if (index < 0 || !value || _model.directionAt((uint8_t)index) == FLPROG_WEBUI_PUBLISH) return false;
+        char *end = 0;
+        errno = 0;
         switch (_model.typeAt((uint8_t)index)) {
-            case FLPROG_WEBUI_BOOL: return _model.queueBool(index, eq(value,"1") || eq(value,"true") || eq(value,"on"));
-            case FLPROG_WEBUI_INT32: return _model.queueInt(index, (int32_t)strtol(value, 0, 10));
-            case FLPROG_WEBUI_FLOAT: return _model.queueFloat(index, strtof(value, 0));
-            default: return _model.queueText(index, value);
+            case FLPROG_WEBUI_BOOL:
+                if (!(eq(value,"1") || eq(value,"true") || eq(value,"on") || eq(value,"0") || eq(value,"false") || eq(value,"off"))) return false;
+                return _model.queueBool(index, eq(value,"1") || eq(value,"true") || eq(value,"on"));
+            case FLPROG_WEBUI_INT32: {
+                const long number = strtol(value, &end, 10);
+                if (!*value || end == value || *end || errno || number < INT32_MIN || number > INT32_MAX) return false;
+                return _model.queueInt(index, (int32_t)number);
+            }
+            case FLPROG_WEBUI_FLOAT: {
+                const float number = strtof(value, &end);
+                if (!*value || end == value || *end || errno || !isfinite(number)) return false;
+                return _model.queueFloat(index, number);
+            }
+            default: return strlen(value) < FLPROG_WEBUI_TEXT_BYTES && _model.queueText(index, value);
         }
     }
 private:
@@ -57,7 +71,7 @@ private:
         void put(char c) { if (!_ok || _at+1>=_size) {_ok=false; return;} _out[_at++]=c; _out[_at]=0; }
         void puts(const char *s) { while (s && *s) put(*s++); }
         void number(int32_t value) { char b[16]; snprintf(b,sizeof(b),"%ld",(long)value); puts(b); }
-        void decimal(float value) { char b[24]; snprintf(b,sizeof(b),"%.3f",(double)value); puts(b); }
+        void decimal(float value) { if (!isfinite(value)) { puts("null"); return; } char b[64]; dtostrf(value,1,3,b); puts(b); }
         void json(const char *s) { put('"'); for (;s && *s;++s) { if (*s=='"'||*s=='\\') put('\\'); if ((unsigned char)*s<0x20) put(' '); else put(*s); } put('"'); }
     private: char *_out; size_t _size,_at; bool _ok;
     };

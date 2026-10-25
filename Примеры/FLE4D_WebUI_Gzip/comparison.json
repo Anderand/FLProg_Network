@@ -1,0 +1,19 @@
+{
+  "plain": {
+    "flash": 137040,
+    "static_ram": 16112,
+    "bin_bytes": 137524,
+    "sha256": "fec8e63020021f27eda2a70f4e7fae3c7d36f80b37ecaa28f9561c813a6f92a6"
+  },
+  "gzip": {
+    "flash": 130856,
+    "static_ram": 16112,
+    "bin_bytes": 131340,
+    "sha256": "93de5076b00e298db66e16784dd7c91b74a7a27e6ab64b07dbb2f556ca2aaea6"
+  },
+  "flash_delta": -6184,
+  "static_ram_delta": 0,
+  "bin_bytes_delta": -6184,
+  "assets_raw_bytes": 17063,
+  "assets_gzip_bytes": 9560
+}

@@ -1,0 +1,21 @@
+{
+  "tests": 25,
+  "preserved_files": 257,
+  "network_changed_files": [
+    "Библиотека/FLProg_Network/src/service/flprogNetworkHttpServer.cpp"
+  ],
+  "only_three_libraries": true,
+  "git_unchanged": true,
+  "flash": {
+    "plain": 137040,
+    "gzip": 130856,
+    "delta": -6184
+  },
+  "static_ram": {
+    "plain": 16112,
+    "gzip": 16112,
+    "delta": 0
+  },
+  "gzip_bin_sha256": "93de5076b00e298db66e16784dd7c91b74a7a27e6ab64b07dbb2f556ca2aaea6",
+  "editor_exe_sha256": "674b5dc987fc58fb04371b057c280f6af8bb5938f6f0fc0da0d1ce3e9a421a63"
+}

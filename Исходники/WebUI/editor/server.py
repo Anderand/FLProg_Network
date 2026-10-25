@@ -45,6 +45,8 @@ FLPROG_LIBRARIES = Path(r"C:\F-981\FLProg\ideV8\portable\sketchbook\libraries")
 FLPROG_LIBRARIES = Path(os.environ.get("FLPROG_LIBRARIES", str(FLPROG_LIBRARIES)))
 sys.path.insert(0, str(RESOURCE_ROOT / "tools"))
 import build_project_package
+from project_validation import validate_project
+from preview_project import preview_html
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -62,6 +64,8 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header("Content-Length", str(len(raw))); self.end_headers(); self.wfile.write(raw)
 
     def do_GET(self):
+        if self.path == "/api/demo-preview":
+            return self.reply(200, json.loads((RESOURCE_ROOT / "projects" / "preview_busy_demo.flpui").read_text(encoding="utf-8")))
         if self.path == "/api/demo":
             # Keep the editor's smoke test identical to the package currently
             # installed under the stable demo_controller identifier.  This lets
@@ -82,10 +86,24 @@ class Handler(SimpleHTTPRequestHandler):
         return super().do_GET()
 
     def do_POST(self):
-        if self.path not in ("/api/save", "/api/build"): return self.reply(404, {"error":"unknown API"})
+        if self.path not in ("/api/save", "/api/build", "/api/validate", "/api/preview"): return self.reply(404, {"error":"unknown API"})
         try:
             raw = self.rfile.read(int(self.headers.get("Content-Length", "0")))
             data = json.loads(raw.decode("utf-8"))
+            if self.path == "/api/preview":
+                return self.reply(200, {"html": preview_html(data, RESOURCE_ROOT)})
+            allow_warnings = False
+            if self.path == "/api/build" and isinstance(data, dict) and isinstance(data.get("document"), dict):
+                allow_warnings = data.get("allowWarnings") is True
+                data = data["document"]
+            if self.path in ("/api/validate", "/api/build"):
+                report = validate_project(data)
+                if self.path == "/api/validate":
+                    return self.reply(200, report)
+                if report["summary"]["errors"]:
+                    return self.reply(422, dict(report, error="Исправьте ошибки проекта перед сборкой"))
+                if report["summary"]["warnings"] and not allow_warnings:
+                    return self.reply(409, dict(report, error="Проверьте предупреждения перед сборкой"))
             if data.get("schema") != "flprog.webui/1.0": raise ValueError("Неверная схема проекта")
             project_id = str(data.get("project", {}).get("id", "")).strip()
             if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]{1,63}", project_id):
@@ -120,7 +138,7 @@ class Handler(SimpleHTTPRequestHandler):
 
 if __name__ == "__main__":
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8766
-    print("FLProg Web UI Editor 1.0: http://127.0.0.1:%d" % port)
+    print("FLProg Web UI Editor — проверка проекта: http://127.0.0.1:%d" % port)
     # The portable Windows editor is launched by double click.  Open the
     # browser only after the listener has had time to bind its local port.
     if getattr(sys, "frozen", False) and '--no-browser' not in sys.argv:

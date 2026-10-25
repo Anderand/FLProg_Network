@@ -11,7 +11,7 @@
 #include <string.h>
 
 #ifndef FLPROG_WEBUI_RUNTIME_VERSION
-#define FLPROG_WEBUI_RUNTIME_VERSION "1.6.3-20261024"
+#define FLPROG_WEBUI_RUNTIME_VERSION "1.7.0-20261024"
 #endif
 
 // WPA2 passwords may contain up to 63 characters. Keep one terminating byte
@@ -64,6 +64,13 @@ struct FLProgWebUiWidgetDescriptor {
     // Optional project generated bindings. Kept trailing for old packages.
     const FLProgWebUiBindingDescriptor *bindings;
     uint8_t bindingCount;
+    // Optional 1.7 fields; old aggregate initializers zero-initialize these.
+    const char *group;
+    const char *placeholder;
+    const char *unit;
+    uint8_t maxLength; // UTF-8 bytes, 0 = text slot capacity minus terminator.
+    const char *confirmation; // Empty = no extra confirmation dialog.
+
 };
 
 // Page labels are project data.  Keep them separate from widgets so device
@@ -110,11 +117,11 @@ public:
     bool publishText(uint8_t index, const char *value) { if (!valid(index, FLPROG_WEBUI_TEXT)) return false; const char *source = value ? value : ""; if (strcmp(_slots[index].value.text, source) != 0) { strncpy(_slots[index].value.text, source, sizeof(_slots[index].value.text)-1); _slots[index].value.text[sizeof(_slots[index].value.text)-1] = 0; touch(index); } return true; }
 
     // Used only by a future transport after validating an incoming command.
-    bool queueBool(uint8_t index, bool value) { if (!valid(index, FLPROG_WEBUI_BOOL)) return false; _slots[index].value.booleanValue=value; _slots[index].pending=true; return true; }
+    bool queueBool(uint8_t index, bool value) { if (!valid(index, FLPROG_WEBUI_BOOL)) return false; _slots[index].value.booleanValue=value; _slots[index].pending=true; touch(index); return true; }
     bool takeBool(uint8_t index, bool &value) { if (!pending(index, FLPROG_WEBUI_BOOL)) return false; value=_slots[index].value.booleanValue; _slots[index].pending=false; return true; }
-    bool queueInt(uint8_t index, int32_t value) { if (!valid(index, FLPROG_WEBUI_INT32)) return false; _slots[index].value.intValue=value; _slots[index].pending=true; return true; }
+    bool queueInt(uint8_t index, int32_t value) { if (!valid(index, FLPROG_WEBUI_INT32)) return false; _slots[index].value.intValue=value; _slots[index].pending=true; touch(index); return true; }
     bool takeInt(uint8_t index, int32_t &value) { if (!pending(index, FLPROG_WEBUI_INT32)) return false; value=_slots[index].value.intValue; _slots[index].pending=false; return true; }
-    bool queueFloat(uint8_t index, float value) { if (!valid(index, FLPROG_WEBUI_FLOAT)) return false; _slots[index].value.floatValue=value; _slots[index].pending=true; return true; }
+    bool queueFloat(uint8_t index, float value) { if (!valid(index, FLPROG_WEBUI_FLOAT)) return false; _slots[index].value.floatValue=value; _slots[index].pending=true; touch(index); return true; }
     bool takeFloat(uint8_t index, float &value) { if (!pending(index, FLPROG_WEBUI_FLOAT)) return false; value=_slots[index].value.floatValue; _slots[index].pending=false; return true; }
     bool queueText(uint8_t index, const char *value) { if (!publishText(index, value)) return false; _slots[index].pending=true; return true; }
     bool takeText(uint8_t index, char *out, uint8_t outSize) { if (!pending(index, FLPROG_WEBUI_TEXT) || !out || outSize == 0) return false; strncpy(out, _slots[index].value.text, outSize-1); out[outSize-1]=0; _slots[index].pending=false; return true; }

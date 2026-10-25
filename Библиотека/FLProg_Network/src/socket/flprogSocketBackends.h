@@ -92,7 +92,7 @@
 // many seconds after a browser aborts a refresh. Bound the graceful phase;
 // outbound/client sockets keep their historical close behavior.
 #ifndef FLPROG_WIZNET_SERVER_GRACEFUL_CLOSE_MS
-#define FLPROG_WIZNET_SERVER_GRACEFUL_CLOSE_MS 500UL
+#define FLPROG_WIZNET_SERVER_GRACEFUL_CLOSE_MS 5000UL
 #endif
 
 #define FLPROG_TCP_BACKEND_EVENT_NONE            0

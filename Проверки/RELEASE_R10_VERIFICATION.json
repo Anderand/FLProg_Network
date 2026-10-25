@@ -1,0 +1,16 @@
+{
+  "tests": 25,
+  "git_unchanged": true,
+  "preserved_files": 278,
+  "network_changed_files": [
+    "Библиотека/FLProg_Network/src/service/flprogNetworkHttpServer.cpp",
+    "Библиотека/FLProg_Network/src/service/flprogNetworkHttpServer.h",
+    "Библиотека/FLProg_Network/src/socket/flprogSocketBackends.h"
+  ],
+  "only_three_libraries": true,
+  "flash": 131136,
+  "static_ram": 16112,
+  "http_context_bytes": 6120,
+  "bin_sha256": "80758a0c42717844c093a1f7f82b233db18f7119177b83e7a1576c31f5632184",
+  "editor_sha256": "48b313279371298afb7c9734034d1dc58b014c2472a0b78c7829fbd8aa12fa78"
+}

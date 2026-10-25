@@ -1,0 +1,12 @@
+{
+  "tests": 26,
+  "git_unchanged": true,
+  "preserved_files": 435,
+  "only_three_libraries": true,
+  "flash": 133840,
+  "static_ram": 16112,
+  "http_assets": 19,
+  "http_routes": 14,
+  "bin_sha256": "4dd7d62c6ca069cfa0a023cb2d309489e38d7e5aa69bdeeb53ddff773fa200d8",
+  "editor_sha256": "32d4e95d27dc9a6e4931deef9072c241f50733ccea63b642bed39cbb2e1a40a3"
+}

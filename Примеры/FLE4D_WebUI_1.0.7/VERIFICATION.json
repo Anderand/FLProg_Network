@@ -1,0 +1,14 @@
+{
+  "version": "1.0.7-WEBUI1.7",
+  "webui": "1.7.0",
+  "bytes": 137524,
+  "sha256": "2436f2d5019e432da1c3b850136970e7f077ce1a971e9cfa48d7669af1831030",
+  "app_address": "0x08010000",
+  "stack": "0x20020000",
+  "entry": "0x8025835",
+  "uploaded": true,
+  "hardware_test": "FIELD_SYNC_RESULT.md",
+  "restart_test": "same-image OTA, browser not reloaded",
+  "test_result": "PASS",
+  "reset": "automatic"
+}

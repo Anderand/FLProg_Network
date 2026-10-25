@@ -11,8 +11,10 @@ def embedded_assets(adapter):
     text = Path(adapter).read_text(encoding="utf-8")
     handlers = dict((callback, path) for path, callback in re.findall(
         r'server\.addHandler\("([^"]+)",\s*(\w+),', text))
+    routes = dict(handlers)
+    routes.update(re.findall(r'// asset-route: (\w+) (\S+)', text))
     pattern = (r'static void FLPROG_WEBUI_HTTP_FLASH (\w+)'
-               r'\(FLProgNetworkHttpServer \*value\)\s*\{\s*'
+               r'\(FLProgNetworkHttpServer \*value\)\s*\{(?:.*?)(?=static const char asset)\s*'
                r'static const char asset\[\] PROGMEM =\s*'
                r'((?:"(?:\\.|[^"\\])*"\s*)+);'
                r'(.*?)value->sendProgmem\(200, "([^"]+)", asset\);')
@@ -20,7 +22,7 @@ def embedded_assets(adapter):
     for match in re.finditer(pattern, text, re.S):
         callback, strings, guard, content_type = match.groups()
         body = "".join(ast.literal_eval(s) for s in re.findall(r'"(?:\\.|[^"\\])*"', strings))
-        assets[handlers[callback]] = {"body": body, "type": content_type,
+        assets[routes[callback]] = {"body": body, "type": content_type,
                                      "compile_guard": "static_assert" in guard}
     if not assets:
         raise AssertionError("No embedded resources found")

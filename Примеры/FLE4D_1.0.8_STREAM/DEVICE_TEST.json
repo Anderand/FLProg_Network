@@ -1,0 +1,40 @@
+{
+  "identity": {
+    "bytes": 131072,
+    "sha256": "1bb661a4392873e940ffdb8b7c821c2901176a9377508913cbcf1f773091b3e2",
+    "seconds": 0.45300000003771856
+  },
+  "gzip": {
+    "bytes": 17255,
+    "sha256": "99c1ea24aed0545a0781a9d1fe3dd2fe2ab98961bca51d35b94944d995ca3c0f",
+    "seconds": 0.06300000002374873
+  },
+  "slow_reader_seconds": 7.922000000020489,
+  "aborts_recovered": 4,
+  "stall_timeout_recovered": true,
+  "ota_identity_during_stall_seconds": [
+    0.03200000000651926,
+    0.015000000013969839,
+    0.0,
+    0.0,
+    0.031000000017229468,
+    0.014999999955762178,
+    0.01600000000325963,
+    0.01600000000325963
+  ],
+  "state_after": {
+    "uptime": 35598,
+    "revision": 38,
+    "values": {
+      "setpoint": 25.0,
+      "title": "FLE4D test",
+      "actual": 25.0,
+      "run": false,
+      "busy": false,
+      "result": false,
+      "running": false,
+      "commands": 0,
+      "uptime": 35
+    }
+  }
+}

@@ -4,8 +4,8 @@
 #include <adapters/FLProgWebUiEsp8266Http.h>
 
 // Local test configuration. Do not publish this sketch with credentials.
-const char *WIFI_SSID = "YOUR_WIFI_SSID";
-const char *WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
+const char *WIFI_SSID = "Ud721";
+const char *WIFI_PASSWORD = "214365870916";
 const IPAddress LOCAL_IP(192, 168, 100, 217);
 const IPAddress DNS_IP(192, 168, 100, 1);
 const IPAddress GATEWAY_IP(192, 168, 100, 1);
