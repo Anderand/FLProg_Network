@@ -1,0 +1,24 @@
+{
+  "cold_ms": 2448,
+  "warm_ms": [
+    1406,
+    1765,
+    1393,
+    1373,
+    1119
+  ],
+  "timing_scope": "inline root bootstrap to metadata, widgets and first state; excludes TCP navigation before HTML execution",
+  "warm_after_stress_ms": [
+    1694,
+    979,
+    1241,
+    1237,
+    993,
+    1249,
+    1376,
+    1230,
+    1003,
+    999
+  ],
+  "warm_after_stress_navigation_ms": 991
+}

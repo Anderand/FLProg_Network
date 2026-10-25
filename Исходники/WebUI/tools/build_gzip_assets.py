@@ -14,7 +14,13 @@ def generate():
     text=re.sub(r'#if FLPROG_WEBUI_GZIP_ASSETS\n.*?\n#else\n', '', text, flags=re.S)
     text=text.replace('\n#endif // FLPROG_WEBUI_GZIP_ASSETS','')
     assets,_=embedded_assets(ADAPTER)
-    pattern=r'(static void FLPROG_WEBUI_HTTP_FLASH (\w+)\(FLProgNetworkHttpServer \*value\)\s*\{.*?)(static const char asset\[\] PROGMEM =.*?value->sendProgmem\(200, "([^"]+)", asset\);)'
+    normalized={k:re.sub(r'webui175-[0-9a-f]{12}', 'webui175-VERSION',v['body']) for k,v in assets.items()}
+    version='webui175-'+hashlib.sha256(json.dumps(normalized,sort_keys=True,ensure_ascii=False).encode('utf-8')).hexdigest()[:12]
+    text=re.sub(r'webui175-[0-9a-f]{12}',version,text)
+    ADAPTER.write_text(text,encoding='utf-8')
+    assets,_=embedded_assets(ADAPTER)
+    (ADAPTER.parent/'FLProgWebUiAssetVersion.h').write_text('#pragma once\n#define FLPROG_WEBUI_ASSET_VERSION "'+version+'"\n',encoding='utf-8')
+    pattern=r'(static void FLPROG_WEBUI_HTTP_FLASH (\w+)\(FLProgNetworkHttpServer \*value\)\s*\{.*?)(static const char asset\[\] PROGMEM =.*?flprogWebUiSendIdentity\(value, "([^"]+)", asset\);)'
     callbacks=dict((callback,path) for path,callback in re.findall(r'server.addHandler\("([^"]+)",\s*(\w+),',text))
     callbacks.update(re.findall(r'// asset-route: (\w+) (\S+)',text))
     measurements={}

@@ -153,7 +153,7 @@
   },
   "C++/FLProg_Network/src/service/flprogNetworkHttpServer.h": {
     "source": "Библиотека/FLProg_Network/src/service/flprogNetworkHttpServer.h",
-    "sha256": "e8bf8706317dbbdabc4564edf9952bc348c0035cce498ed3a7c8a9975a13d480"
+    "sha256": "3b9c29ada1318a7d2e544ea670f9bdd44d61dcb8f36e6279271060be7521b765"
   },
   "C++/FLProg_Network/src/service/flprogNetworkMqttBlockBridge.h": {
     "source": "Библиотека/FLProg_Network/src/service/flprogNetworkMqttBlockBridge.h",
@@ -253,11 +253,11 @@
   },
   "C++/FLProg_WebUI/src/adapters/FLProgWebUiFlprogNetworkPagedHttp.h": {
     "source": "Библиотека/FLProg_WebUI/src/adapters/FLProgWebUiFlprogNetworkPagedHttp.h",
-    "sha256": "7a85ed6762523db7aad1cbfce2b714d72b44116cc2320a70211e048c2b41a41f"
+    "sha256": "3601626e875284a8587371a0240059244c6d4bb7205c8aae84d77edc06a17918"
   },
   "C++/FLProg_WebUI/src/adapters/FLProgWebUiGzipHttp.h": {
     "source": "Библиотека/FLProg_WebUI/src/adapters/FLProgWebUiGzipHttp.h",
-    "sha256": "dc4d50b5a427aac2d408718c35b222da51d5d019e1843652a4aaffa86fc37c82"
+    "sha256": "3585a681a5c8ffd8dcfdca5fb2269a38cfebf94ec563483246ea15ac6c662cc9"
   },
   "C++/FLProg_WebUI/user_blocks/README_EN.md": {
     "source": "Библиотека/FLProg_WebUI/user_blocks/README_EN.md",
@@ -349,7 +349,7 @@
   },
   "Справка/OTA_МЕНЕДЖЕР.md": {
     "source": "Документация/OTA_МЕНЕДЖЕР.md",
-    "sha256": "8dd66934bef060b658854e895b31fb197d723fb10b55126c0ecbffdfb4948ef0"
+    "sha256": "a98adfb6500b39bb08daa9025b43b28855041aab9513799724021b7edff7b59e"
   },
   "Справка/БЛОКИ.md": {
     "source": "Документация/БЛОКИ.md",
@@ -357,6 +357,14 @@
   },
   "Справка/РАЗРАБОТЧИКУ.md": {
     "source": "Документация/РАЗРАБОТЧИКУ.md",
-    "sha256": "b101bb4c54fd20c14f522f6ac541d571ea4770bbe9007ecd418e69e81c6f09f2"
+    "sha256": "ba65afb706322074c16bb782eb63e3be06743b1b5ec645f14debf9673ad1c4c5"
+  },
+  "C++/FLProg_WebUI/src/adapters/FLProgWebUiAssetVersion.h": {
+    "source": "Библиотека/FLProg_WebUI/src/adapters/FLProgWebUiAssetVersion.h",
+    "sha256": "301c0410b40b59122013b129851096d7a179377ac90bb9581cbff469d64825f2"
+  },
+  "Справка/LOAD_RU.md": {
+    "source": "Документация/LOAD_RU.md",
+    "sha256": "e44fafd678e4fff650fa1bccf966e9f9f3030ab4b819b4c495a87442a2de80dd"
   }
 }

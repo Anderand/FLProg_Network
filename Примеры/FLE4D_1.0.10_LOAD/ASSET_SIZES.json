@@ -1,0 +1,122 @@
+{
+  "/": {
+    "raw": 1368,
+    "gzip": 881,
+    "http_bytes": 1027,
+    "sha256": "9db1b727b4994b92001a16db13f02d1b88058d81bd1c90be2a7491268c878366"
+  },
+  "/flprog-webui/app.css": {
+    "raw": 1723,
+    "gzip": 738,
+    "http_bytes": 868,
+    "sha256": "5fe6daf6248d9f2b1e6aa2112d9ffc456dde5d5bd7cff04c101c6719012ad392"
+  },
+  "/flprog-webui/scan.js": {
+    "raw": 714,
+    "gzip": 472,
+    "http_bytes": 616,
+    "sha256": "ca1136233f2d7f6250e49de9d43641b00a05c784b1a8e1a8ade258d218075aac"
+  },
+  "/flprog-webui/widgets.js": {
+    "raw": 1063,
+    "gzip": 568,
+    "http_bytes": 712,
+    "sha256": "2774d69e93a9ecd65067e096aea6d5f2f0a23bc7754ede365386152ae48d7a56"
+  },
+  "/flprog-webui/controls.js?part=loader": {
+    "raw": 1134,
+    "gzip": 591,
+    "http_bytes": 735,
+    "sha256": "21377ff535daab086a031837cafc219c8f15c19769a9b9a4fb753ec3339d4f41"
+  },
+  "/flprog-webui/controls.js?part=status": {
+    "raw": 1303,
+    "gzip": 830,
+    "http_bytes": 974,
+    "sha256": "14de83c8ddbdb079c2e751d7e270f508a697e3185a90dd2b9284d42c84666aba"
+  },
+  "/flprog-webui/controls.js?part=commands": {
+    "raw": 1773,
+    "gzip": 839,
+    "http_bytes": 983,
+    "sha256": "80ea8cc750c623452028f44bf019e5a04cb1c12fd6227d8d7b7a0224a63860ed"
+  },
+  "/flprog-webui/controls.js?part=fields": {
+    "raw": 577,
+    "gzip": 370,
+    "http_bytes": 514,
+    "sha256": "584ab663580c2d19e53f26cadec3c395721cb95da91ee371a875a513eb97bfc3"
+  },
+  "/flprog-webui/controls.js?part=groups": {
+    "raw": 1332,
+    "gzip": 680,
+    "http_bytes": 824,
+    "sha256": "eef8c7a9c9e567038617504a5446e2e7b2d738c3ef7764f1864ccd4070bbd7bb"
+  },
+  "/flprog-webui/controls.js?part=form-state": {
+    "raw": 987,
+    "gzip": 574,
+    "http_bytes": 718,
+    "sha256": "166d9d690f2dbec211c2921761acb081a6ce9a0565048efbc39f73f906fedb54"
+  },
+  "/flprog-webui/controls.js?part=form-apply": {
+    "raw": 723,
+    "gzip": 492,
+    "http_bytes": 636,
+    "sha256": "e22f7b5a1c038c91b5cfbb18f5aab7b8b537e50ad0b915a16f838019847b1e38"
+  },
+  "/flprog-webui/controls.js?part=confirm": {
+    "raw": 589,
+    "gzip": 458,
+    "http_bytes": 602,
+    "sha256": "87b6b62300e96ee94ac5fe35b0a5534cfba3c86342b1c2253539bdb19577fb5a"
+  },
+  "/flprog-webui/controls.js?part=notice-view": {
+    "raw": 1622,
+    "gzip": 819,
+    "http_bytes": 963,
+    "sha256": "206b2ef3ff5f5f81bb3f8cb1e9cb51bc3b3148ee6ab39310b4c4bb6a19bfd69f"
+  },
+  "/flprog-webui/controls.js?part=notice-track": {
+    "raw": 1383,
+    "gzip": 681,
+    "http_bytes": 825,
+    "sha256": "d36bdf096b6a166e1f1d02e7b9e14c0d0b25bb9a7e3ea27133d31a918dcbd649"
+  },
+  "/flprog-webui/controls.js?part=notice-sync": {
+    "raw": 1435,
+    "gzip": 724,
+    "http_bytes": 868,
+    "sha256": "036d2bd496de59be6c0cbffe46ef8e5509a61c3d3ea00e454ab29543367ca94a"
+  },
+  "/flprog-webui/controls.js": {
+    "raw": 1668,
+    "gzip": 836,
+    "http_bytes": 980,
+    "sha256": "c420a2e58b10412a3653845c6c9e9e788a60b130dbe49b4cf584cc13536ebea7"
+  },
+  "/flprog-webui/boot.js": {
+    "raw": 1209,
+    "gzip": 697,
+    "http_bytes": 841,
+    "sha256": "a31ef1d6e5ccd4b72a639b80f5ff390a767a032b2cb9ebbf00f926ef50ebc97f"
+  },
+  "/flprog-webui/boot-view.js": {
+    "raw": 755,
+    "gzip": 445,
+    "http_bytes": 589,
+    "sha256": "ffdd24d76aad0270e1a763fe74c0c2068376b7d03fcfb6eaef2cdeb2778add3d"
+  },
+  "/flprog-webui/elements.js": {
+    "raw": 1188,
+    "gzip": 601,
+    "http_bytes": 745,
+    "sha256": "d31e3c82ccdd378ca488d073e61939e8bec542a40713be3b3ea2a4f53d4ff4a8"
+  },
+  "/flprog-webui/boot-init.js": {
+    "raw": 1071,
+    "gzip": 610,
+    "http_bytes": 754,
+    "sha256": "64cdc1353dbbe8632b90c5bc04b43bc6fe262d1d0c41e720315ae6e1bb512e69"
+  }
+}

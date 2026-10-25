@@ -1,0 +1,17 @@
+# COMPAT FIX2 MODBUS SERVER
+
+RC6-A dev.14-fix2 — Legacy Modbus/TCP compatibility bridge
+
+Changes from dev.14-fix1:
+1. Added FLProgEthernetServer compatibility adapter backed by FLProgNetworkTcpServer/A3.
+2. flprogEthernet.h now exports FLProgEthernetServer and flprogUtilites legacy constants.
+3. Corrected FLProgEthernetClient result translation:
+   legacy ERROR=0, SUCCESS=1, WAIT=2 versus native A3 SUCCESS=0, WAIT=1, ERROR=2.
+4. Corrected FLProgEthernetClient getStatus() to expose the legacy control-state surface.
+5. Repeated connect() calls for the same target no longer restart the native connection attempt.
+
+Primary compile gate:
+Compile the same unmodified old FLProg project that includes Flprog_Modbus and previously failed at:
+  FLProgEthernetServer _server;
+
+No physical W5500 is required when the project is using onboard WiFi.

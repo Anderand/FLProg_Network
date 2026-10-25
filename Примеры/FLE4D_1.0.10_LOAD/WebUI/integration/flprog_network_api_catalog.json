@@ -1,0 +1,49 @@
+{
+  "schema": "flprog.network.api/1.0",
+  "library": "FLProg_Network",
+  "contract": "Public Web UI transport surface only",
+  "transports": [
+    {"id": "wifi-http", "title": "Wi-Fi HTTP", "requires": ["FLProgNetworkInterface", "FLProgNetworkHttpServer", "FLPROG_WIFI_INTERFACE1"], "adapter": "FLProgWebUiFlprogNetworkPagedHttp", "interfaceMacro": "FLPROG_WIFI_INTERFACE1"},
+    {"id": "w5500-http-1", "title": "W5500 / Ethernet #1 HTTP", "requires": ["FLProgNetworkInterface", "FLProgNetworkHttpServer", "FLPROG_WIZNET_INTERFACE1"], "adapter": "FLProgWebUiFlprogNetworkPagedHttp", "interfaceMacro": "FLPROG_WIZNET_INTERFACE1"},
+    {"id": "w5500-http-2", "title": "W5500 / Ethernet #2 HTTP", "requires": ["FLProgNetworkInterface", "FLProgNetworkHttpServer", "FLPROG_WIZNET_INTERFACE2"], "adapter": "FLProgWebUiFlprogNetworkPagedHttp", "interfaceMacro": "FLPROG_WIZNET_INTERFACE2"}
+  ],
+  "api": [
+    {"symbol": "FLProgNetworkInterface", "role": "network-interface", "usedBy": "adapter.begin(interface, port)"},
+    {"symbol": "FLProgNetworkHttpServer", "role": "http-server", "usedBy": "routes: /, /flprog-webui/state, /flprog-webui/config, /flprog-webui/write"},
+    {"symbol": "FLPROG_WIFI_INTERFACE1", "role": "generated-wifi-interface", "usedBy": "Wi-Fi project configurator"},
+    {"symbol": "FLPROG_WIZNET_INTERFACE1", "role": "generated-w5500-interface", "usedBy": "first W5500 project configurator"},
+    {"symbol": "FLPROG_WIZNET_INTERFACE2", "role": "generated-w5500-interface", "usedBy": "second W5500 project configurator"}
+  ],
+  "systemParameters": [
+    {"id":"network_ip","title":"IP-адрес","type":"text","direction":"publish","source":"FLProgNetworkInterface::localIP"},
+    {"id":"network_ready","title":"Сеть подключена","type":"bool","direction":"publish","source":"FLProgNetworkInterface::isReady"},
+    {"id":"wifi_rssi","title":"Сигнал Wi-Fi, dBm","type":"int32","direction":"publish","source":"FLProg Wi-Fi STA RSSI"},
+    {"id":"wifi_ssid","title":"SSID","type":"text","direction":"duplex","source":"FLProg Wi-Fi STA public configuration"},
+    {"id":"network_mac","title":"MAC-адрес","type":"text","direction":"publish","source":"FLProgNetworkInterface::mac"},
+    {"id":"network_gateway","title":"Шлюз","type":"text","direction":"publish","source":"FLProgNetworkInterface::gateway"},
+    {"id":"network_subnet","title":"Маска подсети","type":"text","direction":"publish","source":"FLProgNetworkInterface::subnet"},
+    {"id":"wifi_password","title":"Пароль Wi-Fi","type":"text","direction":"command","source":"FLProgNetworkInterface::setClientPassword","secret":true},
+    {"id":"network_dhcp","title":"DHCP","type":"bool","direction":"duplex","source":"FLProgNetworkInterface::isDhcp/dhcpMode"},
+    {"id":"network_ip_config","title":"Статический IP","type":"text","direction":"duplex","source":"FLProgNetworkInterface::localIP"},
+    {"id":"network_gateway_config","title":"Шлюз","type":"text","direction":"duplex","source":"FLProgNetworkInterface::gateway"},
+    {"id":"network_subnet_config","title":"Маска","type":"text","direction":"duplex","source":"FLProgNetworkInterface::subnet"},
+    {"id":"network_dns","title":"DNS","type":"text","direction":"duplex","source":"FLProgNetworkInterface::dns"},
+    {"id":"network_apply","title":"Применить и переподключить","type":"bool","direction":"command","source":"FLProgNetworkInterface::disconnect/connect"},
+    {"id":"ap_enabled","title":"Точка доступа включена","type":"bool","direction":"duplex","source":"FLProgNetworkInterface::accessPointMode"},
+    {"id":"ap_ready","title":"Точка доступа активна","type":"bool","direction":"publish","source":"FLProgNetworkInterface::accessPointIsReady"},
+    {"id":"ap_ssid","title":"Имя точки доступа","type":"text","direction":"duplex","source":"FLProgNetworkInterface::accessPointSsid"},
+    {"id":"ap_password","title":"Пароль точки доступа","type":"text","direction":"command","source":"FLProgNetworkInterface::setAccessPointPassword","secret":true},
+    {"id":"ap_channel","title":"Канал точки доступа","type":"int32","direction":"duplex","source":"FLProgNetworkInterface::accessPointChannel"},
+    {"id":"ap_hidden","title":"Скрыть SSID","type":"bool","direction":"duplex","source":"FLProgNetworkInterface::accessPointHidden"},
+    {"id":"ap_max_clients","title":"Максимум клиентов","type":"int32","direction":"duplex","source":"FLProgNetworkInterface::accessPointMaxClients"},
+    {"id":"ap_ip","title":"IP точки доступа","type":"text","direction":"duplex","source":"FLProgNetworkInterface::accessPointConfiguredIP"},
+    {"id":"ap_gateway","title":"Шлюз точки доступа","type":"text","direction":"duplex","source":"FLProgNetworkInterface::accessPointConfiguredGateway"},
+    {"id":"ap_subnet","title":"Маска точки доступа","type":"text","direction":"duplex","source":"FLProgNetworkInterface::accessPointConfiguredSubnet"},
+    {"id":"ap_station_count","title":"Подключено клиентов","type":"int32","direction":"publish","source":"FLProgNetworkInterface::accessPointStationCount"},
+    {"id":"ap_live_ip","title":"Текущий IP точки доступа","type":"text","direction":"publish","source":"FLProgNetworkInterface::accessPointIP"},
+    {"id":"ap_pending","title":"Настройки точки доступа применяются","type":"bool","direction":"publish","source":"FLProgNetworkInterface::accessPointConfigurationPending"},
+    {"id":"ap_error","title":"Ошибка точки доступа","type":"int32","direction":"publish","source":"FLProgNetworkInterface::accessPointLastError"},
+    {"id":"ap_apply","title":"Применить точку доступа","type":"bool","direction":"command","source":"FLProgNetworkInterface::accessPointMode"},
+    {"id":"wifi_scan","title":"Сканировать Wi-Fi","type":"bool","direction":"command","source":"FLProgNetworkInterface::startWifiScan"}
+  ]
+}

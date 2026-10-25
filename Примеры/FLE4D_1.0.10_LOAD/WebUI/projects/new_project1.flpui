@@ -1,0 +1,41 @@
+{
+  "schema": "flprog.webui/1.0",
+  "project": {
+    "id": "new_project1",
+    "title": "Новый проект1"
+  },
+  "channels": [
+    {
+      "id": "channel_1",
+      "label": "Канал 1",
+      "type": "bool",
+      "direction": "duplex"
+    },
+    {
+      "id": "channel_2",
+      "label": "Канал 2",
+      "type": "bool",
+      "direction": "duplex"
+    }
+  ],
+  "pages": [
+    {
+      "id": "main",
+      "title": "Главная",
+      "widgets": [
+        {
+          "id": "indicator_1",
+          "type": "indicator",
+          "label": "Индикатор",
+          "channel": "channel_1"
+        },
+        {
+          "id": "switch_2",
+          "type": "switch",
+          "label": "Переключатель",
+          "channel": "channel_2"
+        }
+      ]
+    }
+  ]
+}

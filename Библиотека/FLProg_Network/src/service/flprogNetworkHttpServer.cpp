@@ -1622,7 +1622,7 @@ bool FLProgNetworkHttpServer::sendProgmem(
 
 bool FLProgNetworkHttpServer::sendStreamProgmem(
     int statusCode, const char *type, const void *data, uint32_t length,
-    const char *encoding)
+    const char *encoding, bool cacheImmutable)
 {
     ClientContext *ctx = currentContext();
     if (!ctx || _legacyAutoStart || (length && !data)) return false;
@@ -1633,9 +1633,10 @@ bool FLProgNetworkHttpServer::sendStreamProgmem(
     ctx->responseStructured = 1;
     const size_t headerCapacity = sizeof(ctx->response) < 320U ? sizeof(ctx->response) : 320U;
     const int count = std::snprintf(ctx->response, headerCapacity,
-        "HTTP/1.1 %d %s\r\nContent-Type: %s\r\nContent-Length: %lu\r\n%sConnection: close\r\n\r\n",
+        "HTTP/1.1 %d %s\r\nContent-Type: %s\r\nContent-Length: %lu\r\n%sCache-Control: %s\r\nConnection: close\r\n\r\n",
         statusCode, reasonPhrase(statusCode), type, (unsigned long)length,
-        encoding ? "Content-Encoding: gzip\r\nVary: Accept-Encoding\r\n" : "");
+        encoding ? "Content-Encoding: gzip\r\nVary: Accept-Encoding\r\n" : "",
+        cacheImmutable ? "public, max-age=31536000, immutable" : "no-store");
     if (count <= 0 || (size_t)count >= headerCapacity ||
         (size_t)count > FLPROG_HTTP_SERVER_MAX_RESPONSE_BYTES) return false;
     ctx->responseLength = (uint16_t)count;

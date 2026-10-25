@@ -1,5 +1,6 @@
 #pragma once
 #include <flprogNetwork.h>
+#include "FLProgWebUiAssetVersion.h"
 
 // Build-time compression only. Keep 0 for clients requiring identity encoding.
 #ifndef FLPROG_WEBUI_GZIP_ASSETS
@@ -46,6 +47,30 @@ inline bool flprogWebUiGzipAllowed(const String &header)
     return found ? gzip : wildcard;
 }
 
+
+// Cache only a URL naming the exact generated asset set. Root/dynamic data
+// and versionless/mismatched URLs must never poison an immutable cache entry.
+inline bool flprogWebUiImmutable(FLProgNetworkHttpServer *server)
+{
+    return server->uri() != "/" &&
+        server->argumentValueAtKey("v") == FLPROG_WEBUI_ASSET_VERSION;
+}
+inline void flprogWebUiSendIdentity(FLProgNetworkHttpServer *server, const char *type, const char *data)
+{
+#if defined(ESP8266)
+    const size_t size = strlen_P(data);
+#else
+    const size_t size = strlen(data);
+#endif
+#if defined(FLPROG_HTTP_SERVER_HAS_CACHE_POLICY)
+    server->sendStreamProgmem(200, type, data, size, nullptr, flprogWebUiImmutable(server));
+#elif defined(FLPROG_HTTP_SERVER_HAS_FLASH_STREAM)
+    server->sendStreamProgmem(200, type, data, size);
+#else
+    server->sendProgmem(200, type, data);
+#endif
+}
+
 inline void flprogWebUiSendGzip(FLProgNetworkHttpServer *server, const char *type,
                                const unsigned char *data, size_t size)
 {
@@ -54,7 +79,10 @@ inline void flprogWebUiSendGzip(FLProgNetworkHttpServer *server, const char *typ
         if (server->method() != FLPROG_WEB_SERVER_HEAD) server->print("This UI requires gzip.\r\n");
         return;
     }
-#if defined(FLPROG_HTTP_SERVER_HAS_FLASH_STREAM)
+#if defined(FLPROG_HTTP_SERVER_HAS_CACHE_POLICY)
+    server->sendStreamProgmem(200, type, data, size, "gzip", flprogWebUiImmutable(server));
+    return;
+#elif defined(FLPROG_HTTP_SERVER_HAS_FLASH_STREAM)
     server->sendStreamProgmem(200, type, data, size, "gzip");
     return;
 #endif

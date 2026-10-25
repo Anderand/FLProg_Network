@@ -17,7 +17,7 @@ def embedded_assets(adapter):
                r'\(FLProgNetworkHttpServer \*value\)\s*\{(?:.*?)(?=static const char asset)\s*'
                r'static const char asset\[\] PROGMEM =\s*'
                r'((?:"(?:\\.|[^"\\])*"\s*)+);'
-               r'(.*?)value->sendProgmem\(200, "([^"]+)", asset\);')
+               r'(.*?)flprogWebUiSendIdentity\(value, "([^"]+)", asset\);')
     assets = {}
     for match in re.finditer(pattern, text, re.S):
         callback, strings, guard, content_type = match.groups()
@@ -32,7 +32,7 @@ def embedded_assets(adapter):
 def response_bytes(asset):
     size = len(asset["body"].encode("utf-8"))
     header = ("HTTP/1.1 200 OK\r\nContent-Type: " + asset["type"]
-              + "\r\nContent-Length: " + str(size) + "\r\nConnection: close\r\n\r\n")
+              + "\r\nContent-Length: " + str(size) + "\r\nCache-Control: public, max-age=31536000, immutable\r\nConnection: close\r\n\r\n")
     return len(header.encode("ascii")) + size
 
 
@@ -50,7 +50,7 @@ def check():
         assert response_bytes(asset) <= limit, (path, response_bytes(asset), limit)
         assert len(asset["body"].encode("utf-8")) + 128 <= limit, path
         assert asset["compile_guard"], "Missing compile-time bound: " + path
-    order = ast.literal_eval(re.search(r"let p=(\[[^\]]+\])", assets["/"]["body"]).group(1))
+    order = ast.literal_eval(re.search(r"let p=(\[[^\]]+\])", assets.get("/flprog-webui/controls.js?part=loader",assets["/"])["body"]).group(1))
     for path in order:
         assert "/flprog-webui/" + path in assets, "Loader references missing asset: " + path
     assert order[-1] == "boot.js"
@@ -61,3 +61,4 @@ def check():
 
 if __name__ == "__main__":
     print(json.dumps(check(), indent=2, ensure_ascii=False))
+

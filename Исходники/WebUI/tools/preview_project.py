@@ -13,7 +13,7 @@ def preview_html(document, root):
         raise ValueError('Исправьте ошибки проекта перед предпросмотром')
     document = copy.deepcopy(document)
     assets, _ = embedded_assets(root/'runtime/FLProg_WebUI/src/adapters/FLProgWebUiFlprogNetworkPagedHttp.h')
-    order = ast.literal_eval(re.search(r'let p=(\[[^\]]+\])', assets['/']['body']).group(1))
+    order = ast.literal_eval(re.search(r'let p=(\[[^\]]+\])', assets.get('/flprog-webui/controls.js?part=loader',assets['/'])['body']).group(1))
     def script(text):
         return '<script>'+text.replace('</script', '<\\/script')+'</script>'
     boot = 'const previewDocument='+json.dumps(document, ensure_ascii=False)+';\n'

@@ -1,3 +1,4 @@
+#define FLPROG_HTTP_SERVER_HAS_CACHE_POLICY 1
 /*
  * FLProg_Network — flprogNetworkHttpServer.h
  * Назначение: HTTP server поверх native TCP server.
@@ -293,7 +294,7 @@ public:
     // Reuses request-line storage after parsing; no new per-client allocation.
     bool sendStreamProgmem(int statusCode, const char *contentType,
                           const void *data, uint32_t length,
-                          const char *contentEncoding = nullptr);
+                          const char *contentEncoding = nullptr, bool cacheImmutable = false);
     bool send(int statusCode, const String &contentType, const String &body)
     {
         return send(statusCode, contentType.c_str(), body.c_str());

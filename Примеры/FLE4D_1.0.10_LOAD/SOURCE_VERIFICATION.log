@@ -1,0 +1,12 @@
+FLProg Web UI static release verification: OK
+Field states and reboot/reconnect full synchronization: OK
+Embedded JS and busy guards: OK (cancel, ack, stale, timeout, duplicate, busy transition, labels)
+..........PASS: loader progress, complete-body execution once, transient GET retry, permanent 403, bounded attempts, body timeout, static cache default and data no-store
+..PASS: notices fresh readback, old result, busy cycle, restart, offline, timeout, supersession, errors, password, bounded cards
+PASS: actual command integration, sent/ack/readback, cancel, server rejection and queued offline cancellation
+......PASS: preview typed values, busy lock, result, manual mode, restart cancels pending completion, offline/reconnect, readonly, network isolation
+..........
+----------------------------------------------------------------------
+Ran 28 tests in 0.948s
+
+OK

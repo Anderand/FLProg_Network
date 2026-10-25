@@ -1,0 +1,9 @@
+{
+  "samples": 293,
+  "first_ms": 1000,
+  "last_ms": 293214,
+  "used_min": 7108,
+  "used_max": 7108,
+  "used_last": 7108,
+  "arena_free_last": 124
+}
