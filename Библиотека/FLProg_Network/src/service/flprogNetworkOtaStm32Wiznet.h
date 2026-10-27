@@ -35,6 +35,8 @@ public:
     bool begin(FLProgNetworkInterface &network, const char *password,
                uint16_t port = 3233);
     void setIdentity(const char *model, const char *version);
+    const char *deviceModel() const override { return supported() ? _model : nullptr; }
+    const char *firmwareVersion() const override { return supported() ? _version : nullptr; }
     void end();
     void pool() override;
 

@@ -5,7 +5,7 @@ async function tests(){
  const c={v:{sp:25},document:{activeElement:null,createElement:node},commandBusy:false,lastMessage:'',TextEncoder,p:async()=>true};
  vm.createContext(c);
  vm.runInContext(assets['/flprog-webui/controls.js?part=form-state'].body,c);
- vm.runInContext(assets['/flprog-webui/controls.js?part=form-apply'].body,c);
+ for(const part of ['pattern-parse','pattern-match','form-apply'])vm.runInContext(assets['/flprog-webui/controls.js?part='+part].body,c);
  const d=node(),i={type:'number',value:'25',checkValidity:()=>true,reportValidity(){},blur(){}},b={};
  c.T({label:'Уставка',channel:'sp',unit:'°C'},i,b,d,'sp');
  assert.equal(d.dataset.fieldState,'Синхронизировано');

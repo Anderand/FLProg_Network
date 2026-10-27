@@ -9,7 +9,7 @@ async function test(){
   const c={lastOK:Date.now(),commandBusy:false,a:[],v:{},O:w=>!!w?.bindings?.some(b=>b.role==='busy'&&c.v[b.channel]===true),Date,Error,encodeURIComponent,
     K:async()=>confirm,N:()=>{},M:x=>message=x,q:async()=>{},
     f:async()=>{sent++;return {queued:true}}};
-  vm.createContext(c);vm.runInContext(assets['/flprog-webui/controls.js?part=commands'].body,c);
+  vm.createContext(c);vm.runInContext(assets['/flprog-webui/controls.js?part=enabled'].body,c);vm.runInContext(assets['/flprog-webui/controls.js?part=commands'].body,c);
   c.K=async()=>confirm;
   const widget={id:'pump',label:'Pump',confirmation:'Start?'};
   confirm=false;assert.strictEqual(await c.p('run',true,widget),false);assert.equal(sent,0);
@@ -38,8 +38,8 @@ async function test(){
   await state.q();assert.equal(fresh,1);assert.equal(state.v.value,0);
   const input={disabled:false,closest:()=>({dataset:{widget:'pump'}})},badge={style:{}};
   const ui={a:[{id:'pump',bindings:[{role:'busy',channel:'busy'}]}],v:{busy:true},
-    document:{querySelector:()=>badge,querySelectorAll:()=>[input]},setInterval:()=>{}};
-  vm.createContext(ui);vm.runInContext(assets['/flprog-webui/controls.js?part=status'].body,ui);
+    document:{querySelector:()=>badge,querySelectorAll:s=>s==='[data-widget]'?[]:[input]},setInterval:()=>{}};
+  vm.createContext(ui);vm.runInContext(assets['/flprog-webui/controls.js?part=enabled'].body,ui);vm.runInContext(assets['/flprog-webui/controls.js?part=status'].body,ui);
   ui.N(true);assert.strictEqual(input.disabled,true);
   ui.v.busy=false;ui.N(false);assert.strictEqual(input.disabled,false);
   const box=()=>({children:[],append(x){this.children.push(x)}});

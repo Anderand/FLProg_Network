@@ -5,11 +5,17 @@ The caller must explicitly supply the destination directory.  This tool never
 writes into FLProg_Network and never modifies the original .flpui document.
 """
 import argparse
+from field_pattern import parse_pattern
+from group_style import group_style, validate_group_styles
 import json
 import re
 import math
+import hashlib
+from build_compatibility import DESCRIPTOR_API, MANIFEST, SCHEMA
 from pathlib import Path
 from typing import Dict, List, Tuple
+from build_start_block import start_block_bytes, START_NAME
+from channel_contract import write_contract
 
 TYPES = {"bool": "FLPROG_WEBUI_BOOL", "int32": "FLPROG_WEBUI_INT32",
          "float": "FLPROG_WEBUI_FLOAT", "text": "FLPROG_WEBUI_TEXT"}
@@ -28,6 +34,19 @@ WIDGET_TYPES = {
 HTTP_ITEM_BYTES = 900
 
 
+def polling_settings(document):
+    value = document.get("polling", {})
+    if not isinstance(value, dict):
+        raise ValueError("polling должен быть объектом")
+    interval = value.get("intervalMs", 1300)
+    paused = value.get("pauseWhenHidden", True)
+    if isinstance(interval, bool) or not isinstance(interval, int) or not 500 <= interval <= 60000:
+        raise ValueError("Период опроса: целое число 500–60000 мс")
+    if not isinstance(paused, bool):
+        raise ValueError("Пауза в фоновой вкладке должна быть bool")
+    return {"intervalMs": interval, "pauseWhenHidden": paused}
+
+
 def safe_identifier(value: str) -> str:
     result = re.sub(r"[^A-Za-z0-9_]", "_", value)
     if not result or result[0].isdigit():
@@ -39,14 +58,17 @@ def c_string(value: str) -> str:
     return json.dumps(value, ensure_ascii=False)
 
 
-def _widget_config(item: Dict, labels: Dict[str, str]) -> Dict:
+def _widget_config(item: Dict, labels: Dict[str, str], page=None) -> Dict:
     channel = str(item.get("channel", ""))
     return {
         "id": str(item.get("id", "")),
         "group": str(item.get("group", "")),
+        "groupStyle": group_style(page or {},item.get("group", "")),
         "placeholder": str(item.get("placeholder", "")),
         "unit": str(item.get("unit", "")),
         "maxLength": int(item.get("maxLength", 63)),
+        "pattern": str(item.get("pattern", "")),
+        "validationMessage": str(item.get("validationMessage", "")),
         "confirmation": str(item.get("confirmation", "Отправить команду?" if item.get("type") == "button" else "")),
         "type": str(item.get("type", "")),
         "label": str(item.get("label") or labels.get(channel, channel)),
@@ -69,7 +91,7 @@ def _widget_config(item: Dict, labels: Dict[str, str]) -> Dict:
 def estimate_http_buffers(document: Dict, channels: List[Dict]) -> Tuple[int, int]:
     """Conservative byte estimates for bounded device JSON responses."""
     labels = {str(item["id"]): str(item.get("label") or item["id"]) for item in channels}
-    widgets = [_widget_config(item, labels) for page in document.get("pages", []) for item in page.get("widgets", [])]
+    widgets = [_widget_config(item, labels, page) for page in document.get("pages", []) for item in page.get("widgets", [])]
     theme = {key: str(document.get("theme", {}).get(key, "")) for key in ("background", "card", "text", "accent")}
     # The C++ runtime prints three decimal places, which can be up to six bytes
     # longer than Python's compact float representation across one widget.
@@ -86,6 +108,7 @@ def estimate_http_buffers(document: Dict, channels: List[Dict]) -> Tuple[int, in
 
 
 def _validate_legacy(document: Dict) -> Tuple[str, List[Dict]]:
+    polling_settings(document)
     if document.get("schema") != "flprog.webui/1.0":
         raise ValueError("Ожидается schema: flprog.webui/1.0")
     project_id = str(document.get("project", {}).get("id", "")).strip()
@@ -145,6 +168,7 @@ def _validate_legacy(document: Dict) -> Tuple[str, List[Dict]]:
         raise ValueError("Максимум 255 страниц в одном проекте Web UI")
     widget_count = 0
     for page in pages:
+        validate_group_styles(page)
         if not isinstance(page.get("widgets", []), list):
             raise ValueError("widgets должен быть списком")
         for widget in page["widgets"]:
@@ -156,7 +180,7 @@ def _validate_legacy(document: Dict) -> Tuple[str, List[Dict]]:
                 role = str(binding.get("role", ""))
                 target = str(binding.get("channel", ""))
                 direction = str(binding.get("direction", "duplex"))
-                if role not in ("value", "setpoint", "alarm", "busy", "result", "series1", "series2"):
+                if role not in ("value", "setpoint", "alarm", "busy", "result", "enabled", "series1", "series2"):
                     raise ValueError("Неизвестная роль связи: " + role)
                 if role in roles:
                     raise ValueError("Повтор роли bindings: " + role)
@@ -210,6 +234,12 @@ def _validate_legacy(document: Dict) -> Tuple[str, List[Dict]]:
                 raise ValueError(f"weekdays требует int32-канал: {channel_id}")
             if kind == "select" and not str(widget.get("options", "")).strip():
                 raise ValueError(f"select требует options (варианты через ;): {channel_id}")
+            pattern = widget.get("pattern", "")
+            if not isinstance(pattern, str): raise ValueError("Шаблон должен быть строкой")
+            if pattern and kind not in ("text-input", "password-input"): raise ValueError("Шаблон доступен только текстовому полю и паролю")
+            parse_pattern(pattern)
+            message = widget.get("validationMessage", "")
+            if not isinstance(message,str) or len(message.encode("utf-8")) > 96 or any(ord(c)<32 for c in message): raise ValueError("Текст ошибки: до 96 байт UTF-8")
             if not 1 <= int(widget.get("maxLength", 63)) <= 63:
                 raise ValueError("Длина поля: от 1 до 63 байт UTF-8")
             numbers = [float(widget.get(k, d)) for k, d in (("min", 0), ("max", 100), ("step", 1))]
@@ -246,13 +276,13 @@ def _validate_legacy(document: Dict) -> Tuple[str, List[Dict]]:
         if len(page_payload) > HTTP_ITEM_BYTES:
             raise ValueError("Слишком длинный дескриптор страницы для безопасного HTTP-ответа")
         for item in page.get("widgets", []):
-            value = _widget_config(item, labels)
+            value = _widget_config(item, labels, page)
             value["page"] = str(page.get("id", "main"))
             response = json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
             if len(response) > HTTP_ITEM_BYTES:
                 raise ValueError(f"Слишком большой дескриптор виджета {item.get('id', '?')}; сократите подпись или свойства")
     theme = {key: str(document.get("theme", {}).get(key, "")) for key in ("background", "card", "text", "accent")}
-    meta = json.dumps({"widgets": widget_count, "pages": len(pages), "theme": theme}, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    meta = json.dumps({"widgets": widget_count, "pages": len(pages), "theme": theme, "polling": polling_settings(document)}, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     if len(meta) > HTTP_ITEM_BYTES:
         raise ValueError("Слишком большая тема для безопасного HTTP-ответа")
     return project_id, channels
@@ -267,13 +297,17 @@ def validate(document: Dict) -> Tuple[str, List[Dict]]:
     return _validate_legacy(document)
 
 
-def descriptor(project_id: str, channels: List[Dict], pages: List[Dict], theme: Dict) -> str:
+def descriptor(project_id: str, channels: List[Dict], pages: List[Dict], theme: Dict, polling=None) -> str:
+    polling = polling_settings({"polling": polling or {}})
     namespace = safe_identifier(project_id)
     channel_labels = {str(item["id"]): str(item.get("label") or item["id"]) for item in channels}
     rows = [
         "// Generated by FLProg Web UI Designer 1.0. Do not edit.",
         "#pragma once",
         "#include <FLProgWebUi.h>",
+        "#if !defined(FLPROG_WEBUI_DESCRIPTOR_API) || FLPROG_WEBUI_DESCRIPTOR_API != 1",
+        '#error "FLProg_WebUI headers are incompatible. Rebuild the package with the new editor and use its FLProg_WebUI library."',
+        "#endif",
         "",
         f"namespace flprog_webui_{namespace} {{",
         "static const FLProgWebUiChannelDescriptor channels[] = {",
@@ -308,7 +342,7 @@ def descriptor(project_id: str, channels: List[Dict], pages: List[Dict], theme: 
             layout = (max(1, min(12, int(item.get("x", 1)))), max(1, min(99, int(item.get("y", 1)))), max(1, min(12, int(item.get("w", 4)))), max(1, min(12, int(item.get("h", 2)))))
             bindings = item.get("bindings", [])
             binding_ref = "bindings_%d" % binding_index if bindings else "0"
-            rows.append("    {" + ", ".join(c_string(value) for value in values) + ", " + ", ".join(str(value) + "f" for value in numbers) + ", " + ", ".join(str(value) for value in layout) + ", " + c_string(str(page.get("id", "main"))) + ", " + c_string(str(item.get("options", ""))) + ", " + c_string(str(item.get("code", ""))) + ", " + binding_ref + ", " + str(len(bindings)) + ", " + ", ".join(c_string(str(item.get(k, ""))) for k in ("group", "placeholder", "unit")) + ", " + str(int(item.get("maxLength", 63))) + ", " + c_string(str(item.get("confirmation", "Отправить команду?" if item.get("type") == "button" else ""))) + "},")
+            rows.append("    {" + ", ".join(c_string(value) for value in values) + ", " + ", ".join(str(value) + "f" for value in numbers) + ", " + ", ".join(str(value) for value in layout) + ", " + c_string(str(page.get("id", "main"))) + ", " + c_string(str(item.get("options", ""))) + ", " + c_string(str(item.get("code", ""))) + ", " + binding_ref + ", " + str(len(bindings)) + ", " + ", ".join(c_string(str(item.get(k, ""))) for k in ("group", "placeholder", "unit")) + ", " + str(int(item.get("maxLength", 63))) + ", " + c_string(str(item.get("confirmation", "Отправить команду?" if item.get("type") == "button" else ""))) + ", " + c_string(str(item.get("pattern", ""))) + ", " + c_string(str(item.get("validationMessage", ""))) + ", " + c_string(json.dumps(group_style(page,item.get("group", "")),separators=(",",":"))) + "},")
             binding_index += 1
     rows += [
         "};",
@@ -319,6 +353,8 @@ def descriptor(project_id: str, channels: List[Dict], pages: List[Dict], theme: 
     rows += [
         "};",
         "static const FLProgWebUiThemeDescriptor theme = {" + ", ".join(c_string(str(theme.get(key, ""))) for key in ("background", "card", "text", "accent")) + "};",
+        "static const uint32_t pollIntervalMs = " + str(polling["intervalMs"]) + "UL;",
+        "static const bool pauseWhenHidden = " + ("true" if polling["pauseWhenHidden"] else "false") + ";",
         "static const uint8_t widgetCount = sizeof(widgets) / sizeof(widgets[0]);",
         "static const uint8_t pageCount = sizeof(pages) / sizeof(pages[0]);",
         "static FLProgWebUiChannelSlot slots[sizeof(channels) / sizeof(channels[0])];",
@@ -342,6 +378,7 @@ def config_ubi(project_id: str, transport_id: str = "wifi-http") -> str:
     interface_macro = interface_macros[transport_id]
     setup = (f'flprog_webui_{safe}::configure();\n'
              f'static FLProgWebUiFlprogNetworkPagedHttp webUi(flprog_webui_{safe}::model, flprog_webui_{safe}::widgets, flprog_webui_{safe}::widgetCount, flprog_webui_{safe}::pages, flprog_webui_{safe}::pageCount, flprog_webui_{safe}::theme);\n'
+             f'webUi.setPolling(flprog_webui_{safe}::pollIntervalMs, flprog_webui_{safe}::pauseWhenHidden);\n'
              f'#if defined({interface_macro})\n'
              f'webUi.begin({interface_macro});\n'
              f'#else\n#error "FLProg Web UI: add the selected {transport_id} interface"\n#endif')
@@ -356,13 +393,41 @@ def config_ubi(project_id: str, transport_id: str = "wifi-http") -> str:
             f'<sixx.object sixx.id="16" sixx.type="CodeUserBlockDeclareCodePart" sixx.env="Arduino" sixx.name="declareCodePart"><sixx.object sixx.id="17" sixx.type="OrderedCollection" sixx.env="Core" sixx.name="code"><sixx.object sixx.id="18" sixx.type="CodeUserBlockDeclareDefineBlock" sixx.env="Arduino"><sixx.object sixx.id="19" sixx.type="String" sixx.env="Core" sixx.name="define">#include</sixx.object><sixx.object sixx.id="20" sixx.type="String" sixx.env="Core" sixx.name="name">&lt;{safe}_descriptor.h&gt;</sixx.object></sixx.object><sixx.object sixx.id="21" sixx.type="CodeUserBlockDeclareDefineBlock" sixx.env="Arduino"><sixx.object sixx.id="22" sixx.type="String" sixx.env="Core" sixx.name="define">#include</sixx.object><sixx.object sixx.id="23" sixx.type="String" sixx.env="Core" sixx.name="name">&lt;adapters/FLProgWebUiFlprogNetworkPagedHttp.h&gt;</sixx.object></sixx.object></sixx.object></sixx.object><sixx.object sixx.id="24" sixx.type="CodeUserBlockFunctuinCodePart" sixx.env="Arduino" sixx.name="functionCodePart"><sixx.object sixx.id="25" sixx.type="OrderedCollection" sixx.env="Core" sixx.name="code"/></sixx.object><sixx.object sixx.name="notCanManyUse" sixx.type="True" sixx.env="Core"/></sixx.object></sixx.object>\r\n')
 
 
+def project_entry_header(project_id: str, transport_id: str) -> str:
+    safe = safe_identifier(project_id)
+    interface = {'wifi-http':'FLPROG_WIFI_INTERFACE1', 'w5500-http-1':'FLPROG_WIZNET_INTERFACE1', 'w5500-http-2':'FLPROG_WIZNET_INTERFACE2'}[transport_id]
+    return f'''// Generated Web UI project entry: {project_id}
+#pragma once
+#ifdef FLPROG_WEBUI_SELECTED_PROJECT
+#error "Web UI: only one project may be selected in a sketch"
+#endif
+#define FLPROG_WEBUI_SELECTED_PROJECT "{project_id}"
+#include "{safe}_descriptor.h"
+#include <adapters/FLProgWebUiFlprogNetworkPagedHttp.h>
+namespace flprog_webui_{safe} {{
+inline bool begin(FLProgNetworkInterface &network) {{
+    if (!configure()) return false;
+    static FLProgWebUiFlprogNetworkPagedHttp webUi(model, widgets, widgetCount, pages, pageCount, theme);
+    webUi.setPolling(pollIntervalMs, pauseWhenHidden);
+    return webUi.begin(network);
+}}
+}}
+namespace flprog_webui_selected = flprog_webui_{safe};
+// The interface macro is declared AFTER includes by FLProg. Expand it only
+// at the call site, after the network instance and its macro exist.
+#define FLPROG_WEBUI_BEGIN_SELECTED() flprog_webui_selected::begin({interface})
+'''
+
+
 def build(source: Path, destination: Path) -> Path:
     document = json.loads(source.read_text(encoding="utf-8"))
     project_id, channels = validate(document)
     transport_id = str(document.get("transport", {}).get("id", "wifi-http"))
     if transport_id not in ("wifi-http", "w5500-http-1", "w5500-http-2"):
         raise ValueError("Неподдерживаемый transport.id")
-    library_name = "FLProg_WebUI_Project_" + safe_identifier(project_id)
+    # File IDs remain exact (including '-'); C++ names are normalized locally.
+    # This prevents web-slave and web_slave packages from overwriting each other.
+    library_name = "FLProg_WebUI_Project_" + project_id
     target = destination / library_name
     source_dir = target / "src"
     source_dir.mkdir(parents=True, exist_ok=True)
@@ -373,9 +438,21 @@ def build(source: Path, destination: Path) -> Path:
         "paragraph=Project descriptor and FLProg configurator generated by FLProg Web UI Editor.\n"
         "category=Other\narchitectures=*\ndepends=FLProg_WebUI\n", encoding="utf-8")
     (source_dir / f"{safe_identifier(project_id)}_descriptor.h").write_text(
-        descriptor(project_id, channels, document.get("pages", []), document.get("theme", {})), encoding="utf-8")
-    (target / f"FLProg_WebUI_Configure_{safe_identifier(project_id)}.ubi").write_bytes(
-        b"\xff\xfe" + config_ubi(project_id, transport_id).encode("utf-16-le"))
+        descriptor(project_id, channels, document.get("pages", []), document.get("theme", {}), polling_settings(document)), encoding="utf-8")
+    (source_dir / f"{project_id}_webui.h").write_text(project_entry_header(project_id, transport_id), encoding="utf-8")
+    headers = [source_dir / f"{safe_identifier(project_id)}_descriptor.h", source_dir / f"{project_id}_webui.h"]
+    manifest = dict(schema=SCHEMA, projectId=project_id, descriptorApi=DESCRIPTOR_API,
+                    files={p.relative_to(target).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in headers})
+    (target / MANIFEST).write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    (target / START_NAME).write_bytes(start_block_bytes())
+    write_contract(document, target)
+    (target / "START_RU.md").write_text(
+        f"# Подключение проекта {project_id}\n\n"
+        f"Импортируйте универсальный {START_NAME} один раз. Добавьте один блок Web UI Start "
+        f"и задайте параметр «ID проекта»: `{project_id}` (без кавычек и расширения).\n\n"
+        f"Блок подключит `{project_id}_webui.h`. При обновлении макета с тем же ID "
+        "обновите пакет и пересоберите прошивку. Сеть и SPI задаются в проекте FLProg.\n",
+        encoding="utf-8")
     return target
 
 

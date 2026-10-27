@@ -10,6 +10,10 @@
 #include <stdint.h>
 #include <string.h>
 
+// Increment on an incompatible C++ descriptor/configurator contract change.
+// A library version string is insufficient to identify matching headers.
+#define FLPROG_WEBUI_DESCRIPTOR_API 1
+
 #ifndef FLPROG_WEBUI_RUNTIME_VERSION
 #define FLPROG_WEBUI_RUNTIME_VERSION "1.7.0-20261024"
 #endif
@@ -70,6 +74,9 @@ struct FLProgWebUiWidgetDescriptor {
     const char *unit;
     uint8_t maxLength; // UTF-8 bytes, 0 = text slot capacity minus terminator.
     const char *confirmation; // Empty = no extra confirmation dialog.
+    const char *pattern; // Optional bounded ASCII whole-value pattern.
+    const char *validationMessage; // Optional UTF-8 error, never echoes input.
+    const char *groupStyle; // Optional validated JSON, page-owned group appearance.
 
 };
 

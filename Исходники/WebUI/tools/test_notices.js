@@ -27,7 +27,7 @@ function check(){
 check();
 async function integration(){
  let writes=0;c.a=[];c.lastOK=Date.now();c.commandBusy=false;c.N=()=>{};c.M=t=>c.lastMessage=t;c.O=()=>false;c.q=async()=>c.noticeSync(false);
- vm.runInContext(assets['/flprog-webui/controls.js?part=commands'].body,c);c.K=async()=>true;
+ vm.runInContext(assets['/flprog-webui/controls.js?part=enabled'].body,c);vm.runInContext(assets['/flprog-webui/controls.js?part=commands'].body,c);c.K=async()=>true;
  const w={id:'integration',type:'number-input',channel:'sp',label:'Уставка',confirmation:'Apply?'};
  c.v.sp=25;c.f=async(u,o,sent)=>{sent();writes++;c.v.sp=31;return {queued:true}};
  assert.equal(await c.p('sp','31',w),true);assert.equal(writes,1);assert.equal(c.noticeCards.at(-1).dataset.stage,'confirmed');

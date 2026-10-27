@@ -45,8 +45,11 @@ FLPROG_LIBRARIES = Path(r"C:\F-981\FLProg\ideV8\portable\sketchbook\libraries")
 FLPROG_LIBRARIES = Path(os.environ.get("FLPROG_LIBRARIES", str(FLPROG_LIBRARIES)))
 sys.path.insert(0, str(RESOURCE_ROOT / "tools"))
 import build_project_package
+from project_storage import project_locations
+from channel_contract import channel_contract, contract_markdown
 from project_validation import validate_project
 from preview_project import preview_html
+from build_compatibility import export_report
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -86,12 +89,17 @@ class Handler(SimpleHTTPRequestHandler):
         return super().do_GET()
 
     def do_POST(self):
-        if self.path not in ("/api/save", "/api/build", "/api/validate", "/api/preview"): return self.reply(404, {"error":"unknown API"})
+        if self.path not in ("/api/save", "/api/build", "/api/validate", "/api/preview", "/api/contract", "/api/compatibility"): return self.reply(404, {"error":"unknown API"})
         try:
             raw = self.rfile.read(int(self.headers.get("Content-Length", "0")))
             data = json.loads(raw.decode("utf-8"))
+            if self.path == '/api/compatibility':
+                return self.reply(200, export_report(data, RESOURCE_ROOT, PROJECTS, DEFAULT_PACKAGES, FLPROG_LIBRARIES))
             if self.path == "/api/preview":
                 return self.reply(200, {"html": preview_html(data, RESOURCE_ROOT)})
+            if self.path == "/api/contract":
+                report = channel_contract(data)
+                return self.reply(200, {"report": report, "markdown": contract_markdown(report)})
             allow_warnings = False
             if self.path == "/api/build" and isinstance(data, dict) and isinstance(data.get("document"), dict):
                 allow_warnings = data.get("allowWarnings") is True
@@ -110,26 +118,31 @@ class Handler(SimpleHTTPRequestHandler):
                 raise ValueError("ID проекта: 2–64 латинских буквы, цифры, _ или -, начиная с буквы")
             # Validate before replacing an existing user project file.
             build_project_package.validate(data)
-            PROJECTS.mkdir(parents=True, exist_ok=True)
+            source, output = project_locations(data, PROJECTS, DEFAULT_PACKAGES)
+            if self.path == '/api/build':
+                compatibility = export_report(data, RESOURCE_ROOT, PROJECTS, DEFAULT_PACKAGES, FLPROG_LIBRARIES)
+                if not compatibility['ok']:
+                    return self.reply(422, dict(error='Сборка остановлена: проверьте совместимость проекта и библиотек.', compatibility=compatibility))
+            source.parent.mkdir(parents=True, exist_ok=True)
             if self.path == "/api/build":
-                output = Path(str(data.get("packageOutput") or DEFAULT_PACKAGES)).resolve()
                 normalized = str(output).replace("/", "\\").lower()
                 if "\\libraries\\flprog_network" in normalized:
                     raise ValueError("Пакет проекта нельзя размещать в FLProg_Network")
                 PROJECTS.mkdir(exist_ok=True)
-                source = PROJECTS / (project_id + ".flpui")
                 source.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
                 # Reload the project generator for every build. The editor is
                 # intentionally long-running, while generator/runtime updates
                 # are installed during development; retaining an old imported
                 # function here silently produced obsolete project packages.
                 package = importlib.reload(build_project_package).build(source, output)
+                # Every export carries matching headers, including default packages.
+                copy_tree(RESOURCE_ROOT / 'runtime' / 'FLProg_WebUI', output / 'FLProg_WebUI')
                 installed = None
-                if FLPROG_LIBRARIES.is_dir():
+                if data.get('installToIde') is True and FLPROG_LIBRARIES.is_dir():
                     installed = FLPROG_LIBRARIES / package.name
                     copy_tree(package, installed)
-                return self.reply(200, {"ok":True, "project":str(source), "package":str(package), "installed":str(installed) if installed else None, "generator":"paged-pages", "generatorFile":str(build_project_package.__file__)})
-            path = PROJECTS / (project_id + ".flpui")
+                return self.reply(200, {"ok":True, "project":str(source), "package":str(package), "libraries":str(output), "installed":str(installed) if installed else None, "generator":"paged-pages", "generatorFile":str(build_project_package.__file__)})
+            path = source
             path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             return self.reply(200, {"ok":True, "file":str(path)})
         except (ValueError, OSError, json.JSONDecodeError) as error:

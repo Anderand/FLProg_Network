@@ -7,6 +7,15 @@ import subprocess
 import struct
 from zipfile import ZipFile, ZIP_DEFLATED
 from pathlib import Path
+import sys
+
+# Source checkout; frozen managers resolve the same shared module at build time.
+_webui_tools = Path(__file__).resolve().parents[2] / 'flprog_webui_next/tools'
+if not _webui_tools.is_dir():
+    _webui_tools = Path(__file__).resolve().parents[2] / 'WebUI/tools'
+if _webui_tools.is_dir():
+    sys.path.insert(0, str(_webui_tools))
+from build_compatibility import require_sketch, format_report
 
 ROOT = Path(__file__).resolve().parent
 IDE = Path(r'C:\F-981\FLProg\ideV8')
@@ -64,18 +73,25 @@ def install_profiles():
     path.write_text(text.rstrip() + '\n\n' + '\n'.join(lines) + '\n', encoding='utf-8')
     (ROOT / 'boards_ota_append.txt').write_text('\n'.join(lines) + '\n', encoding='utf-8')
 
-def build(board, sketch=None, check_only=False):
+def build(board, sketch=None, check_only=False, libraries=None):
     row = boards()[board]
     layout = LAYOUTS[row['layout']]
     boot = sketch is None
     sketch = Path(sketch).resolve() if sketch else ROOT / 'STM32_OTA_BOOTLOADER/STM32_OTA_BOOTLOADER.ino'
     if not sketch.is_file() or sketch.suffix.lower() != '.ino':
         raise ValueError('Select an existing .ino sketch')
+    if not boot:
+        print(format_report(require_sketch(sketch, IDE, libraries)), flush=True)
     kind = 'bootloader' if boot else ('compile_check_not_for_flashing' if check_only else 'application')
     output = ROOT / 'build' / board / kind
     output.mkdir(parents=True, exist_ok=True)
     fqbn = row['fqbn'] + '_OTA_SAFE'
     command = [str(IDE / 'arduino-builder.exe'), '-compile', '-jobs=4', '-logger=human']
+    if libraries and not boot:
+        library_folder = Path(libraries).expanduser().resolve()
+        if not library_folder.is_dir():
+            raise ValueError('Папка библиотек проекта не найдена: ' + str(library_folder))
+        command += ['-libraries', str(library_folder)]
     for folder in [IDE / 'hardware', IDE / 'portable/packages']:
         command += ['-hardware', str(folder)]
     for folder in [IDE / 'tools-builder', IDE / 'hardware/tools/avr', IDE / 'portable/packages']:
@@ -147,6 +163,7 @@ if __name__ == '__main__':
     parser.add_argument('--board', choices=sorted(boards()))
     parser.add_argument('--sketch', type=Path, help='Application .ino; omit to build bootloader')
     parser.add_argument('--check-only', action='store_true', help='Do not package the compile-only gate')
+    parser.add_argument('--libraries', type=Path, help='External project libraries folder; no copying into IDE')
     parser.add_argument('--interactive', action='store_true')
     args = parser.parse_args()
     if args.interactive:
@@ -168,4 +185,4 @@ if __name__ == '__main__':
     if args.install_profiles:
         install_profiles()
     if args.board:
-        build(args.board, args.sketch, args.check_only)
+        build(args.board, args.sketch, args.check_only, libraries=args.libraries)

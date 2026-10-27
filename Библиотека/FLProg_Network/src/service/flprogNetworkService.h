@@ -38,6 +38,10 @@ public:
     bool isAttached() const { return _serviceNetwork != nullptr; }
 
     virtual void pool() = 0;
+    // Optional identity provider. Strings remain owned by the attached service.
+    // nullptr means this service does not provide device identity.
+    virtual const char *deviceModel() const { return nullptr; }
+    virtual const char *firmwareVersion() const { return nullptr; }
 
 protected:
     FLProgNetworkInterface *serviceNetwork() { return _serviceNetwork; }

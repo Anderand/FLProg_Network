@@ -206,7 +206,7 @@ def import_package(archive_path, profiles_dir):
 class ManagerApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("FLProg — менеджер STM32 OTA v0.7.7")
+        self.root.title("FLProg — менеджер STM32 OTA v0.7.9")
         self.root.geometry("940x680")
         self.root.minsize(820, 600)
         self.events = queue.Queue()
@@ -302,7 +302,7 @@ class ManagerApp:
         self.log.configure(yscrollcommand=scrollbar.set)
         ttk.Label(outer, text="Если BIN не выбран, используется приложение из профиля. Для первичной установки нужен ST-Link/SWD.",
                   wraplength=880).grid(row=11, column=0, columnspan=3, sticky="w", pady=(8, 0))
-        self._log("Менеджер v0.7.7: по умолчанию доступен проверенный профиль FLE4D-30MT 1.0.1.")
+        self._log("Менеджер v0.7.9: по умолчанию доступен проверенный профиль FLE4D-30MT 1.0.1.")
         attach_extensions(self, self.notebook, app_directory())
 
     def _log(self, message):
@@ -675,6 +675,7 @@ class ManagerApp:
             values = {
                 "builder_ide": self.builder_ide_var.get(),
                 "builder_sketch": self.builder_sketch_var.get(),
+                "builder_libraries": self.builder_libraries_var.get(),
                 "ip": self.ip_var.get().strip(),
                 "programmer": self.cli_var.get().strip(),
                 "application_bin": self.bin_var.get().strip(),

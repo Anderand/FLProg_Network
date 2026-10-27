@@ -69,7 +69,11 @@
           "x": 1,
           "y": 1,
           "w": 6,
-          "h": 2
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "bindings": []
         },
         {
           "id": "start",
@@ -93,7 +97,13 @@
               "channel": "busy",
               "direction": "publish"
             }
-          ]
+          ],
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
         },
         {
           "id": "result_display",
@@ -104,9 +114,21 @@
           "x": 1,
           "y": 1,
           "w": 6,
-          "h": 2
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "bindings": [],
+          "min": 0,
+          "max": 100,
+          "step": 1
         }
       ]
     }
-  ]
+  ],
+  "polling": {
+    "intervalMs": 2000,
+    "pauseWhenHidden": true
+  },
+  "packageOutput": ""
 }

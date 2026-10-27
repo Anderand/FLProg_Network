@@ -88,6 +88,9 @@
 #define FLPROG_NETWORK_MODE_BOTH 3
 #endif
 
+#define FLPROG_NETWORK_HAS_ACTIVE_IP_INFO 1
+#define FLPROG_NETWORK_HAS_DEVICE_IDENTITY 1
+
 #ifndef FLPROG_NETWORK_ACTIVE_NONE
 #define FLPROG_NETWORK_ACTIVE_NONE 0
 #endif
@@ -804,6 +807,13 @@ public:
     void localIP(uint32_t ip) { localIP(IPAddress(ip)); }
     void localIP(uint8_t a, uint8_t b, uint8_t c, uint8_t d) { localIP(IPAddress(a, b, c, d)); }
     IPAddress localIP() const;
+    // Effective addresses of the ready default route; zero while unavailable.
+    // Existing gateway()/subnet() retain configured-value semantics.
+    // Read the first attached identity provider; no copied identity storage.
+    const char *deviceModel() const;
+    const char *firmwareVersion() const;
+    IPAddress activeGateway() const;
+    IPAddress activeSubnet() const;
 
     void dns(IPAddress ip);
     void dns(uint32_t ip) { dns(IPAddress(ip)); }

@@ -19,6 +19,11 @@ def main():
         if old.exists():shutil.rmtree(old)
     for name in ['boards_catalog.json','PORTING_STATUS_RU.md','VALIDATION_RU.md']:
         shutil.copy2(PORTING/name,data/name)
+    shutil.copy2(PORTING/'build_stm32_ota.py',data/'build_stm32_ota.py')
+    webui=ROOT.parents[2]/'flprog_webui_next'
+    if not webui.is_dir():webui=ROOT.parents[2]/'WebUI'
+    shutil.copy2(webui/'tools/build_compatibility.py',data/'build_compatibility.py')
+    shutil.copy2(webui/'specification/BUILD_COMPATIBILITY_RU.md',release/'СОВМЕСТИМОСТЬ.md')
     shutil.copytree(PORTING/'STM32_OTA_BOOTLOADER',data/'STM32_OTA_BOOTLOADER',dirs_exist_ok=True)
     catalog=[]
     for name,row in sorted(builder.boards().items()):
@@ -57,7 +62,7 @@ def main():
     shutil.copytree(block_source/'src',block/'src',dirs_exist_ok=True)
     for name in ['README_RU.md']:
         shutil.copy2(block_source/name,block/name)
-    with ZipFile(ROOT/'FLProg_STM32_OTA_Manager_v0_7_7_portable.zip','w',ZIP_DEFLATED) as archive:
+    with ZipFile(ROOT/'FLProg_STM32_OTA_Manager_v0_7_9_portable.zip','w',ZIP_DEFLATED) as archive:
         for path in release.rglob('*'):
             if path.is_file() and not any(part in ('build','logs','__pycache__') for part in path.relative_to(release).parts):
                 archive.write(path,str(path.relative_to(release)))

@@ -1,0 +1,7 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');const d=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+const c={e:x=>String(x??''),document:{createElement:()=>({})}};vm.createContext(c);vm.runInContext(d.assets['/flprog-webui/elements.js'].body,c);
+for(const value of ['',undefined,null]){let box={innerHTML:'',className:''};assert.equal(c.E({type:'status-row',label:'Version',placeholder:'Не задано'},value,box),1);assert(box.innerHTML.includes('Не задано'))}
+for(const value of [0,false,'1.0.17']){let box={innerHTML:'',className:''};c.E({type:'status-row',label:'Value',placeholder:'Не задано'},value,box);assert(box.innerHTML.includes(String(value)));assert(!box.innerHTML.includes('Не задано'))}
+let old={innerHTML:'',className:''};c.E({type:'status-row',label:'Legacy'},'',old);assert(!old.innerHTML.includes('Не задано'));
+const sim={previewDocument:{channels:[{id:'device_model',type:'text',direction:'duplex'},{id:'firmware_version',type:'text',direction:'publish'}],pages:[{id:'main',title:'Main',widgets:[]}]},parent:{postMessage(){}},Date,TextEncoder,URL,setTimeout(){},window:{addEventListener(){}}};vm.createContext(sim);vm.runInContext(fs.readFileSync(process.argv[3],'utf8'),sim);
+(async()=>{for(const id of ['device_model','firmware_version'])assert.equal((await sim.window.fetch('/flprog-webui/write?channel='+id+'&value=fake',{method:'POST'})).status,422);console.log('PASS: unknown identity placeholders, legacy/zero/bool unchanged, metadata read-only in preview')})().catch(e=>{console.error(e);process.exitCode=1});

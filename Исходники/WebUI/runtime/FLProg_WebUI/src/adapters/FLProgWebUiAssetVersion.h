@@ -1,2 +1,2 @@
 #pragma once
-#define FLPROG_WEBUI_ASSET_VERSION "webui175-4ea409064ff8"
+#define FLPROG_WEBUI_ASSET_VERSION "webui175-01f11e5bf8ac"

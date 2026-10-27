@@ -8,6 +8,7 @@ import loader_batch
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import build_stm32_ota as builder
+from build_compatibility import sketch_report, format_report
 import ota_discovery
 
 class Writer:
@@ -29,6 +30,8 @@ def attach(app, notebook, home):
     visible_names=[]
     ide=tk.StringVar(value=app.settings.get('builder_ide',str(builder.IDE)))
     sketch=tk.StringVar(value=app.settings.get('builder_sketch',''))
+    libraries=tk.StringVar(value=app.settings.get('builder_libraries',''))
+    app.builder_libraries_var=libraries
     app.builder_ide_var=ide; app.builder_sketch_var=sketch
     def choose(var, directory):
         value=filedialog.askdirectory() if directory else filedialog.askopenfilename(filetypes=[('Скетч FLProg','*.ino')])
@@ -93,15 +96,32 @@ def attach(app, notebook, home):
         path=builder.ROOT/'logs'/(chosen[0]+'_bootloader.log')
         if path.exists():os.startfile(str(path))
     listing.bind('<Double-1>',show_log)
+    def compatibility(show=True):
+        report=sketch_report(sketch.get(),ide.get(),libraries.get().strip() or None)
+        text=format_report(report)
+        app._log(text)
+        if show or not report['ok']:
+            window=tk.Toplevel(app.root);window.title('Совместимость перед сборкой')
+            window.geometry('880x570');window.transient(app.root)
+            ttk.Label(window,text='Только проверка. Скетч, IDE и библиотеки не изменяются.').pack(anchor='w',padx=12,pady=8)
+            area=tk.Text(window,wrap='word');area.pack(fill='both',expand=True,padx=12,pady=6)
+            area.insert('1.0',text);area.configure(state='disabled')
+            ttk.Button(window,text='Закрыть',command=window.destroy).pack(pady=8)
+        return report
     def start(kind):
         if app.busy: return
         if not app.show_unverified.get() or board.current()<0:
             messagebox.showinfo('Платы для испытаний','В каталоге сборки находятся непроверенные платы. Включите их показ. Проверенный FLE4D-30MT 1.0.1 доступен на вкладке «Прошивка».',parent=app.root);return
         folder=Path(ide.get());source=sketch.get(); selected=visible_names[board.current()]; action=mode.current()
+        project_libraries=libraries.get().strip() if kind=='package' else ''
+        if project_libraries and not Path(project_libraries).is_dir():
+            messagebox.showerror('Библиотеки проекта','Папка libraries не найдена.',parent=app.root);return
         if not (folder/'arduino-builder.exe').exists():
             messagebox.showerror('IDE','Не найден arduino-builder.exe.',parent=app.root);return
         if kind=='package' and (not source or not Path(source).is_file()):
             messagebox.showerror('Скетч','Выберите свой .ino с блоком OTA.',parent=app.root);return
+        if kind=='package' and not compatibility(False)['ok']:
+            state.set('Сборка остановлена до компилятора: ошибки совместимости.');return
         builder.IDE=folder;builder.CORE=folder/'portable/packages/STMicroelectronics/hardware/stm32/3.0.0'
         app.busy=True;app._save_settings();state.set('Сборка… Подробности — в логе на вкладке «Прошивка».')
         def worker():
@@ -110,7 +130,7 @@ def attach(app, notebook, home):
                     builder.install_profiles()
                     targets=list(visible_names) if kind=='all' else [selected]
                     report=loader_batch.run(builder,targets,source if kind=='package' else None,
-                        lambda value:app.events.put(('build_report',value)))
+                        lambda value:app.events.put(('build_report',value)),libraries=project_libraries or None)
                 failed=[n for n,item in report['rows'].items() if item['status']=='failed']
                 if failed:
                     app.events.put(('build_failed',report))
@@ -136,6 +156,9 @@ def attach(app, notebook, home):
         app.bin_var.set('');app._save_settings();notebook.select(0)
         app._log('Выбран профиль платы. Загрузчик готов; выберите OTA BIN вашего проекта или соберите пакет на вкладке «Плата и сборка».')
     ttk.Button(buttons,text='Выбрать профиль платы',command=select_board_profile).pack(side='left',padx=3)
+    compatibility_button=ttk.Button(buttons,text='Проверить совместимость',command=compatibility)
+    compatibility_button.pack(side='left',padx=3)
+    app.check_build_compatibility=compatibility
     ttk.Label(build,text='Проверенный FLE4D-30MT 1.0.1 — на вкладке «Прошивка». Каталог сборки содержит платы для испытаний; включите галочку, чтобы их выбрать. SPI/Ethernet задаются в проекте FLProg.',wraplength=850).grid(row=8,column=0,columnspan=3,sticky='w',pady=8)
     def refresh_board_choices():
         previous=visible_names[board.current()] if 0<=board.current()<len(visible_names) else None
@@ -143,10 +166,19 @@ def attach(app, notebook, home):
         board['values']=[rows[n]['label']+' / '+str(rows[n]['flash']//1024)+' KiB — не проверена' for n in visible_names]
         if visible_names:board.current(visible_names.index(previous) if previous in visible_names else 0)
         else:board.set('')
-        for button in buttons.winfo_children():button.configure(state='normal' if visible_names else 'disabled')
+        for button in buttons.winfo_children():button.configure(state='normal' if visible_names or button==compatibility_button else 'disabled')
         refresh_loaders()
     app.refresh_board_choices=refresh_board_choices
     refresh_board_choices()
+
+    # Keep the project dependencies next to the sketch, outside the IDE.
+    for child in build.winfo_children():
+        grid=child.grid_info()
+        if grid and int(grid.get('row',0))>=3:child.grid_configure(row=int(grid['row'])+1)
+    build.rowconfigure(7,weight=0);build.rowconfigure(8,weight=1)
+    ttk.Label(build,text='Библиотеки проекта (папка libraries):').grid(row=3,column=0,sticky='w')
+    ttk.Entry(build,textvariable=libraries).grid(row=3,column=1,sticky='ew',pady=5)
+    ttk.Button(build,text='Выбрать…',command=lambda:choose(libraries,True)).grid(row=3,column=2)
 
     scanner=ttk.Frame(notebook,padding=14);notebook.add(scanner,text='Поиск OTA')
     subnet=tk.StringVar(value='192.168.100.0/24');port=tk.StringVar(value='3233')

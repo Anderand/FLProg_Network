@@ -1860,6 +1860,65 @@ IPAddress FLProgNetworkInterface::localIP() const
 }
 
 
+const char *FLProgNetworkInterface::deviceModel() const
+{
+    for (uint8_t i=0;i<FLPROG_NETWORK_MAX_MANAGED_SERVICES;++i) {
+        const FLProgNetworkService *service=_managedServices[i];
+        if (service) { const char *value=service->deviceModel(); if(value) return value; }
+    }
+    return "";
+}
+const char *FLProgNetworkInterface::firmwareVersion() const
+{
+    for (uint8_t i=0;i<FLPROG_NETWORK_MAX_MANAGED_SERVICES;++i) {
+        const FLProgNetworkService *service=_managedServices[i];
+        if (service && service->deviceModel()!=nullptr) {
+            const char *value=service->firmwareVersion(); return value ? value : "";
+        }
+    }
+    return "";
+}
+
+IPAddress FLProgNetworkInterface::activeGateway() const
+{
+#if FLPROG_NETWORK_PROFILE_WIFI_ONLY
+#if FLPROG_NETWORK_HAS_WIFI
+    if (_wifiReady) return WiFi.gatewayIP();
+#endif
+#else
+    const uint8_t route = resolveRoute(FLPROG_NETWORK_ROUTE_DEFAULT);
+#if FLPROG_NETWORK_HAS_WIFI
+    if (route == FLPROG_NETWORK_ACTIVE_WIFI) return WiFi.gatewayIP();
+#endif
+    if (route == FLPROG_NETWORK_ACTIVE_WIZNET) {
+        if (_dhcp && wiznetDhcpRef().bound()) return wiznetDhcpRef().gatewayIP();
+        return const_cast<FLProgWiznetHardware &>(wiznetRef()).getGatewayIp();
+    }
+    if (route == FLPROG_NETWORK_ACTIVE_RMII) return rmiiRef().currentGateway();
+#endif
+    return IPAddress(0, 0, 0, 0);
+}
+
+IPAddress FLProgNetworkInterface::activeSubnet() const
+{
+#if FLPROG_NETWORK_PROFILE_WIFI_ONLY
+#if FLPROG_NETWORK_HAS_WIFI
+    if (_wifiReady) return WiFi.subnetMask();
+#endif
+#else
+    const uint8_t route = resolveRoute(FLPROG_NETWORK_ROUTE_DEFAULT);
+#if FLPROG_NETWORK_HAS_WIFI
+    if (route == FLPROG_NETWORK_ACTIVE_WIFI) return WiFi.subnetMask();
+#endif
+    if (route == FLPROG_NETWORK_ACTIVE_WIZNET) {
+        if (_dhcp && wiznetDhcpRef().bound()) return wiznetDhcpRef().subnetMask();
+        return const_cast<FLProgWiznetHardware &>(wiznetRef()).getSubnetMask();
+    }
+    if (route == FLPROG_NETWORK_ACTIVE_RMII) return rmiiRef().currentSubnet();
+#endif
+    return IPAddress(0, 0, 0, 0);
+}
+
 void FLProgNetworkInterface::dns(IPAddress ip)
 {
     _dnsIp = ip;

@@ -1,0 +1,13 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');const c={};vm.createContext(c);vm.runInContext(fs.readFileSync(process.argv[2],'utf8'),c);
+let value=null;const storage={getItem(){return value},setItem(k,v){value=v}};
+const model={schema:'flprog.webui/1.0',project:{id:'draft_test'},channels:[{id:'test',index:101,type:'float'}],pages:[{id:'main',widgets:[]},{id:'diag',widgets:[{id:'v1',type:'status-row',channel:'test',group:'Group',x:3,y:2,w:6,h:1}]}],theme:{accent:'#abcdef'},polling:{intervalMs:2000,pauseWhenHidden:true}};
+const a=c.createProjectDraftStore(storage);assert.equal(a.load(),null);assert(a.save(model,'diag'));const original=value;
+const b=c.createProjectDraftStore(storage),restored=b.load();assert.equal(JSON.stringify(restored.model),JSON.stringify(model));assert.equal(restored.pageId,'diag');
+model.pages[1].widgets[0].x=7;assert.equal(JSON.parse(original).model.pages[1].widgets[0].x,3);
+storage.setItem=()=>{throw Error('Quota')};assert.equal(b.save(model,'diag'),false);assert.equal(value,original);assert(b.error().includes('Quota'));
+value='{broken';const broken=c.createProjectDraftStore(storage);assert.equal(broken.load(),null);assert.equal(broken.save(model,'main'),false);assert.equal(value,'{broken');
+const denied=c.createProjectDraftStore({getItem(){throw Error('Denied')},setItem(){throw Error('Denied')}});assert.equal(denied.load(),null);assert.equal(denied.save(model,'main'),false);
+value=JSON.stringify({version:1,model:{...model,channels:[null]}});const invalid=c.createProjectDraftStore(storage);assert.equal(invalid.load(),null);assert.equal(invalid.save(model,'main'),false);
+storage.setItem=(k,v)=>value=v;value=null;const old=c.createProjectDraftStore(storage),latest=c.createProjectDraftStore(storage);old.load();latest.load();assert(latest.save(model,'diag'));const saved=value;assert.equal(old.save(model,'main'),false);assert.equal(value,saved);
+latest.allowWrites();assert(latest.save({...model,project:{id:'other'}},'main'));assert.equal(c.createProjectDraftStore(storage).load().model.project.id,'other');
+console.log('PASS: reload snapshot/page/layout/settings; no mutation; quota/denied/corrupt safe; stale tab cannot overwrite; explicit project switch');

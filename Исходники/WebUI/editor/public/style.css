@@ -261,3 +261,25 @@ body{background:radial-gradient(900px 520px at -5% -12%,#42308666,transparent 65
 #previewDialog{width:96vw;max-width:1600px;height:90vh;background:#111827;color:#e5e7eb;border:1px solid #64748b;border-radius:12px;padding:20px;box-sizing:border-box}
 #previewDialog::backdrop{background:#000b}.preview-heading,.preview-controls{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.preview-heading{justify-content:space-between}.preview-controls{margin-bottom:16px}.preview-controls label{display:flex;align-items:center;gap:8px}.preview-workspace{display:grid;grid-template-columns:320px 1fr;gap:16px;height:calc(100% - 170px)}.preview-workspace>section{overflow:auto}.preview-workspace iframe{width:100%;height:100%;border:1px solid #475569;background:#111827}.preview-channel{padding:10px 0;border-bottom:1px solid #475569}.preview-channel label,.preview-channel small{display:block}.preview-channel input{margin:6px 0;width:100%;box-sizing:border-box}.preview-channel input[type=checkbox]{width:auto;display:block}.preview-channel small{color:#a5b4fc}.preview-channel button{margin:0 0 5px}#previewLog{white-space:pre-wrap;max-height:220px;overflow:auto;font-size:12px}@media(max-width:800px){.preview-workspace{grid-template-columns:1fr;height:auto}.preview-workspace iframe{height:650px}}
 #previewDialog .preview-controls label{margin:0;white-space:nowrap;width:auto;flex:none;font-size:13px}#previewDialog input[type="checkbox"]{width:18px;height:18px;min-height:18px;flex:none;margin:0 6px 0 0}#previewDialog .preview-controls{min-height:40px}
+#pauseHidden{width:18px;height:18px;min-height:18px;vertical-align:middle;margin-right:8px}
+
+.group-style-settings{border:1px solid var(--line);border-radius:10px;padding:10px;margin:8px 0}.group-style-settings #groupBorder{width:18px;height:18px;display:inline-block;vertical-align:middle}
+
+#draftStatus{font-size:12px;line-height:1.4;color:#b8c7dc;margin:8px 0}#draftStatus[data-error="1"]{color:#ffb7a5}
+#contractDialog{width:94vw;max-width:1400px;max-height:92vh;box-sizing:border-box;overflow:auto;background:#111827;color:#e5e7eb;border:1px solid #64748b;border-radius:12px;padding:20px}
+#contractDialog::backdrop{background:#000b}.contract-heading,.contract-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.contract-heading{justify-content:space-between}.contract-heading h2{margin:0}.contract-actions{margin:16px 0}.contract-actions label{display:flex;align-items:center;gap:8px;width:auto;margin:0}.contract-table-wrap{overflow:auto;max-height:60vh}#contractTable{border-collapse:collapse;width:100%;font-size:13px}#contractTable th,#contractTable td{text-align:left;vertical-align:top;border-bottom:1px solid #475569;padding:10px;white-space:pre-line;overflow-wrap:anywhere}#contractTable th{position:sticky;top:0;background:#1f2937}#contractTable th:first-child{min-width:70px}
+
+/* Reusable scenarios remain inside the offline preview. */
+#previewDialog[open]{display:flex;flex-direction:column;overflow:auto}
+#previewDialog .preview-workspace{flex:1;min-height:220px;height:auto}
+.preview-scenario{flex:none;border:1px solid #475569;border-radius:8px;padding:10px;margin-bottom:10px;max-height:30vh;overflow:auto;font-size:12px}
+.preview-scenario p{margin:8px 0}.scenario-actions{display:flex;gap:6px;flex-wrap:wrap}.scenario-actions button{font-size:12px;padding:7px 9px}
+#scenarioSteps{max-height:90px;overflow:auto;padding-left:24px;white-space:pre-wrap}#scenarioStatus{color:#a5b4fc}
+#installToIde{width:18px;height:18px;min-height:18px;vertical-align:middle;margin-right:8px}
+#compatibilityDialog{width:min(960px,94vw);max-height:88vh;overflow:auto}
+#compatibilityRows{padding-left:22px}
+#compatibilityRows li{padding:8px 4px;border-bottom:1px solid #52647b}
+#compatibilityRows p{margin:4px 0}
+#compatibilityRows code{white-space:pre-wrap;overflow-wrap:anywhere;user-select:text}
+#compatibilityRows .error{color:#ffacac}
+#compatibilityRows .warning{color:#ffd786}

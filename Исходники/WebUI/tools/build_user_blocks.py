@@ -90,6 +90,8 @@ def build_group():
     elements = ET.SubElement(root, "sixx.object", {"sixx.id": "1", "sixx.name": "elements", "sixx.type": "OrderedCollection", "sixx.env": "Core"})
     next_id = 10
     for source in sorted(OUT.glob("FLProg_WebUI_*.ubi")):
+        if source.name == "FLProg_WebUI_Start.ubi":
+            continue  # Professional starter is imported as its own .ubi document.
         element = ET.parse(str(source)).getroot()
         mapping = {}
         for node in element.iter():

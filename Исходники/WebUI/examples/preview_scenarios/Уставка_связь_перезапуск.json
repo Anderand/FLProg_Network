@@ -1,0 +1,70 @@
+{
+  "schema": "flprog.webui.preview-scenario/1.0",
+  "projectId": "preview_busy_demo",
+  "channels": [
+    {
+      "id": "busy",
+      "type": "bool",
+      "direction": "publish",
+      "secret": false
+    },
+    {
+      "id": "result",
+      "type": "bool",
+      "direction": "publish",
+      "secret": false
+    },
+    {
+      "id": "run",
+      "type": "bool",
+      "direction": "command",
+      "secret": false
+    },
+    {
+      "id": "setpoint",
+      "type": "float",
+      "direction": "duplex",
+      "secret": false
+    }
+  ],
+  "initial": {
+    "values": {
+      "setpoint": 0,
+      "run": false,
+      "result": false,
+      "busy": false
+    },
+    "online": true,
+    "automatic": true
+  },
+  "steps": [
+    {
+      "action": "set",
+      "id": "setpoint",
+      "value": 30.5,
+      "afterMs": 100
+    },
+    {
+      "action": "command",
+      "id": "run",
+      "value": true,
+      "widget": "start",
+      "afterMs": 100
+    },
+    {
+      "action": "online",
+      "value": false,
+      "afterMs": 2500
+    },
+    {
+      "action": "restart",
+      "afterMs": 250
+    },
+    {
+      "action": "online",
+      "value": true,
+      "afterMs": 250
+    }
+  ],
+  "tailMs": 1000
+}

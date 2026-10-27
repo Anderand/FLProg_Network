@@ -2,6 +2,8 @@
 import copy
 import math
 import re
+from field_pattern import parse_pattern
+from group_style import validate_group_styles
 
 STATIC = {"heading", "static-text", "divider", "link"}
 COMMAND = {"switch", "checkbox", "button", "slider", "number-input", "text-input",
@@ -15,7 +17,7 @@ for kinds, types in [
 ]:
     for kind in kinds:
         EXPECTED[kind] = types
-ROLES = {"value", "setpoint", "busy", "result", "alarm", "series1", "series2"}
+ROLES = {"value", "setpoint", "busy", "result", "enabled", "alarm", "series1", "series2"}
 
 
 def _validate_project(document):
@@ -85,6 +87,10 @@ def _validate_project(document):
                 indexes.add(number)
     widget_ids, page_ids = set(), set()
     for pi, page in enumerate(pages):
+        try:
+            validate_group_styles(page)
+        except ValueError as error:
+            add("group-style",str(error),pi,tab="general")
         page_id = str(page.get("id", ""))
         if not page_id or page_id in page_ids:
             add("page-id", "ID страницы пустой или повторяется: " + page_id, pi, tab="project")
@@ -100,6 +106,13 @@ def _validate_project(document):
             widget_ids.add(id)
             if kind not in generator.WIDGET_TYPES:
                 problem("widget-type", "Неизвестный тип виджета: " + str(kind), "general")
+            try:
+                parse_pattern(w.get("pattern", ""))
+                if w.get("pattern") and kind not in ("text-input", "password-input"): raise ValueError("Шаблон доступен только текстовому полю и паролю")
+                message=w.get("validationMessage", "")
+                if not isinstance(message,str) or len(message.encode("utf-8"))>96 or any(ord(c)<32 for c in message): raise ValueError("Текст ошибки: до 96 байт UTF-8")
+            except ValueError as error:
+                problem("field-pattern", str(error), "behavior")
             primary = by_id.get(str(w.get("channel", "")))
             if kind not in STATIC and primary is None:
                 problem("missing-channel", "Не выбран основной канал или он отсутствует: " + str(w.get("channel") or "—"))
@@ -124,8 +137,10 @@ def _validate_project(document):
                 direction = b.get("direction", "duplex")
                 if direction not in generator.DIRECTIONS or (role == "setpoint" and (direction == "publish" or target.get("direction") == "publish")) or (role != "setpoint" and (direction == "command" or target.get("direction") == "command")):
                     problem("binding-direction", "Неподходящее направление связи «%s» и её канала" % role)
-                if role in ("busy", "alarm") and target.get("type") != "bool":
+                if role in ("busy", "alarm", "enabled") and target.get("type") != "bool":
                     problem("binding-type", "Связь «%s» требует bool-канал" % role)
+                if role == "enabled" and kind not in COMMAND:
+                    problem("enabled-widget", "Связь enabled доступна только элементу управления")
                 if role == "setpoint":
                     if kind not in COMMAND:
                         problem("setpoint-widget", "Связь setpoint доступна только элементу управления")

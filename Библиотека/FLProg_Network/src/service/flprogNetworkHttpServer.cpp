@@ -1141,6 +1141,13 @@ void FLProgNetworkHttpServer::urlDecodeInto(
 bool FLProgNetworkHttpServer::parseArguments(ClientContext &ctx, const char *query)
 {
     if (query == nullptr || *query == 0) return true;
+    // Embedded NUL cannot be represented by the fixed C-string arguments.
+    // Reject it before decoding instead of accepting a truncated value.
+    for (const char *p = query; *p; ++p)
+        if (p[0] == '%' && p[1] == '0' && p[2] == '0') {
+            ctx.error = FLPROG_HTTP_SERVER_ERROR_REQUEST_LINE;
+            return false;
+        }
     const char *cursor = query;
     while (*cursor != 0)
     {

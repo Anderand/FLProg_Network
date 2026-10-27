@@ -33,6 +33,14 @@ def main():
                         (str(ROOT / "editor/server.py"), str(temporary / "tools"), data), encoding="utf-8")
         subprocess.run([sys.executable, "-m", "PyInstaller", "--distpath", str(output),
                         "--workpath", str(temporary / "build"), str(spec)], check=True)
+        scenarios = ROOT / 'examples' / 'preview_scenarios'
+        if scenarios.is_dir():
+            shutil.copytree(scenarios, output / 'FLProg_WebUI_Editor' / 'Сценарии')
+        guide = ROOT / 'specification' / 'PREVIEW_SCENARIOS_RU.md'
+        if guide.is_file():
+            shutil.copy2(guide, output / 'FLProg_WebUI_Editor' / 'СЦЕНАРИИ.md')
+        shutil.copy2(ROOT / 'specification/BUILD_COMPATIBILITY_RU.md',
+                     output / 'FLProg_WebUI_Editor' / 'СОВМЕСТИМОСТЬ.md')
 
 
 if __name__ == "__main__":

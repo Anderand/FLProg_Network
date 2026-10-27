@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <title>FLProg Web UI Editor — r13</title>
-  <link rel="stylesheet" href="style.css?v=20261025-r6">
+  <title>FLProg Web UI Editor — каналы FLProg</title>
+  <link rel="stylesheet" href="style.css?v=20261027-scenarios1">
 </head>
 <body>
   <header class="app-header">
@@ -26,9 +26,11 @@
       <span class="header-actions-divider" aria-hidden="true"></span>
       <button id="save" type="button" title="Сохранить проект в файл .flpui">Сохранить</button>
       <button id="validateProject" type="button">Проверить проект</button>
+      <button id="compatibilityCheck" type="button">Совместимость</button>
+      <button id="channelContract" type="button" title="Номера CHANNEL, типы, направления и связи для универсальных блоков">Каналы FLProg</button>
       <button id="previewProject" type="button">Предпросмотр</button>
       <button id="previewDemo" type="button" title="Открыть демопроект и запустить локальный предпросмотр">Демо: уставка и busy/result</button>
-      <button class="primary" id="build" type="button" title="Создать пакет для FLProg и установить его">Собрать и установить</button>
+      <button class="primary" id="build" type="button" title="Создать библиотеку проекта; копирование в IDE задаётся отдельной галочкой">Собрать пакет</button>
     </div>
   </header>
 
@@ -46,7 +48,12 @@
         <div class="section-body">
           <label>ID проекта<input id="projectId" autocomplete="off" spellcheck="false"></label>
           <label>Название<input id="title" autocomplete="off"></label>
-          <label class="advanced-field">Папка пакетов<input id="packageOutput" autocomplete="off" spellcheck="false"></label>
+          <p id="draftStatus" role="status" aria-live="polite"></p><label>Период опроса, мс<input id="pollInterval" type="number" min="500" max="60000" step="1"></label>
+          <label><input id="pauseHidden" type="checkbox">Пауза в фоновой вкладке</label>
+          <small>При возвращении — полная синхронизация. Черновики не отправляются автоматически.</small>
+          <label>Папка проекта (полный путь)<input id="projectFolder" autocomplete="off" spellcheck="false" placeholder="E:\FLProg_Projects\a123"></label>
+          <label><input type="checkbox" id="installToIde"> Копировать библиотеку проекта в Arduino IDE</label>
+          <label class="advanced-field">Папка пакетов (если папка проекта не задана)<input id="packageOutput" autocomplete="off" spellcheck="false"></label>
         </div>
       </details>
 
@@ -65,7 +72,7 @@
       <details class="side-section channels-section collapsible" open>
         <summary><span class="section-kicker">Данные</span><h2>Каналы</h2><span class="section-badge">FBD</span></summary>
         <div class="section-body">
-          <p class="section-note">API FLProg_Network резервирует номера 0–100. Пользовательские каналы начинаются с 101.</p>
+          <p class="section-note">Системные каналы №0–100 заполняются библиотеками автоматически. Пользовательские №101+ связываются с FBD.</p>
           <div id="channels" class="channels-list"></div>
           <div class="toolbar channel-toolbar" aria-label="Добавить пользовательский канал">
             <button type="button" data-channel="bool">+ Bool</button>
@@ -93,7 +100,7 @@
         <div id="pages" class="toolbar page-tabs" role="tablist" aria-label="Страницы проекта"></div>
         <div class="toolbar page-actions" aria-label="Добавить страницу">
           <button id="addPage" type="button">+ Пустая</button>
-          <button id="addDiagnosticsPage" type="button" title="Добавить компактную страницу состояния RMII/TCP/UDP">+ Диагностика</button>
+          <button id="addDiagnosticsPage" type="button" title="Добавить сетевую диагностику из API проекта; существующую страницу сохранить">+ Диагностика</button>
           <button id="addWifiPage" type="button">+ Wi‑Fi</button>
           <button id="addApPage" type="button" title="Добавить страницу точки доступа">+ Точка доступа</button>
           <button id="addScannerPage" type="button" title="Добавить страницу сканера Wi‑Fi">+ Сканер Wi‑Fi</button>
@@ -160,6 +167,11 @@
           <label>Подпись<input id="widgetLabel"></label>
           <label>Группа элементов<input id="widgetGroup" list="elementGroups" placeholder="Например: Насосная"><datalist id="elementGroups"></datalist></label>
           <p class="hint">Одинаковое имя объединяет элементы в секцию. X/Y отсчитываются внутри группы; пустое имя — без группы.</p>
+          <fieldset class="group-style-settings"><legend>Вид группы</legend>
+          <label><input id="groupBorder" type="checkbox"> Показывать рамку группы</label>
+          <label>Внутренний отступ, px<input id="groupPadding" type="number" min="0" max="32" step="1"></label>
+          <label>Между элементами, px<input id="groupGap" type="number" min="0" max="32" step="1"></label>
+          <p class="hint">Общие настройки всех элементов этой группы на текущей странице. Для пустой группы недоступны. Сетка X/Y/W/H сохраняется.</p></fieldset>
           <label>Описание<textarea id="widgetDescription" rows="2" placeholder="Что делает этот виджет"></textarea></label>
           <label>Значок<input id="widgetIcon" placeholder="например: ☀"></label>
           <label>Тип<select id="widgetType"><option value="heading">Элемент: заголовок</option><option value="static-text">Элемент: текст</option><option value="divider">Элемент: разделитель</option><option value="link">Элемент: ссылка</option><option value="status-row">Элемент: строка статуса</option><option value="indicator">Индикатор</option><option value="switch">Переключатель</option><option value="checkbox">Флажок</option><option value="slider">Ползунок</option><option value="number-input">Число</option><option value="progress">Прогресс</option><option value="chart">Тренд</option><option value="radial-gauge">Круговой индикатор</option><option value="sector-gauge">Секторный прибор</option><option value="bar-meter">Столбцы</option><option value="battery">Батарея</option><option value="segment-display">Сегментный дисплей</option><option value="traffic-light">Светофор</option><option value="text">Вывод текста</option><option value="text-input">Ввод текста</option><option value="password-input">Пароль</option><option value="color-input">Цвет</option><option value="date-input">Дата</option><option value="time-input">Время</option><option value="select">Выбор</option><option value="weekdays">Дни недели</option><option value="button">Кнопка</option><option value="wifi-scan">Сканер Wi‑Fi</option></select></label>
@@ -175,7 +187,7 @@
             </div>
             <div class="binding-editor">
               <div class="binding-heading"><b>Дополнительные связи</b><small>Для сложных виджетов: уставка, авария, серия графика, busy.</small></div>
-              <div class="binding-compose"><label>Роль<select id="bindingRole"><option value="value">Значение</option><option value="setpoint">Уставка</option><option value="alarm">Авария</option><option value="busy">Занят</option><option value="result">Результат</option><option value="series1">Серия 1</option><option value="series2">Серия 2</option></select></label><label>Канал<select id="bindingChannel"></select></label><label>Направление<select id="bindingDirection"><option value="publish">Из FBD</option><option value="command">В FBD</option><option value="duplex">Двусторонне</option></select></label><button id="addBinding" type="button">+ Связь</button></div>
+              <div class="binding-compose"><label>Роль<select id="bindingRole"><option value="value">Значение</option><option value="setpoint">Уставка</option><option value="alarm">Авария</option><option value="busy">Занят</option><option value="enabled">Разрешение (bool из FBD)</option><option value="result">Результат</option><option value="series1">Серия 1</option><option value="series2">Серия 2</option></select></label><label>Канал<select id="bindingChannel"></select></label><label>Направление<select id="bindingDirection"><option value="publish">Из FBD</option><option value="command">В FBD</option><option value="duplex">Двусторонне</option></select></label><button id="addBinding" type="button">+ Связь</button></div>
               <div id="bindingList" class="binding-list" aria-live="polite"></div>
               <details class="advanced-binding-json"><summary>Расширенный JSON</summary><label>Связи <small>роль → канал → направление</small><textarea id="widgetBindings" rows="4" spellcheck="false" placeholder='[{"role":"setpoint","channel":"channel_101","direction":"duplex"}]'></textarea></label></details>
             </div>
@@ -185,7 +197,7 @@
           <label id="optionsProps">Варианты выбора / текст <small>(выбор — через ;)</small><input id="widgetOptions" placeholder="Авто;Ручной;Ночь или обычный текст"></label>
           <label>Подсказка поля<input id="widgetPlaceholder" placeholder="Например: задайте температуру"></label>
           <label>Единица измерения<input id="widgetUnit" placeholder="°C, бар, об/мин"></label>
-          <label>Максимум байт текста (UTF-8)<input id="widgetMaxLength" type="number" min="1" max="63" value="63"></label>
+          <label>Шаблон текста (ASCII)<input id="widgetPattern" type="text" maxlength="63" placeholder="[A-Z]{2}-[0-9]{3}"></label><label>Текст ошибки<input id="widgetValidationMessage" type="text" placeholder="Например: AB-123"></label><p class="hint">Шаблон проверяет всё значение: диапазоны, \d, \w, \s, ? * + {n,m}. До 63 ASCII-символов. Текст ошибки — до 96 байт UTF-8.</p><label>Максимум байт текста (UTF-8)<input id="widgetMaxLength" type="number" min="1" max="63" value="63"></label>
           <label>Подтверждение команды<input id="widgetConfirmation" placeholder="Пусто — без диалога; например: Запустить насос?"></label>
           <p class="hint">Поля отправляются кнопкой «Применить» или Enter. Escape отменяет ввод. Приём команды подтверждается отдельно от результата FBD.</p>
           <div id="sliderProps" class="slider-props"><label>Минимум<input id="widgetMin" type="number"></label><label>Максимум<input id="widgetMax" type="number"></label><label>Шаг<input id="widgetStep" type="number" step="any"></label></div>
@@ -225,14 +237,41 @@
       <div id="widgetSettingsMount"></div>
     </form>
   </dialog>
+  <dialog id="contractDialog" aria-label="Каналы для FLProg">
+    <div class="contract-heading"><h2>Каналы для FLProg</h2><button id="contractClose" type="button">Закрыть</button></div>
+    <p id="contractSummary"></p>
+    <p>Это схема подключения из макета. Она не проверяет наличие блоков в вашем .flp. Системные каналы №0–100 заполняются автоматически.</p>
+    <div class="contract-actions"><label>Показать <select id="contractFilter"><option value="all">Все каналы</option><option value="user">Подключение к FBD</option><option value="system">Автоматические</option></select></label><button id="contractMarkdown" type="button">Скачать Markdown</button><button id="contractJson" type="button">Скачать JSON</button></div>
+    <div class="contract-table-wrap"><table id="contractTable"><thead><tr><th>CHANNEL</th><th>Канал</th><th>Тип</th><th>Направление и блоки</th><th>Виджеты и роли</th></tr></thead><tbody></tbody></table></div>
+    <p>Command: NEW — новая команда, не подтверждение её выполнения. При duplex Publish возвращает фактическое значение. Текущие значения и пароли не экспортируются.</p>
+  </dialog>
+  <dialog id="compatibilityDialog" aria-label="Совместимость перед сборкой">
+    <div class="preview-heading"><h2>Совместимость перед сборкой</h2><button id="compatibilityClose" type="button">Закрыть проверку</button></div>
+    <p>Проверка ничего не записывает. Здесь проверяется экспорт пакета; выбранный скетч и STM32 core проверяет OTA-менеджер перед компиляцией.</p>
+    <p id="compatibilitySummary" role="status"></p><ul id="compatibilityRows"></ul>
+    <button id="compatibilityAgain" type="button">Проверить заново</button>
+  </dialog>
   <dialog id="previewDialog" aria-label="Предпросмотр без контроллера">
     <div class="preview-heading"><h2>Предпросмотр без контроллера</h2><button id="previewClose" type="button">Закрыть предпросмотр</button></div>
     <p>Локальная имитация: программа FBD не исполняется. Изменения здесь не сохраняются в проекте.</p>
     <div class="preview-controls"><label><input id="previewOnline" type="checkbox" checked>Связь включена</label><button id="previewRestart" type="button">Перезапустить ПЛК</button><label><input id="previewAutomatic" type="checkbox" checked>Авто busy/result (2 секунды)</label></div>
+    <details id="previewScenario" class="preview-scenario" open>
+      <summary>Сценарий: снимок значений и повтор действий</summary>
+      <p>Записываются принятые действия в локальной модели. Открытие JSON ничего не запускает. Пароли не сохраняются. До 200 шагов и 10 минут.</p>
+      <div class="scenario-actions"><button id="scenarioCapture" type="button">Снимок значений</button><button id="scenarioRecord" type="button">Записать действия</button><button id="scenarioStop" type="button" disabled>Остановить</button><button id="scenarioPlay" type="button" disabled>Воспроизвести</button><button id="scenarioSave" type="button" disabled>Сохранить JSON</button><button id="scenarioLoad" type="button">Открыть JSON</button><input id="scenarioFile" type="file" accept=".json,application/json" hidden></div>
+      <p id="scenarioStatus" role="status">Сценарий ещё не создан</p><ol id="scenarioSteps"></ol>
+    </details>
     <div class="preview-workspace"><section aria-label="Каналы предпросмотра"><h3>Значения каналов</h3><div id="previewChannels"></div><p id="previewStatus" role="status"></p><pre id="previewLog" aria-label="Журнал предпросмотра"></pre></section><iframe id="previewFrame" title="Веб-интерфейс предпросмотра" sandbox="allow-scripts"></iframe></div>
   </dialog>
-  <script src="validation.js?v=validation-1"></script>
-  <script src="app.js?v=20261025-r6"></script>
-  <script src="preview.js?v=1"></script>
+  <script src="compatibility.js?v=20261027-1"></script>
+  <script src="validation.js?v=20261027-compatibility1"></script>
+  <script src="diagnostics.js?v=20261025-memory"></script>
+  <script src="draft.js?v=20261025-draft2"></script>
+  <script src="app.js?v=20261026-projectfolder"></script>
+  <script src="contract.js?v=20261027-contract1"></script>
+  <script src="preview-scenarios.js?v=20261027-1"></script>
+  <script src="preview.js?v=20261027-scenarios1"></script>
+  <script src="preview-scenario-controls.js?v=20261027-1"></script>
 </body>
 </html>
+
