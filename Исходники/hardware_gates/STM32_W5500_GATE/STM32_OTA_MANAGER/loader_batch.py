@@ -5,7 +5,7 @@ import threading
 import time
 
 
-def run(builder, targets, source, notify, libraries=None):
+def run(builder, targets, source, notify, libraries=None, package=True):
     started = time.time()
     report = dict(started=started, finished=None, rows={
         name: dict(status='queued', started=None, seconds=0, size=0, error='')
@@ -24,7 +24,10 @@ def run(builder, targets, source, notify, libraries=None):
             report['rows'][name].update(status='building', started=time.time())
             publish()
         try:
-            path = builder.build(name, source, libraries=libraries) if libraries else builder.build(name, source)
+            options = {}
+            if libraries: options['libraries'] = libraries
+            if not package: options['package'] = False
+            path = builder.build(name, source, **options)
             result = dict(status='success', size=path.stat().st_size)
         except Exception as exc:
             result = dict(status='failed', error=str(exc))

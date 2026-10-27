@@ -3,7 +3,7 @@ const assets=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
 function setup(){
  const store=new Map(),calls=[],timers=[],s={dataset:{},textContent:''},m={hidden:false,setAttribute(){},append(b){this.button=b}},nav={children:[],set innerHTML(v){this.children=[...v.matchAll(/<button>/g)].map(()=>({}))}},main={setAttribute(){}};
  const c={console,Date,encodeURIComponent,location:{pathname:'/'},localStorage:{getItem:k=>store.get(k),setItem:(k,v)=>store.set(k,v)},document:{hidden:false,createElement:()=>({}),documentElement:{style:{setProperty(){}}},querySelector:k=>({'#s':s,'#m':m,'#n':nav,main})[k]},setTimeout:f=>timers.push(f),setInterval(){},pollStop(){},pollEpoch:0,syncPending:true,pollStarted:false,pollSchedule(){},pollConfig(){},N(){},R(){},commandBusy:false,lastOK:1};
- vm.createContext(c);for(const p of ['/flprog-webui/controls.js?part=navigation','/flprog-webui/boot-init.js','/flprog-webui/boot.js'])vm.runInContext(assets[p].body,c);
+ vm.createContext(c);for(const p of ['/flprog-webui/controls.js?part=navigation','/flprog-webui/controls.js?part=catalog','/flprog-webui/boot-init.js','/flprog-webui/boot.js'])vm.runInContext(assets[p].body,c);
  c.f=async u=>{calls.push(u);if(u.includes('page=0'))return{id:'first',title:'First',pages:2,indices:[0]};if(u.includes('page=1'))return{id:'second',title:'Second',indices:[1,2]};if(u.includes('index='))return{id:'w'+u.split('=').at(-1),page:c.g};return{revision:1,uptime:100,values:{sp:27}}};
  return{c,store,calls,nav,m};
 }
@@ -20,5 +20,27 @@ function setup(){
  await nav.children[1].onclick();assert(!c.navReady);assert(c.syncPending);assert.equal(c.a[1],undefined);assert(!c.n[1].loaded);failed=false;await m.button.onclick();assert(c.navReady);assert(c.n[1].loaded);assert.equal(c.a[2].id,'w2');assert(calls.at(-1).endsWith('page=second'));
  // No navigation path ever sends a POST or calls the command function.
  assert(calls.every(u=>u.startsWith('/flprog-webui/item?')||u.startsWith('/flprog-webui/state?')));
+ // A generated Flash catalog is read once, validated fully and committed atomically.
+ let fresh=setup();c=fresh.c;calls=fresh.calls;
+ const batch={page:'second',items:[[1,{id:'w1',type:'button',page:'second'}],[2,{id:'w2',type:'number-input',page:'second'}]]};
+ c.f=async u=>{calls.push(u);return batch};
+ let page={id:'second',indices:[1,2],widgetCatalog:true};await c.L(page);
+ assert.equal(calls.length,1);assert(calls[0].includes('widgets=second'));assert(page.loaded);assert.equal(c.a[2].type,'number-input');
+ assert(c.document.querySelector('#s').textContent.includes('Чтение описаний'));
+ // Loading a catalog for an already rendered page must not erase field drafts.
+ const surface=c.document.querySelector('#s');surface.dataset.page='second';surface.textContent='draft';
+ page={id:'second',indices:[1,2],widgetCatalog:true};await c.L(page);assert.equal(surface.textContent,'draft');
+ for(const bad of [{page:'wrong',items:batch.items},{page:'second',items:batch.items.slice(0,1)},
+     {page:'second',items:[batch.items[1],batch.items[0]]},
+     {page:'second',items:[[1,{id:'x',type:'button',page:'wrong'}],batch.items[1]]}]){
+   c.a=[];page={id:'second',indices:[1,2],widgetCatalog:true};c.f=async()=>bad;
+   await assert.rejects(c.L(page));assert(!page.loaded);assert.equal(c.a[1],undefined);
+ }
+ // A late previous-page GET may defer the first new read. Its eventual success
+ // must clear the loading stage without clearing unrelated command messages.
+ fresh=setup();c=fresh.c;await c.B();c.busy=1;await c.navSelect(c.n[1]);
+ assert.equal(c.lastMessage,'Синхронизация с ПЛК…');c.busy=0;await c.q();assert.equal(c.lastMessage,'');
+ c.loadStage('Чтение описаний элементов…');c.M('Принято контроллером');c.loadStageDone();
+ assert.equal(c.lastMessage,'Принято контроллером');
  console.log('Navigation: restore, removed ID, denied storage, menu retry, atomic widget retry, full sync, no writes OK');
 })().catch(e=>{console.error(e);process.exitCode=1});

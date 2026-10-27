@@ -1,0 +1,1830 @@
+{
+  "schema": "flprog.webui.channel-contract/1.0",
+  "project_id": "FLE4D-30MT",
+  "project_title": "FLE4D-30MT",
+  "transport": "w5500-http-1",
+  "channels": [
+    {
+      "index": 0,
+      "id": "network_ip",
+      "label": "IP-адрес",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgNetworkInterface::localIP",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "network_diag_ip",
+          "widget_label": "IP-адрес",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "id": "network_ready",
+      "label": "Сеть подключена",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgNetworkInterface::isReady",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "network_diag_ready",
+          "widget_label": "Сеть подключена",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "id": "network_mac",
+      "label": "MAC-адрес",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgNetworkInterface::mac",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "network_diag_mac",
+          "widget_label": "MAC-адрес",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "id": "network_gateway",
+      "label": "Шлюз",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgNetworkInterface::activeGateway",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "network_diag_gateway",
+          "widget_label": "Шлюз",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "id": "network_subnet",
+      "label": "Маска подсети",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgNetworkInterface::activeSubnet",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "network_diag_subnet",
+          "widget_label": "Маска подсети",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "id": "device_model",
+      "label": "Модель контроллера",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgNetworkInterface::deviceModel (attached identity provider)",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "network_diag_model",
+          "widget_label": "Модель контроллера",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "id": "firmware_version",
+      "label": "Версия прошивки",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgNetworkInterface::firmwareVersion (attached identity provider)",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "network_diag_version",
+          "widget_label": "Версия прошивки",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "id": "reset_flags",
+      "label": "Маска сброса (накопленная)",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readResetFlags",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "network_diag_flags",
+          "widget_label": "Маска сброса (накопленная)",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "id": "reset_cause",
+      "label": "Расшифровка флагов сброса",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::resetDescription",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "network_diag_reset",
+          "widget_label": "Расшифровка флагов сброса",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "id": "heap_used",
+      "label": "ОЗУ: динамически занято, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readHeap (uordblks)",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "network_diag_heap_used",
+          "widget_label": "ОЗУ: динамически занято, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "id": "heap_arena_free",
+      "label": "ОЗУ: свободные блоки в выделенном пуле, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readHeap (fordblks, not total RAM)",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "network_diag_heap_free",
+          "widget_label": "ОЗУ: свободные блоки в выделенном пуле, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 11,
+      "id": "flash_total",
+      "label": "Flash контроллера: всего, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "system_flash_total",
+          "widget_label": "Flash контроллера: всего, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 12,
+      "id": "flash_app_capacity",
+      "label": "Flash: доступно приложению, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "system_flash_app_capacity",
+          "widget_label": "Flash: доступно приложению, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 13,
+      "id": "flash_app_used",
+      "label": "Flash: размер приложения, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "system_flash_app_used",
+          "widget_label": "Flash: размер приложения, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 14,
+      "id": "flash_app_free",
+      "label": "Flash: свободно для приложения, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "system_flash_app_free",
+          "widget_label": "Flash: свободно для приложения, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 15,
+      "id": "ram_total",
+      "label": "ОЗУ контроллера: всего, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "system_ram_total",
+          "widget_label": "ОЗУ контроллера: всего, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 16,
+      "id": "ram_app_capacity",
+      "label": "ОЗУ: доступно приложению, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "system_ram_app_capacity",
+          "widget_label": "ОЗУ: доступно приложению, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 17,
+      "id": "ram_static_used",
+      "label": "ОЗУ: переменные программы, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "system_ram_static_used",
+          "widget_label": "ОЗУ: переменные программы, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 18,
+      "id": "ram_available_estimate",
+      "label": "ОЗУ: доступно для выделений (оценка), байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "system_ram_available_estimate",
+          "widget_label": "ОЗУ: доступно для выделений (оценка), байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 19,
+      "id": "ram_used_estimate",
+      "label": "ОЗУ: занято и зарезервировано (оценка), байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "system_ram_used_estimate",
+          "widget_label": "ОЗУ: занято и зарезервировано (оценка), байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 20,
+      "id": "ccm_total",
+      "label": "Дополнительная ОЗУ CCM: всего, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "system_ccm_total",
+          "widget_label": "Дополнительная ОЗУ CCM: всего, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 21,
+      "id": "ccm_used",
+      "label": "Дополнительная ОЗУ CCM: занято, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "system_ccm_used",
+          "widget_label": "Дополнительная ОЗУ CCM: занято, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 22,
+      "id": "system_uptime",
+      "label": "Время работы после запуска, с",
+      "type": "int32",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::millis / 1000",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "diagnostics",
+          "page_title": "Диагностика",
+          "widget_id": "system_uptime_value",
+          "widget_label": "Время работы после запуска",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 29,
+      "id": "console_ready",
+      "label": "Консоль готова · UART6",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "project-system",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "main",
+          "page_title": "Главная",
+          "widget_id": "view_console_ready",
+          "widget_label": "Консоль готова · UART6",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 31,
+      "id": "console_core",
+      "label": "Ядро · RT_HW",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "project-system",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "main",
+          "page_title": "Главная",
+          "widget_id": "view_console_core",
+          "widget_label": "Ядро · RT_HW",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 32,
+      "id": "console_arch",
+      "label": "Архитектура · RT_HW",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "project-system",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "main",
+          "page_title": "Главная",
+          "widget_id": "view_console_arch",
+          "widget_label": "Архитектура · RT_HW",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 33,
+      "id": "console_core_version",
+      "label": "Версия ядра · RT_HW",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "project-system",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "main",
+          "page_title": "Главная",
+          "widget_id": "view_console_core_version",
+          "widget_label": "Версия ядра · RT_HW",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 34,
+      "id": "console_cpu_mhz",
+      "label": "Частота CPU, МГц",
+      "type": "int32",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "project-system",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "main",
+          "page_title": "Главная",
+          "widget_id": "view_console_cpu_mhz",
+          "widget_label": "Частота CPU, МГц",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 35,
+      "id": "console_vcc_mv",
+      "label": "Питание Vcc, мВ",
+      "type": "int32",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "project-system",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "main",
+          "page_title": "Главная",
+          "widget_id": "view_console_vcc_mv",
+          "widget_label": "Питание Vcc, мВ",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 37,
+      "id": "console_board_id",
+      "label": "ID платы · RT_HW",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "project-system",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "main",
+          "page_title": "Главная",
+          "widget_id": "view_console_board_id",
+          "widget_label": "ID платы · RT_HW",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 38,
+      "id": "console_base_version",
+      "label": "Версия RT_HW_BASE",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "project-system",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "main",
+          "page_title": "Главная",
+          "widget_id": "view_console_base_version",
+          "widget_label": "Версия RT_HW_BASE",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 39,
+      "id": "console_library_version",
+      "label": "Версия RT_HW_CONSOLE",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "project-system",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "main",
+          "page_title": "Главная",
+          "widget_id": "view_console_library_version",
+          "widget_label": "Версия RT_HW_CONSOLE",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 40,
+      "id": "console_loop_speed",
+      "label": "Скорость цикла, циклов/с",
+      "type": "int32",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "project-system",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "main",
+          "page_title": "Главная",
+          "widget_id": "view_console_loop_speed",
+          "widget_label": "Скорость цикла, циклов/с",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 41,
+      "id": "console_scheduler",
+      "label": "Размеры групп диспетчера",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "project-system",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "main",
+          "page_title": "Главная",
+          "widget_id": "view_console_scheduler",
+          "widget_label": "Размеры групп диспетчера",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 42,
+      "id": "web_control_ready",
+      "label": "Веб-управление разрешено",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "project-system",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_01",
+          "widget_label": "DO1 · PA0",
+          "role": "enabled",
+          "role_title": "разрешение"
+        },
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_02",
+          "widget_label": "DO2 · PA1",
+          "role": "enabled",
+          "role_title": "разрешение"
+        },
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_03",
+          "widget_label": "DO3 · PA2",
+          "role": "enabled",
+          "role_title": "разрешение"
+        },
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_04",
+          "widget_label": "DO4 · PA3",
+          "role": "enabled",
+          "role_title": "разрешение"
+        },
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_05",
+          "widget_label": "DO5 · PA6",
+          "role": "enabled",
+          "role_title": "разрешение"
+        },
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_06",
+          "widget_label": "DO6 · PA7",
+          "role": "enabled",
+          "role_title": "разрешение"
+        },
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_07",
+          "widget_label": "DO7 · PA8",
+          "role": "enabled",
+          "role_title": "разрешение"
+        },
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_08",
+          "widget_label": "DO8 · PA11",
+          "role": "enabled",
+          "role_title": "разрешение"
+        },
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_09",
+          "widget_label": "DO9 · PB0",
+          "role": "enabled",
+          "role_title": "разрешение"
+        },
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_10",
+          "widget_label": "DO10 · PB1",
+          "role": "enabled",
+          "role_title": "разрешение"
+        },
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_11",
+          "widget_label": "DO11 · PE5",
+          "role": "enabled",
+          "role_title": "разрешение"
+        },
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_12",
+          "widget_label": "DO12 · PE6",
+          "role": "enabled",
+          "role_title": "разрешение"
+        },
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_13",
+          "widget_label": "DO13 · PE7",
+          "role": "enabled",
+          "role_title": "разрешение"
+        },
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_14",
+          "widget_label": "DO14 · PE8",
+          "role": "enabled",
+          "role_title": "разрешение"
+        },
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_ao_0",
+          "widget_label": "AO0 · PA4",
+          "role": "enabled",
+          "role_title": "разрешение"
+        },
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_ao_1",
+          "widget_label": "AO1 · PA5",
+          "role": "enabled",
+          "role_title": "разрешение"
+        }
+      ]
+    },
+    {
+      "index": 43,
+      "id": "output_source",
+      "label": "Источник управления выходами",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "project-system",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "output_source_view",
+          "widget_label": "Текущий источник",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 101,
+      "id": "di_01",
+      "label": "DI1 · PD3",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_di_01",
+          "widget_label": "DI1 · PD3",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 102,
+      "id": "di_02",
+      "label": "DI2 · PD4",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_di_02",
+          "widget_label": "DI2 · PD4",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 103,
+      "id": "di_03",
+      "label": "DI3 · PD7",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_di_03",
+          "widget_label": "DI3 · PD7",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 104,
+      "id": "di_04",
+      "label": "DI4 · PD10",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_di_04",
+          "widget_label": "DI4 · PD10",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 105,
+      "id": "di_05",
+      "label": "DI5 · PD11",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_di_05",
+          "widget_label": "DI5 · PD11",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 106,
+      "id": "di_06",
+      "label": "DI6 · PD12",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_di_06",
+          "widget_label": "DI6 · PD12",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 107,
+      "id": "di_07",
+      "label": "DI7 · PD13",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_di_07",
+          "widget_label": "DI7 · PD13",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 108,
+      "id": "di_08",
+      "label": "DI8 · PD14",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_di_08",
+          "widget_label": "DI8 · PD14",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 109,
+      "id": "di_09",
+      "label": "DI9 · PC8",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_di_09",
+          "widget_label": "DI9 · PC8",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 110,
+      "id": "di_10",
+      "label": "DI10 · PC9",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_di_10",
+          "widget_label": "DI10 · PC9",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 111,
+      "id": "di_11",
+      "label": "DI11 · PC13",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_di_11",
+          "widget_label": "DI11 · PC13",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 112,
+      "id": "di_12",
+      "label": "DI12 · PE0",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_di_12",
+          "widget_label": "DI12 · PE0",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 113,
+      "id": "di_13",
+      "label": "DI13 · PE1",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_di_13",
+          "widget_label": "DI13 · PE1",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 114,
+      "id": "di_14",
+      "label": "DI14 · PE2",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_di_14",
+          "widget_label": "DI14 · PE2",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 115,
+      "id": "di_15",
+      "label": "DI15 · PE3",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_di_15",
+          "widget_label": "DI15 · PE3",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 116,
+      "id": "di_16",
+      "label": "DI16 · PE4",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_di_16",
+          "widget_label": "DI16 · PE4",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 117,
+      "id": "ai_0",
+      "label": "AI0 · ADS1115",
+      "type": "int32",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Int"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_ai_0",
+          "widget_label": "AI0 · ADS1115",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 118,
+      "id": "ai_1",
+      "label": "AI1 · ADS1115",
+      "type": "int32",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Int"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_ai_1",
+          "widget_label": "AI1 · ADS1115",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 119,
+      "id": "ai_2",
+      "label": "AI2 · ADS1115",
+      "type": "int32",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Int"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_ai_2",
+          "widget_label": "AI2 · ADS1115",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 120,
+      "id": "ai_3",
+      "label": "AI3 · ADS1115",
+      "type": "int32",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Int"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "inputs",
+          "page_title": "Входы",
+          "widget_id": "view_ai_3",
+          "widget_label": "AI3 · ADS1115",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 121,
+      "id": "do_01",
+      "label": "DO1 · PA0",
+      "type": "bool",
+      "direction": "duplex",
+      "direction_title": "ПЛК ↔ веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool",
+        "Command Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_01",
+          "widget_label": "DO1 · PA0",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 122,
+      "id": "do_02",
+      "label": "DO2 · PA1",
+      "type": "bool",
+      "direction": "duplex",
+      "direction_title": "ПЛК ↔ веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool",
+        "Command Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_02",
+          "widget_label": "DO2 · PA1",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 123,
+      "id": "do_03",
+      "label": "DO3 · PA2",
+      "type": "bool",
+      "direction": "duplex",
+      "direction_title": "ПЛК ↔ веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool",
+        "Command Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_03",
+          "widget_label": "DO3 · PA2",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 124,
+      "id": "do_04",
+      "label": "DO4 · PA3",
+      "type": "bool",
+      "direction": "duplex",
+      "direction_title": "ПЛК ↔ веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool",
+        "Command Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_04",
+          "widget_label": "DO4 · PA3",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 125,
+      "id": "do_05",
+      "label": "DO5 · PA6",
+      "type": "bool",
+      "direction": "duplex",
+      "direction_title": "ПЛК ↔ веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool",
+        "Command Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_05",
+          "widget_label": "DO5 · PA6",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 126,
+      "id": "do_06",
+      "label": "DO6 · PA7",
+      "type": "bool",
+      "direction": "duplex",
+      "direction_title": "ПЛК ↔ веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool",
+        "Command Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_06",
+          "widget_label": "DO6 · PA7",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 127,
+      "id": "do_07",
+      "label": "DO7 · PA8",
+      "type": "bool",
+      "direction": "duplex",
+      "direction_title": "ПЛК ↔ веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool",
+        "Command Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_07",
+          "widget_label": "DO7 · PA8",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 128,
+      "id": "do_08",
+      "label": "DO8 · PA11",
+      "type": "bool",
+      "direction": "duplex",
+      "direction_title": "ПЛК ↔ веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool",
+        "Command Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_08",
+          "widget_label": "DO8 · PA11",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 129,
+      "id": "do_09",
+      "label": "DO9 · PB0",
+      "type": "bool",
+      "direction": "duplex",
+      "direction_title": "ПЛК ↔ веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool",
+        "Command Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_09",
+          "widget_label": "DO9 · PB0",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 130,
+      "id": "do_10",
+      "label": "DO10 · PB1",
+      "type": "bool",
+      "direction": "duplex",
+      "direction_title": "ПЛК ↔ веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool",
+        "Command Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_10",
+          "widget_label": "DO10 · PB1",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 131,
+      "id": "do_11",
+      "label": "DO11 · PE5",
+      "type": "bool",
+      "direction": "duplex",
+      "direction_title": "ПЛК ↔ веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool",
+        "Command Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_11",
+          "widget_label": "DO11 · PE5",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 132,
+      "id": "do_12",
+      "label": "DO12 · PE6",
+      "type": "bool",
+      "direction": "duplex",
+      "direction_title": "ПЛК ↔ веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool",
+        "Command Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_12",
+          "widget_label": "DO12 · PE6",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 133,
+      "id": "do_13",
+      "label": "DO13 · PE7",
+      "type": "bool",
+      "direction": "duplex",
+      "direction_title": "ПЛК ↔ веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool",
+        "Command Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_13",
+          "widget_label": "DO13 · PE7",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 134,
+      "id": "do_14",
+      "label": "DO14 · PE8",
+      "type": "bool",
+      "direction": "duplex",
+      "direction_title": "ПЛК ↔ веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool",
+        "Command Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_do_14",
+          "widget_label": "DO14 · PE8",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 135,
+      "id": "ao_0",
+      "label": "AO0 · PA4",
+      "type": "int32",
+      "direction": "duplex",
+      "direction_title": "ПЛК ↔ веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Int",
+        "Command Int"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_ao_0",
+          "widget_label": "AO0 · PA4",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 136,
+      "id": "ao_1",
+      "label": "AO1 · PA5",
+      "type": "int32",
+      "direction": "duplex",
+      "direction_title": "ПЛК ↔ веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Int",
+        "Command Int"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "view_ao_1",
+          "widget_label": "AO1 · PA5",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 137,
+      "id": "web_control",
+      "label": "Управление выходами из веба",
+      "type": "bool",
+      "direction": "duplex",
+      "direction_title": "ПЛК ↔ веб",
+      "system": false,
+      "source": "user",
+      "blocks": [
+        "Publish Bool",
+        "Command Bool"
+      ],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "outputs",
+          "page_title": "Выходы",
+          "widget_id": "web_control_mode",
+          "widget_label": "Управление DO/AO из веба",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "system": 36,
+    "user": 37,
+    "without_widgets": 0
+  }
+}

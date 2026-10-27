@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "id": "board_flprog_fle_48mx",
+  "loader_only": true,
+  "label": "FLProg PLC FLE-48Mx / 256 KiB — нужен BIN проекта",
+  "description": "Загрузчик готов. Приложение собирается из вашего проекта FLProg на вкладке «Плата и сборка».",
+  "target": {
+    "board": "FLProg PLC FLE-48Mx",
+    "mcu": "STM32F103xE",
+    "flash_size": 262144,
+    "hardware_verified": false
+  },
+  "flash": {
+    "bootloader_address": "0x08000000",
+    "bootloader_size": 32768,
+    "application_address": "0x8008000",
+    "application_max_size": 98304,
+    "staging_address": "0x8020000",
+    "staging_size": 131072
+  },
+  "ota": {
+    "protocol": "FLPOTA2",
+    "port": 3233,
+    "block_size": 1024
+  },
+  "artifacts": {
+    "bootloader": {
+      "file": "bootloader.bin",
+      "max_size": 32768,
+      "sha256": "f8e6ed450c9e476fbcbd5691b73501bfa7f7d15220b0d64b301829d0d539858d"
+    }
+  }
+}

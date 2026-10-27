@@ -62,6 +62,12 @@ class BuildCompatibilityTest(unittest.TestCase):
         self.assertFalse(self.check()['ok'])
         header.unlink(); self.assertFalse(self.check()['ok'])
 
+    def test_catalog_runtime_helper_required_before_compiler(self):
+        (self.libs / 'FLProg_WebUI/src/adapters/FLProgWebUiWidgetCatalog.h').unlink()
+        report = self.check()
+        self.assertFalse(report['ok'])
+        self.assertIn('каталога виджетов', self.messages(report))
+
     def test_missing_manifest_requires_explicit_regeneration(self):
         (self.package / MANIFEST).unlink()
         self.assertFalse(self.check()['ok'])

@@ -601,5 +601,30 @@
     "fqbn": "STMicroelectronics:stm32:GenFLProgWB:pnum=WEACT_WB55CGU6",
     "status": "requires_backend_and_hardware_validation",
     "porting_requirement": "Драйвер Flash, загрузчик, разметка и проверка платы"
+  },
+  {
+    "board": "FLProg_FLE4D_30MT",
+    "family": "GenFLProgF4",
+    "label": "FLProg PLC FLE4D-30MT",
+    "mcu": "STM32F407xx",
+    "flash": 1048576,
+    "ram": 131072,
+    "fqbn": "STMicroelectronics:stm32:GenFLProgF4:pnum=FLProg_FLE4D_30MT",
+    "status": "application_configuration_verified_fle4d",
+    "porting_requirement": "Known FLE4D application configuration; generated bootloader requires separate hardware validation",
+    "layout": 1,
+    "flash_profile_id": "fle4d_30mt_ota_block_1_0_1",
+    "profile_properties": {
+      "upload.maximum_data_size": "131072",
+      "build.board": "BLACK_F407VG",
+      "build.product_line": "STM32F407xx",
+      "build.variant_h": "variant_BLACK_F407VX.h",
+      "build.variant": "STM32F4xx/F407V(E-G)T_F417V(E-G)T",
+      "build.peripheral_pins": "-DCUSTOM_PERIPHERAL_PINS",
+      "debug.svd_file": "{runtime.tools.STM32_SVD.path}/svd/STM32F4xx/STM32F407.svd",
+      "build.flprog": "PLC_FLE4C_30MT",
+      "build.flprog_ota": "FLE4D_W5500",
+      "build.extra_flags": "-DFLPROG_FLE4D_30MT_OTA_PROFILE=1 -DFLPROG_OTA_BOARD_FLE4D_30MT=1 -DFLPROG_WEBUI_GZIP_ASSETS=1"
+    }
   }
 ]

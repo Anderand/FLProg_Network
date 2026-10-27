@@ -1,7 +1,13 @@
-# Документация FLProg Network r14
+# Документация FLProg Network r15
 
-[Установка](УСТАНОВКА.md) · [Редактор](РЕДАКТОР.md) · [OTA-менеджер](OTA_МЕНЕДЖЕР.md) · [Блоки](БЛОКИ.md) · [Совместимость](BUILD_COMPATIBILITY_RU.md) · [Ошибки](УСТРАНЕНИЕ_ОШИБОК.md).
+[Общая инструкция](../Инструкция.md) · [Установка](УСТАНОВКА.md) ·
+[Редактор](РЕДАКТОР.md) · [Менеджер](OTA_МЕНЕДЖЕР.md) ·
+[MQTT: блоки и динамические подписки](MQTT_RU.md) · [Блоки](БЛОКИ_R15.md).
 
-[Внешний проект](EXTERNAL_PROJECT_RU.md) · [Каналы для FBD](CHANNEL_CONTRACT_RU.md) · [Сценарии](PREVIEW_SCENARIOS_RU.md) · [Start](PROFESSIONAL_START_BLOCK_RU.md) · [Карта](../Исходники/WebUI/ROADMAP_RU.md).
+[Совместимость](BUILD_COMPATIBILITY_RU.md) · [Внешние проекты](EXTERNAL_PROJECT_RU.md) ·
+[Ресурсы Flash](FLASH_BUNDLE_RU.md) · [Каталоги виджетов](WIDGET_CATALOG_RU.md) ·
+[Контракт каналов](CHANNEL_CONTRACT_RU.md) · [Сценарии](PREVIEW_SCENARIOS_RU.md).
 
-Отчёты с номерами1.0.x описывают конкретные прежние испытания, а не обещание проверки каждой платы. Актуальная упаковка: [r14](../Проверки/RELEASE_R14.md).
+[Проверки r15](../Проверки/RELEASE_R15.md) · [Карта](../Исходники/WebUI/ROADMAP_RU.md) ·
+[API для интеграций](../API_для_интеграции/README.md).
+Исторические отчёты описывают конкретные испытанные версии, не текущий статус всех плат.

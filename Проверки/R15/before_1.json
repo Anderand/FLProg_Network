@@ -1,0 +1,330 @@
+{
+  "mode": "after",
+  "trial": "1",
+  "version": "1.0.22-BUNDLE",
+  "requests": 29,
+  "static_requests": 2,
+  "static_ms": 648,
+  "total_ms": 15966,
+  "rows": [
+    {
+      "path": "/",
+      "status": 200,
+      "connect_ms": 14.06,
+      "headers_ms": 17.03,
+      "body_ms": 4.8,
+      "total_ms": 35.89,
+      "bytes": 958,
+      "cache": "no-store"
+    },
+    {
+      "path": "/flprog-webui/controls.js?part=loader&v=webui175-95bcb719e82e",
+      "status": 200,
+      "connect_ms": 532.49,
+      "headers_ms": 25.3,
+      "body_ms": 52.58,
+      "total_ms": 610.37,
+      "bytes": 9612,
+      "cache": "public, max-age=31536000, immutable"
+    },
+    {
+      "path": "/flprog-webui/item?page=0",
+      "status": 200,
+      "connect_ms": 544.58,
+      "headers_ms": 20.32,
+      "body_ms": 0.09,
+      "total_ms": 564.99,
+      "bytes": 213,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?page=1",
+      "status": 200,
+      "connect_ms": 513.09,
+      "headers_ms": 21.68,
+      "body_ms": 0.08,
+      "total_ms": 534.85,
+      "bytes": 141,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=0",
+      "status": 200,
+      "connect_ms": 509.64,
+      "headers_ms": 21.87,
+      "body_ms": 0.09,
+      "total_ms": 531.6,
+      "bytes": 405,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=1",
+      "status": 200,
+      "connect_ms": 531.18,
+      "headers_ms": 23.02,
+      "body_ms": 1.17,
+      "total_ms": 555.36,
+      "bytes": 429,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=2",
+      "status": 200,
+      "connect_ms": 523.19,
+      "headers_ms": 23.52,
+      "body_ms": 1.71,
+      "total_ms": 548.41,
+      "bytes": 451,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=3",
+      "status": 200,
+      "connect_ms": 520.74,
+      "headers_ms": 21.48,
+      "body_ms": 1.44,
+      "total_ms": 543.67,
+      "bytes": 433,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=4",
+      "status": 200,
+      "connect_ms": 536.95,
+      "headers_ms": 21.01,
+      "body_ms": 1.95,
+      "total_ms": 559.91,
+      "bytes": 434,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=5",
+      "status": 200,
+      "connect_ms": 517.29,
+      "headers_ms": 21.53,
+      "body_ms": 0.79,
+      "total_ms": 539.6,
+      "bytes": 471,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=6",
+      "status": 200,
+      "connect_ms": 540.03,
+      "headers_ms": 20.93,
+      "body_ms": 0.99,
+      "total_ms": 561.95,
+      "bytes": 471,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=7",
+      "status": 200,
+      "connect_ms": 522.63,
+      "headers_ms": 21.65,
+      "body_ms": 2.21,
+      "total_ms": 546.49,
+      "bytes": 486,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=8",
+      "status": 200,
+      "connect_ms": 536.12,
+      "headers_ms": 22.25,
+      "body_ms": 3.05,
+      "total_ms": 561.41,
+      "bytes": 486,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=9",
+      "status": 200,
+      "connect_ms": 535.67,
+      "headers_ms": 21.26,
+      "body_ms": 1.16,
+      "total_ms": 558.09,
+      "bytes": 508,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=10",
+      "status": 200,
+      "connect_ms": 1023.89,
+      "headers_ms": 22.93,
+      "body_ms": 1.12,
+      "total_ms": 1047.94,
+      "bytes": 541,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=11",
+      "status": 200,
+      "connect_ms": 522.72,
+      "headers_ms": 21.58,
+      "body_ms": 0.94,
+      "total_ms": 545.25,
+      "bytes": 473,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=12",
+      "status": 200,
+      "connect_ms": 517.46,
+      "headers_ms": 20.93,
+      "body_ms": 1.53,
+      "total_ms": 539.92,
+      "bytes": 491,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=13",
+      "status": 200,
+      "connect_ms": 531.79,
+      "headers_ms": 21.94,
+      "body_ms": 0.75,
+      "total_ms": 554.47,
+      "bytes": 479,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=14",
+      "status": 200,
+      "connect_ms": 520.1,
+      "headers_ms": 22.91,
+      "body_ms": 1.08,
+      "total_ms": 544.08,
+      "bytes": 490,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=15",
+      "status": 200,
+      "connect_ms": 531.35,
+      "headers_ms": 23.6,
+      "body_ms": 1.7,
+      "total_ms": 556.65,
+      "bytes": 500,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=16",
+      "status": 200,
+      "connect_ms": 510.21,
+      "headers_ms": 20.99,
+      "body_ms": 1.99,
+      "total_ms": 533.18,
+      "bytes": 518,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=17",
+      "status": 200,
+      "connect_ms": 518.26,
+      "headers_ms": 22.73,
+      "body_ms": 1.52,
+      "total_ms": 542.51,
+      "bytes": 518,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=18",
+      "status": 200,
+      "connect_ms": 542.61,
+      "headers_ms": 21.55,
+      "body_ms": 1.0,
+      "total_ms": 565.17,
+      "bytes": 550,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=19",
+      "status": 200,
+      "connect_ms": 528.01,
+      "headers_ms": 21.35,
+      "body_ms": 1.75,
+      "total_ms": 551.11,
+      "bytes": 544,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=20",
+      "status": 200,
+      "connect_ms": 510.52,
+      "headers_ms": 21.36,
+      "body_ms": 0.87,
+      "total_ms": 532.74,
+      "bytes": 520,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=21",
+      "status": 200,
+      "connect_ms": 530.06,
+      "headers_ms": 23.33,
+      "body_ms": 0.98,
+      "total_ms": 554.37,
+      "bytes": 520,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=22",
+      "status": 200,
+      "connect_ms": 510.75,
+      "headers_ms": 20.14,
+      "body_ms": 2.11,
+      "total_ms": 532.99,
+      "bytes": 472,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?index=23",
+      "status": 200,
+      "connect_ms": 525.18,
+      "headers_ms": 24.73,
+      "body_ms": 1.19,
+      "total_ms": 551.1,
+      "bytes": 449,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/state?page=network-diagnostics",
+      "status": 200,
+      "connect_ms": 528.82,
+      "headers_ms": 25.47,
+      "body_ms": 3.67,
+      "total_ms": 557.96,
+      "bytes": 686,
+      "cache": null
+    }
+  ],
+  "state": {
+    "uptime": 43123,
+    "revision": 51,
+    "values": {
+      "network_ip": "192.168.100.17",
+      "network_ready": true,
+      "network_mac": "78:AC:C0:E0:22:D4",
+      "network_gateway": "192.168.100.1",
+      "device_model": "FLE4D-30MT / STM32F407VG",
+      "firmware_version": "1.0.22-BUNDLE",
+      "reset_cause": "Флаги не сохранены",
+      "reset_flags": "0x00000000",
+      "heap_used": "7304",
+      "heap_arena_free": "96",
+      "flash_total": "1048576",
+      "flash_app_capacity": "458752",
+      "flash_app_used": "168300",
+      "flash_app_free": "290452",
+      "ram_total": "196608",
+      "ram_app_capacity": "131072",
+      "ram_static_used": "19392",
+      "ram_available_estimate": "103344",
+      "ram_used_estimate": "27728",
+      "ccm_total": "65536",
+      "ccm_used": "",
+      "system_uptime": 43,
+      "network_subnet": "255.255.255.0"
+    }
+  }
+}

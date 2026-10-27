@@ -21,12 +21,14 @@
 #include "../flprogNetwork.h"
 
 #include <string.h>
+#include <stdlib.h>
 
 #define FLPROG_MQTT_BODY_OFFSET 5U
 
 FLProgNetworkMqttClient::~FLProgNetworkMqttClient()
 {
     end();
+    free(_subscriptions);
 }
 
 bool FLProgNetworkMqttClient::ipIsZero(IPAddress value)
@@ -483,19 +485,15 @@ bool FLProgNetworkMqttClient::subscribe(const char *topicFilter)
         _error = FLPROG_MQTT_ERROR_BAD_TOPIC;
         return false;
     }
-    bool exists = false;
-    for (uint8_t i = 0; i < _subscriptionCount; ++i)
+    if (!hasSubscription(topicFilter))
     {
-        if (strcmp(_subscriptions[i], topicFilter) == 0)
+        if (_subscriptionLimit != 0 && _subscriptionCount >= _subscriptionLimit)
         {
-            exists = true;
-            break;
+            _error = FLPROG_MQTT_ERROR_SUBSCRIPTION_LIMIT;
+            return false;
         }
-    }
-    if (!exists && _subscriptionCount >= FLPROG_MQTT_MAX_SUBSCRIPTIONS)
-    {
-        _error = FLPROG_MQTT_ERROR_PACKET_TOO_LARGE;
-        return false;
+        // Reserve before transmission: a successful SUBACK must always fit.
+        if (!reserveSubscriptions(_subscriptionCount + 1)) return false;
     }
     _error = FLPROG_MQTT_ERROR_NONE;
     return buildSubscribePacket(topicFilter, FLPROG_MQTT_TX_SUBSCRIBE);
@@ -797,16 +795,67 @@ bool FLProgNetworkMqttClient::handleConnack(const uint8_t *body, size_t length)
     return true;
 }
 
+bool FLProgNetworkMqttClient::hasSubscription(const char *topicFilter) const
+{
+    for (size_t i = 0; i < _subscriptionCount; ++i)
+        if (strcmp(_subscriptions[i], topicFilter) == 0) return true;
+    return false;
+}
+
+bool FLProgNetworkMqttClient::reserveSubscriptions(size_t count)
+{
+    if (count <= _subscriptionCapacity) return true;
+    if (count > ((size_t)-1) / sizeof(*_subscriptions))
+    {
+        _error = FLPROG_MQTT_ERROR_NO_MEMORY;
+        return false;
+    }
+    void *storage = realloc(_subscriptions, count * sizeof(*_subscriptions));
+    if (storage == nullptr)
+    {
+        _error = FLPROG_MQTT_ERROR_NO_MEMORY;
+        return false;
+    }
+    _subscriptions = static_cast<char (*)[FLPROG_MQTT_MAX_TOPIC_LENGTH + 1]>(storage);
+    _subscriptionCapacity = count;
+    return true;
+}
+
+bool FLProgNetworkMqttClient::setSubscriptionLimit(size_t value)
+{
+    const size_t pending = _pendingSubscribe[0] != 0 &&
+        !_pendingSubscribeIsResubscribe && !hasSubscription(_pendingSubscribe) ? 1 : 0;
+    if (value != 0 && value < _subscriptionCount + pending)
+    {
+        _error = FLPROG_MQTT_ERROR_SUBSCRIPTION_LIMIT;
+        return false;
+    }
+    _subscriptionLimit = value;
+    _error = FLPROG_MQTT_ERROR_NONE;
+    return true;
+}
+
+bool FLProgNetworkMqttClient::clearSubscriptions()
+{
+    if (_wantConnected || _sessionConnected || _state != FLPROG_MQTT_STATE_IDLE)
+    {
+        _error = FLPROG_MQTT_ERROR_BUSY;
+        return false;
+    }
+    free(_subscriptions);
+    _subscriptions = nullptr;
+    _subscriptionCount = _subscriptionCapacity = _resubscribeIndex = 0;
+    _resubscribeActive = false;
+    _error = FLPROG_MQTT_ERROR_NONE;
+    return true;
+}
+
 void FLProgNetworkMqttClient::addOrKeepSubscription(const char *topicFilter)
 {
-    for (uint8_t i = 0; i < _subscriptionCount; ++i)
-    {
-        if (strcmp(_subscriptions[i], topicFilter) == 0) return;
-    }
-    if (_subscriptionCount >= FLPROG_MQTT_MAX_SUBSCRIPTIONS) return;
-    const size_t length = strlen(topicFilter);
-    memcpy(_subscriptions[_subscriptionCount], topicFilter, length + 1);
-    _subscriptionCount++;
+    if (hasSubscription(topicFilter)) return;
+    // subscribe() has already reserved this slot before sending the packet.
+    if (_subscriptionCount >= _subscriptionCapacity) return;
+    strcpy(_subscriptions[_subscriptionCount++], topicFilter);
 }
 
 void FLProgNetworkMqttClient::completeSubscribe()

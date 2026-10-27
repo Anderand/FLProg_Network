@@ -176,6 +176,12 @@ def sketch_report(sketch, ide, libraries=None):
                 runtime_header = choose(report, roots, 'FLProgWebUi.h')
                 if runtime_header:
                     runtime_check(report, runtime_header.parent.parent)
+                    if wrapper:
+                        safe = re.sub(r'[^A-Za-z0-9_]', '_', project_id)
+                        descriptor = wrapper.parent / (safe + '_descriptor.h')
+                        helper = runtime_header.parent / 'adapters/FLProgWebUiWidgetCatalog.h'
+                        if descriptor.is_file() and 'FLProgWebUiWidgetCatalog.h' in descriptor.read_text(encoding='utf-8-sig') and not helper.is_file():
+                            add(report, 'error', 'Для каталога виджетов нужна FLProg_WebUI из того же нового пакета проекта. Обновите только эту библиотеку.', helper)
                 choose(report, roots, 'flprogNetwork.h')
                 if not re.search(r'\bFLPROG_WEBUI_BEGIN_SELECTED\s*\(', text):
                     add(report, 'warning', 'Не найден FLPROG_WEBUI_BEGIN_SELECTED(). Проверьте стартовый блок и вызов после настройки Ethernet.')

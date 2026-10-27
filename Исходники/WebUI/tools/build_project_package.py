@@ -11,6 +11,8 @@ import json
 import re
 import math
 import hashlib
+import gzip
+import struct
 from build_compatibility import DESCRIPTOR_API, MANIFEST, SCHEMA
 from pathlib import Path
 from typing import Dict, List, Tuple
@@ -29,8 +31,8 @@ WIDGET_TYPES = {
     "button", "wifi-scan",
 }
 # Per-response envelope used by the paged Web UI transport.  There is no
-# aggregate dashboard limit: metadata, every widget and every live channel
-# are returned as separate bounded HTTP responses.
+# aggregate dashboard limit. The compatibility endpoint keeps individual
+# widgets bounded; generated page catalogs are streamed directly from Flash.
 HTTP_ITEM_BYTES = 900
 
 
@@ -297,6 +299,49 @@ def validate(document: Dict) -> Tuple[str, List[Dict]]:
     return _validate_legacy(document)
 
 
+def widget_catalog_payloads(channels, pages):
+    labels = {str(c['id']): str(c.get('label') or c['id']) for c in channels}
+    result = []
+    index = 0
+    for page in pages:
+        page_id = str(page.get('id', 'main'))
+        items = []
+        for item in page.get('widgets', []):
+            value = _widget_config(item, labels, page)
+            value['page'] = page_id
+            value['bindings'] = [dict(role=str(b['role']),channel=str(b['channel']),direction=str(b.get('direction','duplex'))) for b in item.get('bindings', [])]
+            # Match the float32 fields/three decimal places of the legacy C++ JSON.
+            for key in ('min','max','step'):
+                value[key] = float(format(struct.unpack('<f',struct.pack('<f',value[key]))[0],'.3f'))
+            items.append([index, value]); index += 1
+        result.append(dict(page=page_id, items=items))
+    return result
+
+
+def widget_catalog_header(project_id, channels, pages):
+    namespace = safe_identifier(project_id)
+    rows = ['#include <adapters/FLProgWebUiWidgetCatalog.h>',
+            '#if defined(FLPROG_HTTP_SERVER_HAS_FLASH_STREAM)',
+            '#ifdef FLPROG_WEBUI_WIDGET_CATALOG',
+            '#error "Only one Web UI project may provide widget catalogs"',
+            '#endif',f'namespace flprog_webui_{namespace} {{',
+            'inline bool sendWidgetCatalog(FLProgNetworkHttpServer *server, const char *page) {']
+    for payload in widget_catalog_payloads(channels, pages):
+        body = json.dumps(payload,ensure_ascii=False,separators=(',',':'))
+        packed = gzip.compress(body.encode('utf-8'),compresslevel=9,mtime=0)
+        rows += ['    if (strcmp(page, '+c_string(payload['page'])+') == 0) {',
+            '#if FLPROG_WEBUI_GZIP_ASSETS',
+            '        static const unsigned char data[] PROGMEM = {'+', '.join('0x%02x'%v for v in packed)+'};',
+            '        flprogWebUiSendWidgetCatalog(server, data, sizeof(data), true);',
+            '#else','        static const char data[] PROGMEM = '+c_string(body)+';',
+            '        flprogWebUiSendWidgetCatalog(server, data, sizeof(data)-1U, false);',
+            '#endif','        return true;','    }']
+    rows += ['    return false;','}','}',
+             '#define FLPROG_WEBUI_WIDGET_CATALOG(server, page) flprog_webui_'+namespace+'::sendWidgetCatalog(server, page)',
+             '#endif','']
+    return '\n'.join(rows)
+
+
 def descriptor(project_id: str, channels: List[Dict], pages: List[Dict], theme: Dict, polling=None) -> str:
     polling = polling_settings({"polling": polling or {}})
     namespace = safe_identifier(project_id)
@@ -363,7 +408,7 @@ def descriptor(project_id: str, channels: List[Dict], pages: List[Dict], theme: 
         "}",
         "",
     ]
-    return "\n".join(rows)
+    return "\n".join(rows) + widget_catalog_header(project_id, channels, pages)
 
 
 def config_ubi(project_id: str, transport_id: str = "wifi-http") -> str:

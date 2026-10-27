@@ -40,6 +40,13 @@ def boards():
             result[row['board']] = dict(row, layout=layout)
     return result
 
+
+DEFAULT_BUILD_BOARD = 'FLProg_FLE4D_30MT'
+
+
+def visible_build_boards(rows, show_unverified=False):
+    return sorted(name for name in rows if show_unverified or name == DEFAULT_BUILD_BOARD)
+
 def install_profiles():
     props = {}
     for line in (CORE / 'boards.txt').read_text(encoding='utf-8-sig').splitlines():
@@ -52,15 +59,16 @@ def install_profiles():
         new = old + '_OTA_SAFE'
         layout = LAYOUTS[row['layout']]
         lines.append(new + '=' + row['label'] + ' (OTA, hardware validation pending)')
-        for key, value in props.items():
-            if key.startswith(old + '.'):
-                suffix = key[len(old):]
-                if suffix in ('.upload.maximum_size', '.build.flash_offset', '.build.extra_flags'):
-                    continue
-                lines.append(new + suffix + '=' + value)
+        board_props = {key[len(old)+1:]: value for key, value in props.items() if key.startswith(old + '.')}
+        # Standalone FLE4D definition: don't depend on a previous local IDE patch.
+        # Existing boards continue to inherit their own installed pin definitions.
+        board_props.update(row.get('profile_properties', {}))
+        for suffix, value in board_props.items():
+            if suffix not in ('upload.maximum_size', 'build.flash_offset', 'build.extra_flags'):
+                lines.append(new + '.' + suffix + '=' + value)
         lines += [new + '.upload.maximum_size=' + str(layout['capacity']),
                   new + '.build.flash_offset=' + hex(layout['offset']),
-                  new + '.build.extra_flags=' + props.get(old + '.build.extra_flags', '') +
+                  new + '.build.extra_flags=' + board_props.get('build.extra_flags', '') +
                   ' -DFLPROG_STM32_OTA_LAYOUT=' + str(row['layout']) +
                   ' -DFLPROG_OTA_BOARD_' + board + '=1']
     lines.append('# END FLPROG STM32 OTA PORTABILITY')
@@ -73,7 +81,7 @@ def install_profiles():
     path.write_text(text.rstrip() + '\n\n' + '\n'.join(lines) + '\n', encoding='utf-8')
     (ROOT / 'boards_ota_append.txt').write_text('\n'.join(lines) + '\n', encoding='utf-8')
 
-def build(board, sketch=None, check_only=False, libraries=None):
+def build(board, sketch=None, check_only=False, libraries=None, package=True):
     row = boards()[board]
     layout = LAYOUTS[row['layout']]
     boot = sketch is None
@@ -129,7 +137,7 @@ def build(board, sketch=None, check_only=False, libraries=None):
     (dest / (kind + '_build.json')).write_text(json.dumps(info, ensure_ascii=False, indent=2), encoding='utf-8')
     print(str(target), flush=True)
     print(log_path.read_text(encoding='utf-8', errors='replace')[-1500:], flush=True)
-    if not boot and not check_only:
+    if not boot and not check_only and package:
         loader = dest / 'bootloader.bin'
         # Rebuild from the same layout sources; never package a stale loader.
         build(board)

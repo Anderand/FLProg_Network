@@ -1,0 +1,605 @@
+{
+  "schema": "flprog.webui/1.0",
+  "project": {
+    "id": "network_diagnostics_example",
+    "title": "Диагностика сети из API"
+  },
+  "transport": {
+    "id": "w5500-http-1",
+    "port": 80
+  },
+  "theme": {
+    "background": "#111827",
+    "card": "#1f2937",
+    "text": "#e5e7eb",
+    "accent": "#6366f1"
+  },
+  "channels": [
+    {
+      "id": "setpoint",
+      "label": "Уставка",
+      "type": "float",
+      "direction": "duplex",
+      "index": 101,
+      "source": "user"
+    },
+    {
+      "id": "run",
+      "label": "Пуск",
+      "type": "bool",
+      "direction": "command",
+      "index": 102,
+      "source": "user"
+    },
+    {
+      "id": "result",
+      "label": "Результат из FBD",
+      "type": "bool",
+      "direction": "publish",
+      "index": 103,
+      "source": "user"
+    },
+    {
+      "id": "busy",
+      "label": "Занят",
+      "type": "bool",
+      "direction": "publish",
+      "index": 104,
+      "source": "user"
+    },
+    {
+      "id": "network_ip",
+      "label": "IP-адрес",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgNetworkInterface::localIP",
+      "index": 0
+    },
+    {
+      "id": "network_ready",
+      "label": "Сеть подключена",
+      "type": "bool",
+      "direction": "publish",
+      "source": "FLProgNetworkInterface::isReady",
+      "index": 1
+    },
+    {
+      "id": "network_mac",
+      "label": "MAC-адрес",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgNetworkInterface::mac",
+      "index": 2
+    },
+    {
+      "id": "network_gateway",
+      "label": "Шлюз",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgNetworkInterface::activeGateway",
+      "index": 3
+    },
+    {
+      "id": "network_subnet",
+      "label": "Маска подсети",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgNetworkInterface::activeSubnet",
+      "index": 4
+    },
+    {
+      "id": "device_model",
+      "label": "Модель контроллера",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgNetworkInterface::deviceModel (attached identity provider)",
+      "index": 5
+    },
+    {
+      "id": "firmware_version",
+      "label": "Версия прошивки",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgNetworkInterface::firmwareVersion (attached identity provider)",
+      "index": 6
+    },
+    {
+      "id": "reset_flags",
+      "label": "Маска сброса (накопленная)",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgWebUiPlatformDiagnostics::readResetFlags",
+      "index": 7
+    },
+    {
+      "id": "reset_cause",
+      "label": "Расшифровка флагов сброса",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgWebUiPlatformDiagnostics::resetDescription",
+      "index": 8
+    },
+    {
+      "id": "heap_used",
+      "label": "ОЗУ: динамически занято, байт",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgWebUiPlatformDiagnostics::readHeap (uordblks)",
+      "index": 9
+    },
+    {
+      "id": "heap_arena_free",
+      "label": "ОЗУ: свободные блоки в выделенном пуле, байт",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgWebUiPlatformDiagnostics::readHeap (fordblks, not total RAM)",
+      "index": 10
+    },
+    {
+      "id": "flash_total",
+      "label": "Flash контроллера: всего, байт",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "index": 11
+    },
+    {
+      "id": "flash_app_capacity",
+      "label": "Flash: доступно приложению, байт",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "index": 12
+    },
+    {
+      "id": "flash_app_used",
+      "label": "Flash: размер приложения, байт",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "index": 13
+    },
+    {
+      "id": "flash_app_free",
+      "label": "Flash: свободно для приложения, байт",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "index": 14
+    },
+    {
+      "id": "ram_total",
+      "label": "ОЗУ контроллера: всего, байт",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "index": 15
+    },
+    {
+      "id": "ram_app_capacity",
+      "label": "ОЗУ: доступно приложению, байт",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "index": 16
+    },
+    {
+      "id": "ram_static_used",
+      "label": "ОЗУ: переменные программы, байт",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "index": 17
+    },
+    {
+      "id": "ram_available_estimate",
+      "label": "ОЗУ: доступно для выделений (оценка), байт",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "index": 18
+    },
+    {
+      "id": "ram_used_estimate",
+      "label": "ОЗУ: занято и зарезервировано (оценка), байт",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "index": 19
+    },
+    {
+      "id": "ccm_total",
+      "label": "Дополнительная ОЗУ CCM: всего, байт",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "index": 20
+    },
+    {
+      "id": "ccm_used",
+      "label": "Дополнительная ОЗУ CCM: занято, байт",
+      "type": "text",
+      "direction": "publish",
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "index": 21
+    },
+    {
+      "id": "system_uptime",
+      "label": "Время работы после запуска, с",
+      "type": "int32",
+      "direction": "publish",
+      "source": "FLProgWebUiPlatformDiagnostics::millis / 1000",
+      "index": 22
+    }
+  ],
+  "pages": [
+    {
+      "id": "main",
+      "title": "Главная",
+      "widgets": [
+        {
+          "id": "setpoint_field",
+          "type": "number-input",
+          "label": "Уставка температуры",
+          "channel": "setpoint",
+          "group": "Управление",
+          "placeholder": "Температура",
+          "unit": "°C",
+          "maxLength": 20,
+          "confirmation": "",
+          "min": 0,
+          "max": 100,
+          "step": 0.5,
+          "x": 1,
+          "y": 1,
+          "w": 6,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "bindings": []
+        },
+        {
+          "id": "start",
+          "type": "button",
+          "label": "Пуск",
+          "channel": "run",
+          "group": "Управление",
+          "confirmation": "Запустить оборудование?",
+          "x": 7,
+          "y": 1,
+          "w": 6,
+          "h": 2,
+          "bindings": [
+            {
+              "role": "result",
+              "channel": "result",
+              "direction": "publish"
+            },
+            {
+              "role": "busy",
+              "channel": "busy",
+              "direction": "publish"
+            }
+          ],
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "id": "result_display",
+          "type": "indicator",
+          "label": "Состояние из FBD",
+          "channel": "result",
+          "group": "Диагностика",
+          "x": 1,
+          "y": 1,
+          "w": 6,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "bindings": [],
+          "min": 0,
+          "max": 100,
+          "step": 1
+        }
+      ]
+    },
+    {
+      "id": "network-diagnostics",
+      "title": "Диагностика контроллера",
+      "system": "network-diagnostics",
+      "widgets": [
+        {
+          "id": "network_diag_heading",
+          "type": "heading",
+          "label": "Диагностика контроллера",
+          "x": 1,
+          "y": 1,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "network_diag_ip",
+          "type": "status-row",
+          "label": "IP-адрес",
+          "channel": "network_ip",
+          "group": "Сеть проекта",
+          "x": 1,
+          "y": 1,
+          "w": 6,
+          "h": 1
+        },
+        {
+          "id": "network_diag_ready",
+          "type": "status-row",
+          "label": "Сеть подключена",
+          "channel": "network_ready",
+          "group": "Сеть проекта",
+          "x": 7,
+          "y": 1,
+          "w": 6,
+          "h": 1
+        },
+        {
+          "id": "network_diag_mac",
+          "type": "status-row",
+          "label": "MAC-адрес",
+          "channel": "network_mac",
+          "group": "Сеть проекта",
+          "x": 1,
+          "y": 2,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "network_diag_gateway",
+          "type": "status-row",
+          "label": "Шлюз",
+          "channel": "network_gateway",
+          "group": "Сеть проекта",
+          "x": 1,
+          "y": 3,
+          "w": 6,
+          "h": 1
+        },
+        {
+          "id": "network_diag_model",
+          "type": "status-row",
+          "label": "Модель контроллера",
+          "channel": "device_model",
+          "placeholder": "Не задано",
+          "group": "Устройство",
+          "x": 1,
+          "y": 1,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "network_diag_version",
+          "type": "status-row",
+          "label": "Версия прошивки",
+          "channel": "firmware_version",
+          "placeholder": "Не задано",
+          "group": "Устройство",
+          "x": 1,
+          "y": 2,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "network_diag_reset",
+          "type": "status-row",
+          "label": "Расшифровка флагов сброса",
+          "channel": "reset_cause",
+          "placeholder": "Недоступно",
+          "group": "Устройство",
+          "x": 1,
+          "y": 3,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "network_diag_flags",
+          "type": "status-row",
+          "label": "Маска сброса (накопленная)",
+          "channel": "reset_flags",
+          "placeholder": "Недоступно",
+          "group": "Устройство",
+          "x": 1,
+          "y": 4,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "network_diag_heap_used",
+          "type": "status-row",
+          "label": "ОЗУ: динамически занято, байт",
+          "channel": "heap_used",
+          "placeholder": "Недоступно",
+          "group": "Оперативная память",
+          "x": 1,
+          "y": 4,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "network_diag_heap_free",
+          "type": "status-row",
+          "label": "ОЗУ: свободные блоки в выделенном пуле, байт",
+          "channel": "heap_arena_free",
+          "placeholder": "Недоступно",
+          "group": "Оперативная память",
+          "x": 1,
+          "y": 5,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "system_flash_total",
+          "type": "status-row",
+          "label": "Flash контроллера: всего, байт",
+          "channel": "flash_total",
+          "placeholder": "Недоступно",
+          "group": "Flash",
+          "x": 1,
+          "y": 1,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "system_flash_app_capacity",
+          "type": "status-row",
+          "label": "Flash: доступно приложению, байт",
+          "channel": "flash_app_capacity",
+          "placeholder": "Недоступно",
+          "group": "Flash",
+          "x": 1,
+          "y": 2,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "system_flash_app_used",
+          "type": "status-row",
+          "label": "Flash: размер приложения, байт",
+          "channel": "flash_app_used",
+          "placeholder": "Недоступно",
+          "group": "Flash",
+          "x": 1,
+          "y": 3,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "system_flash_app_free",
+          "type": "status-row",
+          "label": "Flash: свободно для приложения, байт",
+          "channel": "flash_app_free",
+          "placeholder": "Недоступно",
+          "group": "Flash",
+          "x": 1,
+          "y": 4,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "system_ram_total",
+          "type": "status-row",
+          "label": "ОЗУ контроллера: всего, байт",
+          "channel": "ram_total",
+          "placeholder": "Недоступно",
+          "group": "Оперативная память",
+          "x": 1,
+          "y": 1,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "system_ram_app_capacity",
+          "type": "status-row",
+          "label": "ОЗУ: доступно приложению, байт",
+          "channel": "ram_app_capacity",
+          "placeholder": "Недоступно",
+          "group": "Оперативная память",
+          "x": 1,
+          "y": 2,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "system_ram_static_used",
+          "type": "status-row",
+          "label": "ОЗУ: переменные программы, байт",
+          "channel": "ram_static_used",
+          "placeholder": "Недоступно",
+          "group": "Оперативная память",
+          "x": 1,
+          "y": 3,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "system_ram_available_estimate",
+          "type": "status-row",
+          "label": "ОЗУ: доступно для выделений (оценка), байт",
+          "channel": "ram_available_estimate",
+          "placeholder": "Недоступно",
+          "group": "Оперативная память",
+          "x": 1,
+          "y": 7,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "system_ram_used_estimate",
+          "type": "status-row",
+          "label": "ОЗУ: занято и зарезервировано (оценка), байт",
+          "channel": "ram_used_estimate",
+          "placeholder": "Недоступно",
+          "group": "Оперативная память",
+          "x": 1,
+          "y": 6,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "system_ccm_total",
+          "type": "status-row",
+          "label": "Дополнительная ОЗУ CCM: всего, байт",
+          "channel": "ccm_total",
+          "placeholder": "Недоступно",
+          "group": "Дополнительная память CCM",
+          "x": 1,
+          "y": 1,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "system_ccm_used",
+          "type": "status-row",
+          "label": "Дополнительная ОЗУ CCM: занято, байт",
+          "channel": "ccm_used",
+          "placeholder": "Недоступно",
+          "group": "Дополнительная память CCM",
+          "x": 1,
+          "y": 2,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "system_uptime_value",
+          "type": "status-row",
+          "label": "Время работы после запуска",
+          "channel": "system_uptime",
+          "unit": "с",
+          "group": "Устройство",
+          "x": 1,
+          "y": 5,
+          "w": 12,
+          "h": 1
+        },
+        {
+          "id": "network_diag_subnet",
+          "type": "status-row",
+          "label": "Маска подсети",
+          "channel": "network_subnet",
+          "group": "Сеть проекта",
+          "x": 7,
+          "y": 3,
+          "w": 6,
+          "h": 1
+        }
+      ]
+    }
+  ],
+  "polling": {
+    "intervalMs": 2000,
+    "pauseWhenHidden": true
+  },
+  "packageOutput": ""
+}

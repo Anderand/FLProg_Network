@@ -61,7 +61,7 @@ class FLProgNetworkInterface;
 #define FLPROG_MQTT_MAX_PASSWORD_LENGTH 95U
 #endif
 #ifndef FLPROG_MQTT_MAX_SUBSCRIPTIONS
-#define FLPROG_MQTT_MAX_SUBSCRIPTIONS 4U
+#define FLPROG_MQTT_MAX_SUBSCRIPTIONS 0U
 #endif
 #ifndef FLPROG_MQTT_READ_BUDGET
 #define FLPROG_MQTT_READ_BUDGET 256U
@@ -101,6 +101,8 @@ class FLProgNetworkInterface;
 #define FLPROG_MQTT_ERROR_BAD_TOPIC         14
 #define FLPROG_MQTT_ERROR_NOT_CONNECTED     15
 #define FLPROG_MQTT_ERROR_CREDENTIALS       16
+#define FLPROG_MQTT_ERROR_SUBSCRIPTION_LIMIT 17
+#define FLPROG_MQTT_ERROR_NO_MEMORY          18
 
 #define FLPROG_MQTT_EVENT_NONE                0x0000U
 #define FLPROG_MQTT_EVENT_CONNECTED           0x0001U
@@ -133,6 +135,8 @@ class FLProgNetworkMqttClient : public FLProgNetworkService
 {
 public:
     FLProgNetworkMqttClient() {}
+    FLProgNetworkMqttClient(const FLProgNetworkMqttClient &) = delete;
+    FLProgNetworkMqttClient &operator=(const FLProgNetworkMqttClient &) = delete;
     ~FLProgNetworkMqttClient() override;
 
     bool begin(FLProgNetworkInterface &network, uint8_t route = 0);
@@ -237,8 +241,14 @@ public:
         _messageCallback = value;
     }
 
-    uint8_t subscriptionCount() const { return _subscriptionCount; }
-    const char *subscription(uint8_t index) const
+    // Zero means no fixed count limit; allocation remains bounded by available RAM.
+    bool setSubscriptionLimit(size_t value);
+    size_t subscriptionLimit() const { return _subscriptionLimit; }
+    size_t subscriptionMemoryBytes() const { return _subscriptionCapacity * sizeof(*_subscriptions); }
+    // end()/begin() preserve filters for compatibility. Clear only while stopped.
+    bool clearSubscriptions();
+    size_t subscriptionCount() const { return _subscriptionCount; }
+    const char *subscription(size_t index) const
     {
         return index < _subscriptionCount ? _subscriptions[index] : "";
     }
@@ -303,6 +313,8 @@ private:
     void resetTransaction();
     void completeSubscribe();
     void addOrKeepSubscription(const char *topicFilter);
+    bool hasSubscription(const char *topicFilter) const;
+    bool reserveSubscriptions(size_t count);
     void scheduleReconnect(uint8_t errorValue);
     void fail(uint8_t errorValue, bool reconnectAllowed = true);
     void processDisconnectRequest();
@@ -364,9 +376,11 @@ private:
     uint16_t _waitingPacketId = 0;
     char _pendingSubscribe[FLPROG_MQTT_MAX_TOPIC_LENGTH + 1] = {0};
     bool _pendingSubscribeIsResubscribe = false;
-    char _subscriptions[FLPROG_MQTT_MAX_SUBSCRIPTIONS][FLPROG_MQTT_MAX_TOPIC_LENGTH + 1] = {{0}};
-    uint8_t _subscriptionCount = 0;
-    uint8_t _resubscribeIndex = 0;
+    char (*_subscriptions)[FLPROG_MQTT_MAX_TOPIC_LENGTH + 1] = nullptr;
+    size_t _subscriptionCount = 0;
+    size_t _subscriptionCapacity = 0;
+    size_t _subscriptionLimit = FLPROG_MQTT_MAX_SUBSCRIPTIONS;
+    size_t _resubscribeIndex = 0;
     bool _resubscribeActive = false;
 
     FLProgNetworkMqttMessageCallback _messageCallback = nullptr;

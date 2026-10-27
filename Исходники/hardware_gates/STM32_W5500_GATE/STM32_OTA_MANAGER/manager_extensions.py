@@ -35,10 +35,10 @@ def attach(app, notebook, home):
     app.builder_ide_var=ide; app.builder_sketch_var=sketch
     def choose(var, directory):
         value=filedialog.askdirectory() if directory else filedialog.askopenfilename(filetypes=[('Скетч FLProg','*.ino')])
-        if value: var.set(value)
+        if value: var.set(os.path.normpath(value))
     for row,label,var,directory in [(1,'Arduino IDE:',ide,True),(2,'Скетч с OTA-блоком:',sketch,False)]:
         ttk.Label(build,text=label).grid(row=row,column=0,sticky='w')
-        ttk.Entry(build,textvariable=var).grid(row=row,column=1,sticky='ew',pady=5)
+        app._path_entry(build,var).grid(row=row,column=1,sticky='ew',pady=5)
         ttk.Button(build,text='Выбрать…',command=lambda v=var,d=directory:choose(v,d)).grid(row=row,column=2)
     mode=ttk.Combobox(build,state='readonly',values=['Только собрать','После сборки: обновить по OTA','После сборки: первая установка по SWD'])
     mode.current(0);mode.grid(row=3,column=0,columnspan=3,sticky='ew',pady=8)
@@ -110,30 +110,36 @@ def attach(app, notebook, home):
         return report
     def start(kind):
         if app.busy: return
-        if not app.show_unverified.get() or board.current()<0:
-            messagebox.showinfo('Платы для испытаний','В каталоге сборки находятся непроверенные платы. Включите их показ. Проверенный FLE4D-30MT 1.0.1 доступен на вкладке «Прошивка».',parent=app.root);return
+        if board.current()<0:
+            messagebox.showinfo('Плата для сборки','Выберите плату. FLE4D-30MT доступен по умолчанию; другие платы показываются по галочке непроверенных.',parent=app.root);return
         folder=Path(ide.get());source=sketch.get(); selected=visible_names[board.current()]; action=mode.current()
-        project_libraries=libraries.get().strip() if kind=='package' else ''
+        project_libraries=libraries.get().strip() if kind in ('package','bin') else ''
         if project_libraries and not Path(project_libraries).is_dir():
             messagebox.showerror('Библиотеки проекта','Папка libraries не найдена.',parent=app.root);return
         if not (folder/'arduino-builder.exe').exists():
             messagebox.showerror('IDE','Не найден arduino-builder.exe.',parent=app.root);return
-        if kind=='package' and (not source or not Path(source).is_file()):
+        if kind in ('package','bin') and (not source or not Path(source).is_file()):
             messagebox.showerror('Скетч','Выберите свой .ino с блоком OTA.',parent=app.root);return
-        if kind=='package' and not compatibility(False)['ok']:
+        if kind in ('package','bin') and not compatibility(False)['ok']:
             state.set('Сборка остановлена до компилятора: ошибки совместимости.');return
         builder.IDE=folder;builder.CORE=folder/'portable/packages/STMicroelectronics/hardware/stm32/3.0.0'
+        app.builder_selected_board=selected
         app.busy=True;app._save_settings();state.set('Сборка… Подробности — в логе на вкладке «Прошивка».')
         def worker():
             try:
                 with contextlib.redirect_stdout(Writer(app)):
                     builder.install_profiles()
                     targets=list(visible_names) if kind=='all' else [selected]
-                    report=loader_batch.run(builder,targets,source if kind=='package' else None,
-                        lambda value:app.events.put(('build_report',value)),libraries=project_libraries or None)
+                    report=loader_batch.run(builder,targets,source if kind in ('package','bin') else None,
+                        lambda value:app.events.put(('build_report',value)),libraries=project_libraries or None,package=kind!='bin')
                 failed=[n for n,item in report['rows'].items() if item['status']=='failed']
                 if failed:
                     app.events.put(('build_failed',report))
+                    return
+                if kind=='bin':
+                    binary=builder.ROOT/'output'/selected/'application.bin'
+                    app.events.put(('build_bin_complete',dict(path=str(binary),board=rows[selected]['label'],
+                        profile=rows[selected].get('flash_profile_id','board_'+selected.lower()))))
                     return
                 package=builder.ROOT/'output'/selected/(selected+'.fwpkg') if kind=='package' else None
                 app.events.put(('build_complete',(str(package) if package else '',action if package else 0)))
@@ -143,29 +149,35 @@ def attach(app, notebook, home):
         threading.Thread(target=worker,daemon=True).start()
     app.start_build=start
     buttons=ttk.Frame(build);buttons.grid(row=4,column=0,columnspan=3,sticky='w')
-    for text,kind in [('Собрать загрузчик','loader'),('Собрать BIN и пакет','package'),('Собрать все загрузчики','all')]:
-        ttk.Button(buttons,text=text,command=lambda k=kind:start(k)).pack(side='left',padx=3)
+    def add_build_button(text,command):
+        position=len(buttons.winfo_children())
+        button=ttk.Button(buttons,text=text,command=command)
+        button.grid(row=position//4,column=position%4,sticky='w',padx=3,pady=3)
+        return button
+    for text,kind in [('Собрать BIN','bin'),('Собрать BIN и пакет','package'),('Собрать загрузчик','loader'),('Собрать все загрузчики','all')]:
+        add_build_button(text,lambda k=kind:start(k))
     def open_output():
         if board.current()<0:return
         folder=builder.ROOT/'output'/visible_names[board.current()];folder.mkdir(parents=True,exist_ok=True);os.startfile(str(folder))
-    ttk.Button(buttons,text='Файлы платы',command=open_output).pack(side='left',padx=3)
+    add_build_button('Файлы платы',open_output)
     def select_board_profile():
-        if app.busy or board.current()<0 or not app.show_unverified.get():return
-        profile_id='board_'+visible_names[board.current()].lower()
+        if app.busy or board.current()<0:return
+        key=visible_names[board.current()]
+        profile_id=rows[key].get('flash_profile_id','board_'+key.lower())
         app._refresh_profiles(profile_id)
         app.bin_var.set('');app._save_settings();notebook.select(0)
         app._log('Выбран профиль платы. Загрузчик готов; выберите OTA BIN вашего проекта или соберите пакет на вкладке «Плата и сборка».')
-    ttk.Button(buttons,text='Выбрать профиль платы',command=select_board_profile).pack(side='left',padx=3)
-    compatibility_button=ttk.Button(buttons,text='Проверить совместимость',command=compatibility)
-    compatibility_button.pack(side='left',padx=3)
+    add_build_button('Выбрать профиль платы',select_board_profile)
+    compatibility_button=add_build_button('Проверить совместимость',compatibility)
     app.check_build_compatibility=compatibility
-    ttk.Label(build,text='Проверенный FLE4D-30MT 1.0.1 — на вкладке «Прошивка». Каталог сборки содержит платы для испытаний; включите галочку, чтобы их выбрать. SPI/Ethernet задаются в проекте FLProg.',wraplength=850).grid(row=8,column=0,columnspan=3,sticky='w',pady=8)
+    ttk.Label(build,text='FLE4D-30MT доступен по умолчанию. «Собрать BIN» собирает только приложение и никогда не запускает прошивку. Остальные платы — по галочке непроверенных. SPI/Ethernet задаются в FLProg.',wraplength=850).grid(row=8,column=0,columnspan=3,sticky='w',pady=8)
     def refresh_board_choices():
-        previous=visible_names[board.current()] if 0<=board.current()<len(visible_names) else None
-        visible_names[:]=names if app.show_unverified.get() else []
-        board['values']=[rows[n]['label']+' / '+str(rows[n]['flash']//1024)+' KiB — не проверена' for n in visible_names]
+        previous=visible_names[board.current()] if 0<=board.current()<len(visible_names) else app.settings.get('builder_board')
+        visible_names[:]=builder.visible_build_boards(rows,app.show_unverified.get())
+        board['values']=[rows[n]['label']+' / '+str(rows[n]['flash']//1024)+' KiB'+(' — конфигурация FLE4D' if n==builder.DEFAULT_BUILD_BOARD else ' — не проверена') for n in visible_names]
         if visible_names:board.current(visible_names.index(previous) if previous in visible_names else 0)
         else:board.set('')
+        app.builder_selected_board=visible_names[board.current()] if board.current()>=0 else ''
         for button in buttons.winfo_children():button.configure(state='normal' if visible_names or button==compatibility_button else 'disabled')
         refresh_loaders()
     app.refresh_board_choices=refresh_board_choices
@@ -177,7 +189,7 @@ def attach(app, notebook, home):
         if grid and int(grid.get('row',0))>=3:child.grid_configure(row=int(grid['row'])+1)
     build.rowconfigure(7,weight=0);build.rowconfigure(8,weight=1)
     ttk.Label(build,text='Библиотеки проекта (папка libraries):').grid(row=3,column=0,sticky='w')
-    ttk.Entry(build,textvariable=libraries).grid(row=3,column=1,sticky='ew',pady=5)
+    app._path_entry(build,libraries).grid(row=3,column=1,sticky='ew',pady=5)
     ttk.Button(build,text='Выбрать…',command=lambda:choose(libraries,True)).grid(row=3,column=2)
 
     scanner=ttk.Frame(notebook,padding=14);notebook.add(scanner,text='Поиск OTA')
@@ -242,6 +254,17 @@ def event(app,kind,payload,import_package):
         app._set_result('Сборка завершена. Ошибок: '+str(len(failed)), '#a00000')
         for name in failed:app._log(name+': '+payload['rows'][name]['error'])
     elif kind=='build_status':app.build_status.set(payload)
+    elif kind=='build_bin_complete':
+        app._set_idle();app.refresh_loaders()
+        binary=Path(payload['path'])
+        if not binary.is_file():
+            app._set_result('Сборка завершена, но BIN не найден.', '#a00000');return
+        app._refresh_profiles(payload['profile'])
+        if payload['profile'] not in app.profiles:app.profile_var.set('')
+        app.bin_var.set(str(binary));app._save_settings()
+        app.build_status.set('УСПЕХ: '+payload['board']+'; BIN '+str(binary.stat().st_size)+' байт. '+str(binary))
+        app._set_result('УСПЕХ: BIN собран. Прошивка не запускалась.', '#176b2c')
+        app._log('РЕЗУЛЬТАТ: BIN собран: '+str(binary)+'; '+str(binary.stat().st_size)+' байт. Прошивка не запускалась.')
     elif kind=='build_complete':
         package,action=payload;app._set_idle();app.refresh_loaders()
         if package:

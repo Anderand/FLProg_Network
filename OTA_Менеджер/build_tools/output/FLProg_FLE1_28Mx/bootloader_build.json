@@ -1,0 +1,20 @@
+{
+  "board": "FLProg_FLE1_28Mx",
+  "family": "GenFLProgF1",
+  "label": "FLProg PLC FLE1-28Mx",
+  "mcu": "STM32F103xE",
+  "flash": 262144,
+  "ram": 49152,
+  "fqbn": "STMicroelectronics:stm32:GenFLProgF1:pnum=FLProg_FLE1_28Mx",
+  "status": "backend_implemented_hardware_validation_pending",
+  "porting_requirement": "Hardware validation; build with matching OTA_SAFE profile",
+  "layout": 3,
+  "memory": {
+    "flash": 262144,
+    "offset": 32768,
+    "capacity": 98304,
+    "stage": 131072
+  },
+  "hardware_verified": false,
+  "build_kind": "bootloader"
+}

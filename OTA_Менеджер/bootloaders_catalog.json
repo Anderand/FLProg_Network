@@ -1,0 +1,202 @@
+[
+  {
+    "board": "BLACK_F407VE",
+    "label": "FLProg Board Black F407VE",
+    "flash": 524288,
+    "layout": 2,
+    "size": 16476,
+    "sha256": "3c5bbddc8a574140173278151fd8a1fee3204255cd57090e6e36d560b7c54796",
+    "file": "build_tools\\output\\BLACK_F407VE\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "BLACK_F407VG",
+    "label": "FLProg Board Black F407VG",
+    "flash": 1048576,
+    "layout": 1,
+    "size": 16484,
+    "sha256": "b90ef25917937ec12920515ea5d0cc065346253d7c798699bcfa8ef70c530f94",
+    "file": "build_tools\\output\\BLACK_F407VG\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "BLACK_F407VG_NO_USB",
+    "label": "FLProg Board Black F407VG without USB",
+    "flash": 1048576,
+    "layout": 1,
+    "size": 16484,
+    "sha256": "b90ef25917937ec12920515ea5d0cc065346253d7c798699bcfa8ef70c530f94",
+    "file": "build_tools\\output\\BLACK_F407VG_NO_USB\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "FLProg_FLE1_28Mx",
+    "label": "FLProg PLC FLE1-28Mx",
+    "flash": 262144,
+    "layout": 3,
+    "size": 15672,
+    "sha256": "f8e6ed450c9e476fbcbd5691b73501bfa7f7d15220b0d64b301829d0d539858d",
+    "file": "build_tools\\output\\FLProg_FLE1_28Mx\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "FLProg_FLE1_32Mx",
+    "label": "FLProg PLC FLE1-32Mx",
+    "flash": 262144,
+    "layout": 3,
+    "size": 15672,
+    "sha256": "f8e6ed450c9e476fbcbd5691b73501bfa7f7d15220b0d64b301829d0d539858d",
+    "file": "build_tools\\output\\FLProg_FLE1_32Mx\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "FLProg_FLE1_40Mx",
+    "label": "FLProg PLC FLE1-40Mx",
+    "flash": 262144,
+    "layout": 3,
+    "size": 15672,
+    "sha256": "f8e6ed450c9e476fbcbd5691b73501bfa7f7d15220b0d64b301829d0d539858d",
+    "file": "build_tools\\output\\FLProg_FLE1_40Mx\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "FLProg_FLE4C_30MR",
+    "label": "FLProg PLC FLE4C-30MR",
+    "flash": 1048576,
+    "layout": 1,
+    "size": 16484,
+    "sha256": "b90ef25917937ec12920515ea5d0cc065346253d7c798699bcfa8ef70c530f94",
+    "file": "build_tools\\output\\FLProg_FLE4C_30MR\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "FLProg_FLE4C_30MT",
+    "label": "FLProg PLC FLE4C-30MT",
+    "flash": 1048576,
+    "layout": 1,
+    "size": 16484,
+    "sha256": "b90ef25917937ec12920515ea5d0cc065346253d7c798699bcfa8ef70c530f94",
+    "file": "build_tools\\output\\FLProg_FLE4C_30MT\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "FLProg_FLE4F_32_1",
+    "label": "FLProg PLC FLE4F-32.1",
+    "flash": 1048576,
+    "layout": 1,
+    "size": 16484,
+    "sha256": "b90ef25917937ec12920515ea5d0cc065346253d7c798699bcfa8ef70c530f94",
+    "file": "build_tools\\output\\FLProg_FLE4F_32_1\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "FLProg_FLE4_20_1",
+    "label": "FLProg PLC FLE4-20.1",
+    "flash": 1048576,
+    "layout": 1,
+    "size": 16484,
+    "sha256": "b90ef25917937ec12920515ea5d0cc065346253d7c798699bcfa8ef70c530f94",
+    "file": "build_tools\\output\\FLProg_FLE4_20_1\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "FLProg_FLE4_24_1",
+    "label": "FLProg PLC FLE4-24.1",
+    "flash": 524288,
+    "layout": 2,
+    "size": 16476,
+    "sha256": "3c5bbddc8a574140173278151fd8a1fee3204255cd57090e6e36d560b7c54796",
+    "file": "build_tools\\output\\FLProg_FLE4_24_1\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "FLProg_FLE4_40_1",
+    "label": "FLProg PLC FLE4-40.1",
+    "flash": 524288,
+    "layout": 2,
+    "size": 16476,
+    "sha256": "3c5bbddc8a574140173278151fd8a1fee3204255cd57090e6e36d560b7c54796",
+    "file": "build_tools\\output\\FLProg_FLE4_40_1\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "FLProg_FLE_10Mx",
+    "label": "FLProg PLC FLE-10Mx",
+    "flash": 262144,
+    "layout": 3,
+    "size": 15672,
+    "sha256": "f8e6ed450c9e476fbcbd5691b73501bfa7f7d15220b0d64b301829d0d539858d",
+    "file": "build_tools\\output\\FLProg_FLE_10Mx\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "FLProg_FLE_14Mx",
+    "label": "FLProg PLC FLE-14Mx",
+    "flash": 262144,
+    "layout": 3,
+    "size": 15672,
+    "sha256": "f8e6ed450c9e476fbcbd5691b73501bfa7f7d15220b0d64b301829d0d539858d",
+    "file": "build_tools\\output\\FLProg_FLE_14Mx\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "FLProg_FLE_24Mx",
+    "label": "FLProg PLC FLE-24Mx",
+    "flash": 262144,
+    "layout": 3,
+    "size": 15672,
+    "sha256": "f8e6ed450c9e476fbcbd5691b73501bfa7f7d15220b0d64b301829d0d539858d",
+    "file": "build_tools\\output\\FLProg_FLE_24Mx\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "FLProg_FLE_32Mx",
+    "label": "FLProg PLC FLE-32Mx",
+    "flash": 262144,
+    "layout": 3,
+    "size": 15672,
+    "sha256": "f8e6ed450c9e476fbcbd5691b73501bfa7f7d15220b0d64b301829d0d539858d",
+    "file": "build_tools\\output\\FLProg_FLE_32Mx\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "FLProg_FLE_48Mx",
+    "label": "FLProg PLC FLE-48Mx",
+    "flash": 262144,
+    "layout": 3,
+    "size": 15672,
+    "sha256": "f8e6ed450c9e476fbcbd5691b73501bfa7f7d15220b0d64b301829d0d539858d",
+    "file": "build_tools\\output\\FLProg_FLE_48Mx\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "FLProg_FLE_56Mx",
+    "label": "FLProg PLC FLE-56Mx",
+    "flash": 262144,
+    "layout": 3,
+    "size": 15672,
+    "sha256": "f8e6ed450c9e476fbcbd5691b73501bfa7f7d15220b0d64b301829d0d539858d",
+    "file": "build_tools\\output\\FLProg_FLE_56Mx\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "GENERIC_F103VCTX",
+    "label": "FLProg Generic F103VCTx",
+    "flash": 262144,
+    "layout": 3,
+    "size": 15672,
+    "sha256": "f8e6ed450c9e476fbcbd5691b73501bfa7f7d15220b0d64b301829d0d539858d",
+    "file": "build_tools\\output\\GENERIC_F103VCTX\\bootloader.bin",
+    "hardware_verified": false
+  },
+  {
+    "board": "GENERIC_F103VETX",
+    "label": "FLProg Generic F103VETx",
+    "flash": 524288,
+    "layout": 4,
+    "size": 15672,
+    "sha256": "d7bbfbe52e64471889110c06cb1df726acf9c4f176b0e1489aaab0e38f1b21a5",
+    "file": "build_tools\\output\\GENERIC_F103VETX\\bootloader.bin",
+    "hardware_verified": false
+  }
+]

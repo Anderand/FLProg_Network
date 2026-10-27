@@ -1,0 +1,20 @@
+{
+  "board": "FLProg_FLE4C_30MT",
+  "family": "GenFLProgF4",
+  "label": "FLProg PLC FLE4C-30MT",
+  "mcu": "STM32F407xx",
+  "flash": 1048576,
+  "ram": 131072,
+  "fqbn": "STMicroelectronics:stm32:GenFLProgF4:pnum=FLProg_FLE4C_30MT",
+  "status": "backend_implemented_hardware_validation_pending",
+  "porting_requirement": "Hardware validation; build with matching OTA_SAFE profile",
+  "layout": 1,
+  "memory": {
+    "flash": 1048576,
+    "offset": 65536,
+    "capacity": 458752,
+    "stage": 524288
+  },
+  "hardware_verified": false,
+  "build_kind": "bootloader"
+}

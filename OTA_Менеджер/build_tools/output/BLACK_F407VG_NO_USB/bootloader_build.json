@@ -1,0 +1,20 @@
+{
+  "board": "BLACK_F407VG_NO_USB",
+  "family": "GenFLProgF4",
+  "label": "FLProg Board Black F407VG without USB",
+  "mcu": "STM32F407xx",
+  "flash": 1048576,
+  "ram": 131072,
+  "fqbn": "STMicroelectronics:stm32:GenFLProgF4:pnum=BLACK_F407VG_NO_USB",
+  "status": "backend_implemented_hardware_validation_pending",
+  "porting_requirement": "Hardware validation; build with matching OTA_SAFE profile",
+  "layout": 1,
+  "memory": {
+    "flash": 1048576,
+    "offset": 65536,
+    "capacity": 458752,
+    "stage": 524288
+  },
+  "hardware_verified": false,
+  "build_kind": "bootloader"
+}

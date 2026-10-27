@@ -1,0 +1,100 @@
+{
+  "mode": "after",
+  "trial": "3",
+  "version": "1.0.23-WIDGETS",
+  "requests": 6,
+  "static_requests": 2,
+  "static_ms": 645,
+  "total_ms": 2840,
+  "rows": [
+    {
+      "path": "/",
+      "status": 200,
+      "connect_ms": 8.96,
+      "headers_ms": 16.95,
+      "body_ms": 5.29,
+      "total_ms": 31.2,
+      "bytes": 958,
+      "cache": "no-store"
+    },
+    {
+      "path": "/flprog-webui/controls.js?part=loader&v=webui175-0ad879ed016f",
+      "status": 200,
+      "connect_ms": 533.36,
+      "headers_ms": 24.76,
+      "body_ms": 54.03,
+      "total_ms": 612.15,
+      "bytes": 9893,
+      "cache": "public, max-age=31536000, immutable"
+    },
+    {
+      "path": "/flprog-webui/item?page=0",
+      "status": 200,
+      "connect_ms": 543.88,
+      "headers_ms": 20.65,
+      "body_ms": 1.53,
+      "total_ms": 566.05,
+      "bytes": 234,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?page=1",
+      "status": 200,
+      "connect_ms": 515.24,
+      "headers_ms": 21.14,
+      "body_ms": 0.09,
+      "total_ms": 536.47,
+      "bytes": 162,
+      "cache": null
+    },
+    {
+      "path": "/flprog-webui/item?widgets=network-diagnostics",
+      "status": 200,
+      "connect_ms": 509.61,
+      "headers_ms": 23.28,
+      "body_ms": 6.52,
+      "total_ms": 539.41,
+      "bytes": 1306,
+      "cache": "no-store"
+    },
+    {
+      "path": "/flprog-webui/state?page=network-diagnostics",
+      "status": 200,
+      "connect_ms": 522.12,
+      "headers_ms": 24.82,
+      "body_ms": 3.15,
+      "total_ms": 550.09,
+      "bytes": 687,
+      "cache": null
+    }
+  ],
+  "state": {
+    "uptime": 23641,
+    "revision": 35,
+    "values": {
+      "network_ip": "192.168.100.17",
+      "network_ready": true,
+      "network_mac": "78:AC:C0:E0:22:D4",
+      "network_gateway": "192.168.100.1",
+      "device_model": "FLE4D-30MT / STM32F407VG",
+      "firmware_version": "1.0.23-WIDGETS",
+      "reset_cause": "Флаги не сохранены",
+      "reset_flags": "0x00000000",
+      "heap_used": "7304",
+      "heap_arena_free": "96",
+      "flash_total": "1048576",
+      "flash_app_capacity": "458752",
+      "flash_app_used": "170844",
+      "flash_app_free": "287908",
+      "ram_total": "196608",
+      "ram_app_capacity": "131072",
+      "ram_static_used": "19392",
+      "ram_available_estimate": "103344",
+      "ram_used_estimate": "27728",
+      "ccm_total": "65536",
+      "ccm_used": "",
+      "system_uptime": 23,
+      "network_subnet": "255.255.255.0"
+    }
+  }
+}

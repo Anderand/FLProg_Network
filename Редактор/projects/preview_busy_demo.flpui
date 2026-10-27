@@ -1,0 +1,134 @@
+{
+  "schema": "flprog.webui/1.0",
+  "project": {
+    "id": "preview_busy_demo",
+    "title": "Демо: уставка и busy/result"
+  },
+  "transport": {
+    "id": "w5500-http-1",
+    "port": 80
+  },
+  "theme": {
+    "background": "#111827",
+    "card": "#1f2937",
+    "text": "#e5e7eb",
+    "accent": "#6366f1"
+  },
+  "channels": [
+    {
+      "id": "setpoint",
+      "label": "Уставка",
+      "type": "float",
+      "direction": "duplex",
+      "index": 101,
+      "source": "user"
+    },
+    {
+      "id": "run",
+      "label": "Пуск",
+      "type": "bool",
+      "direction": "command",
+      "index": 102,
+      "source": "user"
+    },
+    {
+      "id": "result",
+      "label": "Результат из FBD",
+      "type": "bool",
+      "direction": "publish",
+      "index": 103,
+      "source": "user"
+    },
+    {
+      "id": "busy",
+      "label": "Занят",
+      "type": "bool",
+      "direction": "publish",
+      "index": 104,
+      "source": "user"
+    }
+  ],
+  "pages": [
+    {
+      "id": "main",
+      "title": "Главная",
+      "widgets": [
+        {
+          "id": "setpoint_field",
+          "type": "number-input",
+          "label": "Уставка температуры",
+          "channel": "setpoint",
+          "group": "Управление",
+          "placeholder": "Температура",
+          "unit": "°C",
+          "maxLength": 20,
+          "confirmation": "",
+          "min": 0,
+          "max": 100,
+          "step": 0.5,
+          "x": 1,
+          "y": 1,
+          "w": 6,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "bindings": []
+        },
+        {
+          "id": "start",
+          "type": "button",
+          "label": "Пуск",
+          "channel": "run",
+          "group": "Управление",
+          "confirmation": "Запустить оборудование?",
+          "x": 7,
+          "y": 1,
+          "w": 6,
+          "h": 2,
+          "bindings": [
+            {
+              "role": "result",
+              "channel": "result",
+              "direction": "publish"
+            },
+            {
+              "role": "busy",
+              "channel": "busy",
+              "direction": "publish"
+            }
+          ],
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "id": "result_display",
+          "type": "indicator",
+          "label": "Состояние из FBD",
+          "channel": "result",
+          "group": "Диагностика",
+          "x": 1,
+          "y": 1,
+          "w": 6,
+          "h": 2,
+          "icon": "",
+          "color": "#6366f1",
+          "options": "",
+          "bindings": [],
+          "min": 0,
+          "max": 100,
+          "step": 1
+        }
+      ]
+    }
+  ],
+  "polling": {
+    "intervalMs": 2000,
+    "pauseWhenHidden": true
+  },
+  "packageOutput": ""
+}

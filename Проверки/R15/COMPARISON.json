@@ -1,0 +1,35 @@
+{
+  "before_version": "1.0.22-BUNDLE",
+  "after_version": "1.0.23-WIDGETS",
+  "before_requests": 29,
+  "after_requests": 6,
+  "before_ms": [
+    15966,
+    15389,
+    14903
+  ],
+  "after_ms": [
+    4921,
+    2832,
+    2840
+  ],
+  "before_median_ms": 15389,
+  "after_median_ms": 2840,
+  "speedup": 5.419,
+  "reduction_percent": 81.55,
+  "before_flash": 167816,
+  "after_flash": 170360,
+  "before_bin": 168300,
+  "after_bin": 170844,
+  "before_static_ram": 19392,
+  "after_static_ram": 19392,
+  "before_heap_used": 7304,
+  "after_heap_used": 7304,
+  "catalog_raw_bytes": 11669,
+  "catalog_gzip_bytes": 1306,
+  "catalog_sha256": "2efabf341ce5ccf9418c4ca745265069ba44017374114c2beff9a23774c60a82",
+  "widget_count": 24,
+  "all_legacy_fields_equal": true,
+  "bundle_matches_source": true,
+  "automatic_tests": 95
+}

@@ -21,7 +21,7 @@ import zipfile
 
 
 APP_NAME = "FLProg STM32 OTA Manager"
-DEFAULT_IP = "192.168.100.22"
+DEFAULT_IP = ""
 DEFAULT_PORT = "3233"
 MAX_PACKAGE_FILE = 16 * 1024 * 1024
 PACKAGE_FILES = {"profile.json", "bootloader.bin", "application.bin"}
@@ -34,7 +34,7 @@ if str(_UPLOADER_DIR) not in sys.path:
 from upload_fle4d_ota import check_ota_ready, upload_image  # noqa: E402
 sys.path.insert(0, str(_PROJECT_DIR.parent / 'STM32_OTA_PORTABILITY'))
 from manager_extensions import attach as attach_extensions, event as extension_event
-from profile_policy import is_verified, is_visible
+from profile_policy import is_verified, is_visible, profile_status
 
 
 def app_directory():
@@ -206,7 +206,7 @@ def import_package(archive_path, profiles_dir):
 class ManagerApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("FLProg — менеджер STM32 OTA v0.7.9")
+        self.root.title("FLProg — менеджер STM32 OTA v0.7.13")
         self.root.geometry("940x680")
         self.root.minsize(820, 600)
         self.events = queue.Queue()
@@ -259,31 +259,37 @@ class ManagerApp:
         self.password_var = tk.StringVar()
         ttk.Entry(outer, textvariable=self.password_var, show="•").grid(row=4, column=1, columnspan=2, sticky="ew", padx=(10, 0), pady=4)
 
-        ttk.Label(outer, text="BIN приложения:").grid(row=5, column=0, sticky="w", pady=4)
+        ttk.Label(outer, text="Прошивка ПЛК (BIN):").grid(row=5, column=0, sticky="nw", pady=4)
         self.bin_var = tk.StringVar(value=self.settings.get("application_bin", ""))
-        ttk.Entry(outer, textvariable=self.bin_var).grid(row=5, column=1, sticky="ew", padx=(10, 8), pady=4)
+        bin_field = ttk.Frame(outer)
+        bin_field.grid(row=5, column=1, sticky="ew", padx=(10, 8), pady=4)
+        self._path_entry(bin_field, self.bin_var).pack(fill="x")
+        self.bin_info_var = tk.StringVar(value="Выберите плату и BIN программы ПЛК, собранный для OTA. Загрузчик сюда не выбирают.")
+        ttk.Label(bin_field, textvariable=self.bin_info_var, wraplength=470, justify="left").pack(anchor="w", pady=(3, 0))
+        self.bin_var.trace_add("write", self._update_bin_info)
         bin_actions = ttk.Frame(outer)
-        bin_actions.grid(row=5, column=2, sticky="ew", pady=4)
+        bin_actions.grid(row=5, column=2, sticky="new", pady=4)
         ttk.Button(bin_actions, text="Выбрать BIN…", command=self._choose_bin).pack(side="left")
-        ttk.Button(bin_actions, text="Из профиля", command=self._use_profile_bin).pack(side="left", padx=(4, 0))
+        ttk.Button(bin_actions, text="Программа профиля", command=self._use_profile_bin).pack(side="left", padx=(4, 0))
 
         ttk.Label(outer, text="STM32CubeProgrammer CLI:").grid(row=6, column=0, sticky="w", pady=4)
         self.cli_var = tk.StringVar(value=self.settings.get("programmer", ""))
-        ttk.Entry(outer, textvariable=self.cli_var).grid(row=6, column=1, sticky="ew", padx=(10, 8), pady=4)
+        self._path_entry(outer, self.cli_var).grid(row=6, column=1, sticky="ew", padx=(10, 8), pady=4)
         ttk.Button(outer, text="Обзор…", command=self._choose_cli).grid(row=6, column=2, sticky="ew", pady=4)
 
         actions = ttk.Frame(outer)
         actions.grid(row=7, column=0, columnspan=3, sticky="ew", pady=(10, 8))
-        for column in range(4):
+        for column in range(3):
             actions.columnconfigure(column, weight=1)
+        ttk.Style(self.root).configure("OtaPrimary.TButton", font=("Segoe UI", 11, "bold"), padding=(12, 9))
+        self.ota_button = ttk.Button(actions, text="Прошить по OTA", style="OtaPrimary.TButton", command=self._upload_ota)
+        self.ota_button.grid(row=0, column=0, columnspan=3, sticky="ew", pady=(0, 6))
         self.check_button = ttk.Button(actions, text="Проверить OTA-порт", command=self._check)
-        self.check_button.grid(row=0, column=0, sticky="ew", padx=(0, 4))
-        self.ota_button = ttk.Button(actions, text="Обновить по OTA", command=self._upload_ota)
-        self.ota_button.grid(row=0, column=1, sticky="ew", padx=4)
+        self.check_button.grid(row=1, column=0, sticky="ew", padx=(0, 4))
         self.install_button = ttk.Button(actions, text="Первичная установка по SWD", command=self._install_swd)
-        self.install_button.grid(row=0, column=2, sticky="ew", padx=4)
+        self.install_button.grid(row=1, column=1, sticky="ew", padx=4)
         self.restart_button = ttk.Button(actions, text="Перезапуск по SWD", command=self._restart_swd)
-        self.restart_button.grid(row=0, column=3, sticky="ew", padx=(4, 0))
+        self.restart_button.grid(row=1, column=2, sticky="ew", padx=(4, 0))
 
         self.progress = ttk.Progressbar(outer, mode="determinate", maximum=100)
         self.progress.grid(row=8, column=0, columnspan=3, sticky="ew", pady=(2, 8))
@@ -300,10 +306,34 @@ class ManagerApp:
         scrollbar = ttk.Scrollbar(outer, command=self.log.yview)
         scrollbar.grid(row=10, column=3, sticky="ns")
         self.log.configure(yscrollcommand=scrollbar.set)
-        ttk.Label(outer, text="Если BIN не выбран, используется приложение из профиля. Для первичной установки нужен ST-Link/SWD.",
+        ttk.Label(outer, text="Выбирайте OTA-программу ПЛК. Для первой установки загрузчика и приложения используйте SWD.",
                   wraplength=880).grid(row=11, column=0, columnspan=3, sticky="w", pady=(8, 0))
-        self._log("Менеджер v0.7.9: по умолчанию доступен проверенный профиль FLE4D-30MT 1.0.1.")
+        self._log("Менеджер v0.7.13: программа и версия указаны в выбранном профиле. IP выбирается получателем.")
         attach_extensions(self, self.notebook, app_directory())
+
+    def _path_entry(self, parent, variable, **options):
+        def normalize(_event=None):
+            value = variable.get().strip()
+            variable.set(os.path.normpath(value) if value else "")
+        normalize()
+        entry = ttk.Entry(parent, textvariable=variable, **options)
+        entry.bind("<FocusOut>", normalize)
+        return entry
+
+    def _update_bin_info(self, *_args):
+        try:
+            _id, _folder, profile, files = self._selected()
+        except ValueError:
+            self.bin_info_var.set("Выберите профиль платы. Нужна программа ПЛК, собранная для OTA, не загрузчик.")
+            return
+        address = profile["flash"]["application_address"]
+        selected = self.bin_var.get().strip()
+        if selected:
+            self.bin_info_var.set("Выбрана программа ПЛК: {}. Нужна OTA-сборка для адреса {}. Это не загрузчик.".format(Path(selected).name, address))
+        elif "application" in files:
+            self.bin_info_var.set("BIN не выбран: будет прошита эталонная программа из профиля ({} байт), а не ваш проект. Адрес {}.".format(files["application"].stat().st_size, address))
+        else:
+            self.bin_info_var.set("Выберите BIN вашей программы ПЛК для адреса {}. Загрузчик сюда не выбирают.".format(address))
 
     def _log(self, message):
         self.log.configure(state="normal")
@@ -383,7 +413,7 @@ class ManagerApp:
         ota = profile["ota"]
         info = (
             "{}\nMCU: {} | Flash: {} KiB | OTA: TCP {}\n"
-            "Загрузчик: {} байт → {} | Приложение: {} байт → {}\n"
+            "В профиле: загрузчик {} байт → {} | эталонная программа {} байт → {}\n"
             "SHA-256 обоих файлов проверен. Профиль: {}"
         ).format(
             profile["description"], target["mcu"], int(target["flash_size"]) // 1024,
@@ -394,8 +424,9 @@ class ManagerApp:
         self.profile_info.set(info)
         if profile.get("loader_only"):
             self.profile_info.set(info.replace("SHA-256 обоих файлов проверен.", "SHA-256 загрузчика проверен."))
-        status = "Проверенный профиль FLE4D-30MT, прошивка 1.0.1." if is_verified(profile) else "НЕ ПРОВЕРЕН НА ПЛАТЕ: используется только для испытаний."
+        status = profile_status(profile)
         self.profile_info.set(status + "\n" + self.profile_info.get())
+        self._update_bin_info()
 
     def _import_package(self):
         filename = filedialog.askopenfilename(
@@ -420,7 +451,7 @@ class ManagerApp:
             filetypes=(("STM32CubeProgrammer CLI", "STM32_Programmer_CLI.exe"), ("Программы", "*.exe")),
         )
         if path:
-            self.cli_var.set(path)
+            self.cli_var.set(os.path.normpath(path))
             self._save_settings()
 
     def _network_inputs(self):
@@ -448,7 +479,7 @@ class ManagerApp:
         except (OSError, ValueError) as error:
             messagebox.showerror("Проверьте BIN", str(error), parent=self.root)
             return
-        self.bin_var.set(str(path))
+        self.bin_var.set(os.path.normpath(str(path)))
         self._save_settings()
         self._log("Выбран BIN: {} ({} байт).".format(path.name, path.stat().st_size))
 
@@ -674,6 +705,7 @@ class ManagerApp:
         try:
             values = {
                 "builder_ide": self.builder_ide_var.get(),
+                "builder_board": getattr(self, 'builder_selected_board', ''),
                 "builder_sketch": self.builder_sketch_var.get(),
                 "builder_libraries": self.builder_libraries_var.get(),
                 "ip": self.ip_var.get().strip(),
@@ -705,6 +737,9 @@ def main():
     if '--build-all' in sys.argv:
         app.notebook.select(1)
         root.after(500, lambda: app.start_build('all'))
+    elif '--build-bin' in sys.argv:
+        app.notebook.select(1)
+        root.after(500, lambda: app.start_build('bin'))
     root.mainloop()
 
 

@@ -28,6 +28,10 @@ def main():
     catalog=[]
     for name,row in sorted(builder.boards().items()):
         source=PORTING/'output'/name/'bootloader.bin'
+        # FLE4D's default flashing profile already carries its tested loader.
+        # Building only an application must not force a replacement loader.
+        if name==builder.DEFAULT_BUILD_BOARD and not source.is_file():
+            continue
         blob=source.read_bytes();sp,entry=struct.unpack('<II',blob[:8])
         layout=builder.LAYOUTS[row['layout']]
         assert 8<=len(blob)<=layout['offset'] and entry&1 and not sp&7
@@ -62,7 +66,7 @@ def main():
     shutil.copytree(block_source/'src',block/'src',dirs_exist_ok=True)
     for name in ['README_RU.md']:
         shutil.copy2(block_source/name,block/name)
-    with ZipFile(ROOT/'FLProg_STM32_OTA_Manager_v0_7_9_portable.zip','w',ZIP_DEFLATED) as archive:
+    with ZipFile(ROOT/'FLProg_STM32_OTA_Manager_v0_7_12_portable.zip','w',ZIP_DEFLATED) as archive:
         for path in release.rglob('*'):
             if path.is_file() and not any(part in ('build','logs','__pycache__') for part in path.relative_to(release).parts):
                 archive.write(path,str(path.relative_to(release)))

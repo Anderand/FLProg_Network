@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "id": "board_flprog_fle4f_32_1",
+  "loader_only": true,
+  "label": "FLProg PLC FLE4F-32.1 / 1024 KiB — нужен BIN проекта",
+  "description": "Загрузчик готов. Приложение собирается из вашего проекта FLProg на вкладке «Плата и сборка».",
+  "target": {
+    "board": "FLProg PLC FLE4F-32.1",
+    "mcu": "STM32F407xx",
+    "flash_size": 1048576,
+    "hardware_verified": false
+  },
+  "flash": {
+    "bootloader_address": "0x08000000",
+    "bootloader_size": 65536,
+    "application_address": "0x8010000",
+    "application_max_size": 458752,
+    "staging_address": "0x8080000",
+    "staging_size": 524288
+  },
+  "ota": {
+    "protocol": "FLPOTA2",
+    "port": 3233,
+    "block_size": 1024
+  },
+  "artifacts": {
+    "bootloader": {
+      "file": "bootloader.bin",
+      "max_size": 65536,
+      "sha256": "b90ef25917937ec12920515ea5d0cc065346253d7c798699bcfa8ef70c530f94"
+    }
+  }
+}

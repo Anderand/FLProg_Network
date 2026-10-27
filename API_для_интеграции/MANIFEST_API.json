@@ -5,7 +5,7 @@
   },
   "C++/FLProg_Network/src/flprogMqttUserBlocks.h": {
     "source": "Библиотека/FLProg_Network/src/flprogMqttUserBlocks.h",
-    "sha256": "80676a13aa3be69ca112b5a7c202eae59866e08c15c02e85ab5aecc15c569286"
+    "sha256": "9baf46f81bf1d80bc0add4606a6754e87a6f8412c63d528f1a71ba99142e50c1"
   },
   "C++/FLProg_Network/src/flprogNetwork.h": {
     "source": "Библиотека/FLProg_Network/src/flprogNetwork.h",
@@ -113,7 +113,7 @@
   },
   "C++/FLProg_Network/src/service/flprogNetworkMqttClient.h": {
     "source": "Библиотека/FLProg_Network/src/service/flprogNetworkMqttClient.h",
-    "sha256": "a75d2399714717943dc07c32df3d6b1241d302dd1b897486a292c8e1d87b0082"
+    "sha256": "017c08fbd3c5741cc613f25cd2dedede50d907e1613ccf236d33f700012ba0f8"
   },
   "C++/FLProg_Network/src/service/flprogNetworkNtp.h": {
     "source": "Библиотека/FLProg_Network/src/service/flprogNetworkNtp.h",
@@ -175,10 +175,6 @@
     "source": "Библиотека/FLProg_Network/src/udp/flprogUdp.h",
     "sha256": "d0bf0860c3f0a9bc9eb01c21e588996e5ae94ffb4dcc7dc60cc841c41db08e9e"
   },
-  "C++/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_1/flprogMqttUserBlocks.h": {
-    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_1/flprogMqttUserBlocks.h",
-    "sha256": "80676a13aa3be69ca112b5a7c202eae59866e08c15c02e85ab5aecc15c569286"
-  },
   "C++/FLProg_WebUI/src/FLProgWebUi.h": {
     "source": "Библиотека/FLProg_WebUI/src/FLProgWebUi.h",
     "sha256": "86070d132d5d7163879ac189be535ffcb95d8a4135913cfdb40440da9194d487"
@@ -197,7 +193,7 @@
   },
   "C++/FLProg_WebUI/src/adapters/FLProgWebUiAssetVersion.h": {
     "source": "Библиотека/FLProg_WebUI/src/adapters/FLProgWebUiAssetVersion.h",
-    "sha256": "3125b030d47d46e9ed47a6578ced37ae021b982c5dd5384b0be97d5f212943c9"
+    "sha256": "be79dc0cc05090e613c2633f6618bf0ffb37c537993eebb39d2ca865901f0ee8"
   },
   "C++/FLProg_WebUI/src/adapters/FLProgWebUiEsp8266Http.h": {
     "source": "Библиотека/FLProg_WebUI/src/adapters/FLProgWebUiEsp8266Http.h",
@@ -209,7 +205,7 @@
   },
   "C++/FLProg_WebUI/src/adapters/FLProgWebUiFlprogNetworkPagedHttp.h": {
     "source": "Библиотека/FLProg_WebUI/src/adapters/FLProgWebUiFlprogNetworkPagedHttp.h",
-    "sha256": "4b4f96e88253ec19489981dcd047a0b01b43418704ae1038919d487e89b79333"
+    "sha256": "6d41882e1e3c10b60a2b722b90baebc32939f85b899afd3f1b4837f5a627b235"
   },
   "C++/FLProg_WebUI/src/adapters/FLProgWebUiGzipHttp.h": {
     "source": "Библиотека/FLProg_WebUI/src/adapters/FLProgWebUiGzipHttp.h",
@@ -353,7 +349,7 @@
   },
   "C++/FLProg_Network/README.md": {
     "source": "Библиотека/FLProg_Network/README.md",
-    "sha256": "68c321a5bd21e7515ad349ff44d41aaf97c46c2898044de656dd1e7d4057cad2"
+    "sha256": "0000730398aa36039460ca2d2efc0ff6b0aeadfa55da9c05a069ddd7463021e7"
   },
   "C++/FLProg_Network/README_EN.md": {
     "source": "Библиотека/FLProg_Network/README_EN.md",
@@ -366,14 +362,6 @@
   "C++/FLProg_Network/docs/OTA_ETHERNET_RU.md": {
     "source": "Библиотека/FLProg_Network/docs/OTA_ETHERNET_RU.md",
     "sha256": "560c132444148649750d297925add631adac2ce6227a441d4158ab3d5c028863"
-  },
-  "C++/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_1/README_EN.md": {
-    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_1/README_EN.md",
-    "sha256": "5a42b87a0a316031198658e22dfc34580bfbdc7137b3a9c23437b3bf1a873f9b"
-  },
-  "C++/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_1/README_RU.md": {
-    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_1/README_RU.md",
-    "sha256": "a5e4e3424deec654a540dca79c35280d585250adb3fa7e3ba632bbdbe789bd24"
   },
   "C++/FLProg_WebUI/user_blocks/README_EN.md": {
     "source": "Библиотека/FLProg_WebUI/user_blocks/README_EN.md",
@@ -397,11 +385,11 @@
   },
   "Справка/OTA_МЕНЕДЖЕР.md": {
     "source": "Документация/OTA_МЕНЕДЖЕР.md",
-    "sha256": "203f417a940af28732dd0a22141bf87d43a42a719b1b3e65c3d3b54ea52bf344"
+    "sha256": "73869e2700f9c80ae10a9a32018dc88809d6e9a7cc5f6a60a83f0e016a547d21"
   },
   "Справка/БЛОКИ.md": {
     "source": "Документация/БЛОКИ.md",
-    "sha256": "ad2ec64970322da8d7c35aa6876f2b0fca54c90ed2fb7f0403fff8c3fd73b901"
+    "sha256": "9c67bd3da4ce351f8871b5d486555a8fcd7dd2bc500bf139cda1054dceef595f"
   },
   "Справка/РАЗРАБОТЧИКУ.md": {
     "source": "Документация/РАЗРАБОТЧИКУ.md",
@@ -410,5 +398,37 @@
   "Справка/LOAD_RU.md": {
     "source": "Документация/LOAD_RU.md",
     "sha256": "e44fafd678e4fff650fa1bccf966e9f9f3030ab4b819b4c495a87442a2de80dd"
+  },
+  "C++/FLProg_WebUI/src/adapters/FLProgWebUiBundle.h": {
+    "source": "Библиотека/FLProg_WebUI/src/adapters/FLProgWebUiBundle.h",
+    "sha256": "db93e791ef16402f6895fb4e73f691c2efc62c25e3cac91bcb752c168ebd8d60"
+  },
+  "C++/FLProg_WebUI/src/adapters/FLProgWebUiWidgetCatalog.h": {
+    "source": "Библиотека/FLProg_WebUI/src/adapters/FLProgWebUiWidgetCatalog.h",
+    "sha256": "f7cf6f2809d779d0e327ec7f97b10639ea45ea13302d78489d8f119f98fbc7e8"
+  },
+  "Справка/FLASH_BUNDLE_RU.md": {
+    "source": "Документация/FLASH_BUNDLE_RU.md",
+    "sha256": "5c55f4b16c7146bd919c5462d4e01bfdbb495c71e1a1ebb9520601ed997a7723"
+  },
+  "Справка/WIDGET_CATALOG_RU.md": {
+    "source": "Документация/WIDGET_CATALOG_RU.md",
+    "sha256": "636cee7a4d7b441a4f0c6b2c45869bd7a7032aa7055b874d5c2aff0273ccf8b6"
+  },
+  "Справка/MQTT_RU.md": {
+    "source": "Документация/MQTT_RU.md",
+    "sha256": "6801404bd5dc1fa36e7a4a9dbb50f388a39a6613276fd8a46c78f33ae764b5ee"
+  },
+  "C++/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_2/flprogMqttUserBlocks.h": {
+    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_2/flprogMqttUserBlocks.h",
+    "sha256": "9baf46f81bf1d80bc0add4606a6754e87a6f8412c63d528f1a71ba99142e50c1"
+  },
+  "C++/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_2/README_EN.md": {
+    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_2/README_EN.md",
+    "sha256": "0076d92a0d0b6495e1ec2815a5b6fd76630f9111e59593ae2a942b8584d4d151"
+  },
+  "C++/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_2/README_RU.md": {
+    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_2/README_RU.md",
+    "sha256": "6801404bd5dc1fa36e7a4a9dbb50f388a39a6613276fd8a46c78f33ae764b5ee"
   }
 }

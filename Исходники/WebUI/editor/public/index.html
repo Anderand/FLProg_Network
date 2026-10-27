@@ -51,7 +51,8 @@
           <p id="draftStatus" role="status" aria-live="polite"></p><label>Период опроса, мс<input id="pollInterval" type="number" min="500" max="60000" step="1"></label>
           <label><input id="pauseHidden" type="checkbox">Пауза в фоновой вкладке</label>
           <small>При возвращении — полная синхронизация. Черновики не отправляются автоматически.</small>
-          <label>Папка проекта (полный путь)<input id="projectFolder" autocomplete="off" spellcheck="false" placeholder="E:\FLProg_Projects\a123"></label>
+          <label>Папка проекта (полный путь)<input id="projectFolder" type="text" autocomplete="off" spellcheck="false" placeholder="E:\FLProg_Projects\FLE4D-30MT" aria-describedby="projectFolderHint"></label>
+          <small id="projectFolderHint">Путь можно ввести или вставить. «Сохранить» запишет .flpui сюда, «Собрать пакет» — в подпапку libraries.</small>
           <label><input type="checkbox" id="installToIde"> Копировать библиотеку проекта в Arduino IDE</label>
           <label class="advanced-field">Папка пакетов (если папка проекта не задана)<input id="packageOutput" autocomplete="off" spellcheck="false"></label>
         </div>
@@ -267,7 +268,7 @@
   <script src="validation.js?v=20261027-compatibility1"></script>
   <script src="diagnostics.js?v=20261025-memory"></script>
   <script src="draft.js?v=20261025-draft2"></script>
-  <script src="app.js?v=20261026-projectfolder"></script>
+  <script src="app.js?v=20261027-edit-project-path"></script>
   <script src="contract.js?v=20261027-contract1"></script>
   <script src="preview-scenarios.js?v=20261027-1"></script>
   <script src="preview.js?v=20261027-scenarios1"></script>

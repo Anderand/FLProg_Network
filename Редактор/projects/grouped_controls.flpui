@@ -1,0 +1,99 @@
+{
+  "schema": "flprog.webui/1.0",
+  "project": {
+    "id": "grouped_controls",
+    "title": "Группы и команды"
+  },
+  "transport": {
+    "id": "w5500-http-1",
+    "port": 80
+  },
+  "theme": {
+    "background": "#111827",
+    "card": "#1f2937",
+    "text": "#e5e7eb",
+    "accent": "#6366f1"
+  },
+  "channels": [
+    {
+      "id": "setpoint",
+      "label": "Уставка",
+      "type": "float",
+      "direction": "duplex",
+      "index": 101,
+      "source": "user"
+    },
+    {
+      "id": "run",
+      "label": "Пуск",
+      "type": "bool",
+      "direction": "command",
+      "index": 102,
+      "source": "user"
+    },
+    {
+      "id": "result",
+      "label": "Результат из FBD",
+      "type": "bool",
+      "direction": "publish",
+      "index": 103,
+      "source": "user"
+    }
+  ],
+  "pages": [
+    {
+      "id": "main",
+      "title": "Главная",
+      "widgets": [
+        {
+          "id": "setpoint_field",
+          "type": "number-input",
+          "label": "Уставка температуры",
+          "channel": "setpoint",
+          "group": "Управление",
+          "placeholder": "Температура",
+          "unit": "°C",
+          "maxLength": 20,
+          "confirmation": "",
+          "min": 0,
+          "max": 100,
+          "step": 0.5,
+          "x": 1,
+          "y": 1,
+          "w": 6,
+          "h": 2
+        },
+        {
+          "id": "start",
+          "type": "button",
+          "label": "Пуск",
+          "channel": "run",
+          "group": "Управление",
+          "confirmation": "Запустить оборудование?",
+          "x": 7,
+          "y": 1,
+          "w": 6,
+          "h": 2,
+          "bindings": [
+            {
+              "role": "result",
+              "channel": "result",
+              "direction": "publish"
+            }
+          ]
+        },
+        {
+          "id": "result_display",
+          "type": "indicator",
+          "label": "Состояние из FBD",
+          "channel": "result",
+          "group": "Диагностика",
+          "x": 1,
+          "y": 1,
+          "w": 6,
+          "h": 2
+        }
+      ]
+    }
+  ]
+}

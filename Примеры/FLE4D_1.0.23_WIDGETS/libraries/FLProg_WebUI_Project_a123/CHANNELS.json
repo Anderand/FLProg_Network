@@ -1,0 +1,519 @@
+{
+  "schema": "flprog.webui.channel-contract/1.0",
+  "project_id": "a123",
+  "project_title": "FLE4D-30MT",
+  "transport": "w5500-http-1",
+  "channels": [
+    {
+      "index": 0,
+      "id": "network_ip",
+      "label": "IP-адрес",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgNetworkInterface::localIP",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "network_diag_ip",
+          "widget_label": "IP-адрес",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "id": "network_ready",
+      "label": "Сеть подключена",
+      "type": "bool",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgNetworkInterface::isReady",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "network_diag_ready",
+          "widget_label": "Сеть подключена",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "id": "network_mac",
+      "label": "MAC-адрес",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgNetworkInterface::mac",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "network_diag_mac",
+          "widget_label": "MAC-адрес",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "id": "network_gateway",
+      "label": "Шлюз",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgNetworkInterface::activeGateway",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "network_diag_gateway",
+          "widget_label": "Шлюз",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "id": "network_subnet",
+      "label": "Маска подсети",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgNetworkInterface::activeSubnet",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "network_diag_subnet",
+          "widget_label": "Маска подсети",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "id": "device_model",
+      "label": "Модель контроллера",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgNetworkInterface::deviceModel (attached identity provider)",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "network_diag_model",
+          "widget_label": "Модель контроллера",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "id": "firmware_version",
+      "label": "Версия прошивки",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgNetworkInterface::firmwareVersion (attached identity provider)",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "network_diag_version",
+          "widget_label": "Версия прошивки",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "id": "reset_flags",
+      "label": "Маска сброса (накопленная)",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readResetFlags",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "network_diag_flags",
+          "widget_label": "Маска сброса (накопленная)",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "id": "reset_cause",
+      "label": "Расшифровка флагов сброса",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::resetDescription",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "network_diag_reset",
+          "widget_label": "Расшифровка флагов сброса",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "id": "heap_used",
+      "label": "ОЗУ: динамически занято, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readHeap (uordblks)",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "network_diag_heap_used",
+          "widget_label": "ОЗУ: динамически занято, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "id": "heap_arena_free",
+      "label": "ОЗУ: свободные блоки в выделенном пуле, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readHeap (fordblks, not total RAM)",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "network_diag_heap_free",
+          "widget_label": "ОЗУ: свободные блоки в выделенном пуле, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 11,
+      "id": "flash_total",
+      "label": "Flash контроллера: всего, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "system_flash_total",
+          "widget_label": "Flash контроллера: всего, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 12,
+      "id": "flash_app_capacity",
+      "label": "Flash: доступно приложению, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "system_flash_app_capacity",
+          "widget_label": "Flash: доступно приложению, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 13,
+      "id": "flash_app_used",
+      "label": "Flash: размер приложения, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "system_flash_app_used",
+          "widget_label": "Flash: размер приложения, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 14,
+      "id": "flash_app_free",
+      "label": "Flash: свободно для приложения, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "system_flash_app_free",
+          "widget_label": "Flash: свободно для приложения, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 15,
+      "id": "ram_total",
+      "label": "ОЗУ контроллера: всего, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "system_ram_total",
+          "widget_label": "ОЗУ контроллера: всего, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 16,
+      "id": "ram_app_capacity",
+      "label": "ОЗУ: доступно приложению, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "system_ram_app_capacity",
+          "widget_label": "ОЗУ: доступно приложению, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 17,
+      "id": "ram_static_used",
+      "label": "ОЗУ: переменные программы, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "system_ram_static_used",
+          "widget_label": "ОЗУ: переменные программы, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 18,
+      "id": "ram_available_estimate",
+      "label": "ОЗУ: доступно для выделений (оценка), байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "system_ram_available_estimate",
+          "widget_label": "ОЗУ: доступно для выделений (оценка), байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 19,
+      "id": "ram_used_estimate",
+      "label": "ОЗУ: занято и зарезервировано (оценка), байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "system_ram_used_estimate",
+          "widget_label": "ОЗУ: занято и зарезервировано (оценка), байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 20,
+      "id": "ccm_total",
+      "label": "Дополнительная ОЗУ CCM: всего, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "system_ccm_total",
+          "widget_label": "Дополнительная ОЗУ CCM: всего, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 21,
+      "id": "ccm_used",
+      "label": "Дополнительная ОЗУ CCM: занято, байт",
+      "type": "text",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::readMemory",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "system_ccm_used",
+          "widget_label": "Дополнительная ОЗУ CCM: занято, байт",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    },
+    {
+      "index": 22,
+      "id": "system_uptime",
+      "label": "Время работы после запуска, с",
+      "type": "int32",
+      "direction": "publish",
+      "direction_title": "ПЛК → веб",
+      "system": true,
+      "source": "FLProgWebUiPlatformDiagnostics::millis / 1000",
+      "blocks": [],
+      "secret": false,
+      "references": [
+        {
+          "page_id": "network-diagnostics",
+          "page_title": "Диагностика FLE4D",
+          "widget_id": "system_uptime_value",
+          "widget_label": "Время работы после запуска",
+          "role": "value",
+          "role_title": "значение"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "system": 23,
+    "user": 0,
+    "without_widgets": 0
+  }
+}

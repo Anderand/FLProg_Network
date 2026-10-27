@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "id": "board_black_f407ve",
+  "loader_only": true,
+  "label": "FLProg Board Black F407VE / 512 KiB — нужен BIN проекта",
+  "description": "Загрузчик готов. Приложение собирается из вашего проекта FLProg на вкладке «Плата и сборка».",
+  "target": {
+    "board": "FLProg Board Black F407VE",
+    "mcu": "STM32F407xx",
+    "flash_size": 524288,
+    "hardware_verified": false
+  },
+  "flash": {
+    "bootloader_address": "0x08000000",
+    "bootloader_size": 65536,
+    "application_address": "0x8010000",
+    "application_max_size": 196608,
+    "staging_address": "0x8040000",
+    "staging_size": 262144
+  },
+  "ota": {
+    "protocol": "FLPOTA2",
+    "port": 3233,
+    "block_size": 1024
+  },
+  "artifacts": {
+    "bootloader": {
+      "file": "bootloader.bin",
+      "max_size": 65536,
+      "sha256": "3c5bbddc8a574140173278151fd8a1fee3204255cd57090e6e36d560b7c54796"
+    }
+  }
+}

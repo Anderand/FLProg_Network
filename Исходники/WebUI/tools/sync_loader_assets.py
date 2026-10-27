@@ -6,7 +6,7 @@ def sync():
  h=ROOT/'runtime/FLProg_WebUI/src/adapters/FLProgWebUiFlprogNetworkPagedHttp.h'
  text=h.read_text(encoding='utf-8')
  text=re.sub(r'#if FLPROG_WEBUI_GZIP_ASSETS\n.*?\n#else\n','',text,flags=re.S).replace('\n#endif // FLPROG_WEBUI_GZIP_ASSETS','')
- for callback,name in [('index','index.html'),('loaderScript','loader.js'),('pollingScript','polling.js'),('navigationScript','navigation.js'),('bootInitScript','boot-init.js'),('enabledScript','enabled.js'),('patternParseScript','pattern-parse.js'),('patternMatchScript','pattern-match.js'),('groupScript','groups.js')]:
+ for callback,name in [('index','index.html'),('loaderScript','loader.js'),('pollingScript','polling.js'),('navigationScript','navigation.js'),('catalogScript','catalog.js'),('bootInitScript','boot-init.js'),('enabledScript','enabled.js'),('patternParseScript','pattern-parse.js'),('patternMatchScript','pattern-match.js'),('groupScript','groups.js')]:
   body=(ROOT/'runtime/FLProg_WebUI/web_assets'/name).read_text(encoding='utf-8').strip()
   pattern=r'(static void FLPROG_WEBUI_HTTP_FLASH '+callback+r'\(FLProgNetworkHttpServer \*value\).*?static const char asset\[\] PROGMEM =\s*)((?:"(?:\\.|[^"\\])*"\s*)+);'
   text,count=re.subn(pattern,lambda m:m[1]+json.dumps(body,ensure_ascii=False)+';',text,count=1,flags=re.S)

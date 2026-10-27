@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "fle4d_30mt_profile_1_0_4",
+  "label": "FLE4D-30MT / STM32F407VG / W5500 — программа профиля 1.0.4",
+  "description": "Программа профиля 1.0.4-PROFILE из скетча 3: Web UI, диагностика, 16 DI / 4 AI, 14 DO / 2 AO, OTA. SPI0 PB13/PB14/PB15, CS PB12; DHCP; пароль OTA пустой.",
+  "target": {
+    "board": "FLE4D-30MT / STM32F407VG / W5500",
+    "mcu": "STM32F407VG",
+    "device_id": "0x413",
+    "flash_size": 1048576,
+    "core": "STMicroelectronics STM32 3.0.0"
+  },
+  "flash": {
+    "bootloader_address": "0x08000000",
+    "bootloader_size": 65536,
+    "application_address": "0x08010000",
+    "application_max_size": 458752,
+    "staging_address": "0x08080000",
+    "staging_size": 524288
+  },
+  "ota": {
+    "protocol": "FLPOTA2",
+    "port": 3233,
+    "block_size": 1024
+  },
+  "artifacts": {
+    "bootloader": {
+      "file": "bootloader.bin",
+      "sha256": "5723f837c36ddba8a7e72acd389773da9d1e7273666282dda0d46dd0c35f8ec6",
+      "max_size": 65536,
+      "revision": "2026-10-23-stack-handoff-fixed"
+    },
+    "application": {
+      "file": "application.bin",
+      "sha256": "91d1ded3bebe34bb3f90ef2dc4eaa04e5f15f2f164e6127ad688b5ac9415c386",
+      "max_size": 458752
+    }
+  },
+  "firmware_version": "1.0.4-PROFILE",
+  "validation": {
+    "build_verified": true,
+    "application_hardware_verified": false,
+    "bootloader_reference": "previously tested FLE4D image; unchanged",
+    "source_sketch": "3/3.ino",
+    "source_sha256": "d5ed37f08ced9e3a768153421388a71c6b2f5eb66d98dc07a53cf269e036ee93"
+  }
+}

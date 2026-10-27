@@ -1,0 +1,20 @@
+{
+  "board": "GENERIC_F103VETX",
+  "family": "GenFLProgF1",
+  "label": "FLProg Generic F103VETx",
+  "mcu": "STM32F103xE",
+  "flash": 524288,
+  "ram": 65536,
+  "fqbn": "STMicroelectronics:stm32:GenFLProgF1:pnum=GENERIC_F103VETX",
+  "status": "backend_implemented_hardware_validation_pending",
+  "porting_requirement": "Hardware validation; build with matching OTA_SAFE profile",
+  "layout": 4,
+  "memory": {
+    "flash": 524288,
+    "offset": 32768,
+    "capacity": 229376,
+    "stage": 262144
+  },
+  "hardware_verified": false,
+  "build_kind": "bootloader"
+}

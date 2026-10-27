@@ -1,0 +1,9 @@
+{
+  "schema": "flprog.webui.build/1.0",
+  "projectId": "a123",
+  "descriptorApi": 1,
+  "files": {
+    "src/a123_descriptor.h": "84718b59885cb0bf89dafb73820e135aede8bf9bcf9ff9d47ad701aedafad303",
+    "src/a123_webui.h": "880137704d71de31413979ac10d2110484891a782a31d374e7dedbe4581981aa"
+  }
+}

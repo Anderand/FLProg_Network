@@ -1,0 +1,6 @@
+{
+  "ip": "192.168.100.17",
+  "port": 3233,
+  "service": "FLProg OTA",
+  "detail": "FLE4D-30MT / STM32F407VG; версия: 1.0.23-WIDGETS; Layout 1; Flash 1024 KiB; app 0x08010000; max 448 KiB"
+}

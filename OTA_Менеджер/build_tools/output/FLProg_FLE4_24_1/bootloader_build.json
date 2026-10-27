@@ -1,0 +1,20 @@
+{
+  "board": "FLProg_FLE4_24_1",
+  "family": "GenFLProgF4",
+  "label": "FLProg PLC FLE4-24.1",
+  "mcu": "STM32F407xx",
+  "flash": 524288,
+  "ram": 131072,
+  "fqbn": "STMicroelectronics:stm32:GenFLProgF4:pnum=FLProg_FLE4_24_1",
+  "status": "backend_implemented_hardware_validation_pending",
+  "porting_requirement": "Hardware validation; build with matching OTA_SAFE profile",
+  "layout": 2,
+  "memory": {
+    "flash": 524288,
+    "offset": 65536,
+    "capacity": 196608,
+    "stage": 262144
+  },
+  "hardware_verified": false,
+  "build_kind": "bootloader"
+}

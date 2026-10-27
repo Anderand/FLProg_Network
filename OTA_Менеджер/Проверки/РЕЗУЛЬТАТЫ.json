@@ -1,0 +1,16 @@
+{
+  "manager_version": "0.7.13",
+  "firmware_version": "1.0.4-PROFILE",
+  "source_sketch": "3.ino",
+  "source_sha256": "d5ed37f08ced9e3a768153421388a71c6b2f5eb66d98dc07a53cf269e036ee93",
+  "tests_passed": 99,
+  "gui_verified": true,
+  "application_hardware_verified": false,
+  "application_size": 363280,
+  "application_sha256": "91d1ded3bebe34bb3f90ef2dc4eaa04e5f15f2f164e6127ad688b5ac9415c386",
+  "executable_sha256": "2cd0e1cc2b92e1c384f8ca9b76f74ddc63684a51ece752b400fe91094f39e770",
+  "flash_used": 362772,
+  "ram_static_used": 50788,
+  "no_personal_settings": true,
+  "flashed": false
+}
