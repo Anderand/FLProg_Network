@@ -4,7 +4,7 @@ import xml.etree.ElementTree as X
 import uuid, argparse
 
 parser=argparse.ArgumentParser()
-parser.add_argument('--output',type=Path,default=Path(__file__).resolve().parents[1]/'releases/MQTT_User_Blocks_v0_2')
+parser.add_argument('--output',type=Path,default=Path(__file__).resolve().parents[1]/'releases/MQTT_User_Blocks_v0_3')
 OUT=parser.parse_args().output
 OUT.mkdir(parents=True, exist_ok=True)
 
@@ -22,7 +22,7 @@ def build(kind, inputs, outputs, loop, declarations, setup='', info=''):
     b=obj(root,'CodeUserBlock','typeClass',env='Arduino')
     def s(p,n,t): return obj(p,'String',n,t)
     def flag(p,n,v): X.SubElement(p,'sixx.object',{'sixx.name':n,'sixx.type':str(v),'sixx.env':'Core'})
-    s(b,'id',str(uuid.uuid5(uuid.NAMESPACE_URL, 'flprog/mqtt/v0.2/'+kind+'/'+str(serial))))
+    s(b,'id',str(uuid.uuid5(uuid.NAMESPACE_URL, 'flprog/mqtt/v0.3/'+kind+'/'+str(serial))))
     obj(b,'OrderedCollection','blocks')
     s(b,'label','FLProg MQTT '+kind)
     s(b,'name','FLProg MQTT '+kind)
@@ -30,9 +30,9 @@ def build(kind, inputs, outputs, loop, declarations, setup='', info=''):
         c=obj(b,'OrderedCollection',group)
         for name,typ in pins:
             a=obj(c,'InputsOutputsAdaptorForUserBlock',env='Arduino')
-            s(a,'id',str(uuid.uuid5(uuid.NAMESPACE_URL, 'flprog/mqtt/v0.2/'+kind+'/'+str(serial))))
+            s(a,'id',str(uuid.uuid5(uuid.NAMESPACE_URL, 'flprog/mqtt/v0.3/'+kind+'/'+str(serial))))
             p=obj(a,'UniversalBlockInputOutput','object',env='Arduino')
-            s(p,'id',str(uuid.uuid5(uuid.NAMESPACE_URL, 'flprog/mqtt/v0.2/'+kind+'/'+str(serial))))
+            s(p,'id',str(uuid.uuid5(uuid.NAMESPACE_URL, 'flprog/mqtt/v0.3/'+kind+'/'+str(serial))))
             X.SubElement(p,'sixx.object',{'sixx.name':'block','sixx.idref':'1'})
             obj(p,typ+'DataType','type',env='Arduino')
             flag(p,'isInput','True' if group=='inputs' else 'False')
@@ -66,16 +66,16 @@ def resolve_code():
     return '\n'.join(lines)+'\n'
 
 B='Boolean'; S='String'; N='Long' 
-build('Core', [('EN',B),('CON',B),('DIS',B),('NET_KIND',N),('NET_NUM',N),('SUB_LIMIT',N),('Broker',S),('Port',N),('ClientID',S),('User',S),('Password',S)],
+build('Core', [('EN',B),('CON',B),('DIS',B),('NET_KIND',N),('NET_NUM',N),('SUB_LIMIT',N),('POLL_MS',N),('Broker',S),('Port',N),('ClientID',S),('User',S),('Password',S)],
  [('Connected',B),('Busy',B),('Error',B),('ERR',N),('State',N),('Subscriptions',N),('SubBytes',N)],
- resolve_code()+'''flpMqttBlocks().control(mqttSelectedNetwork, EN, CON, DIS, Broker, Port, ClientID, User, Password, SUB_LIMIT);
+ resolve_code()+'''flpMqttBlocks().control(mqttSelectedNetwork, EN, CON, DIS, Broker, Port, ClientID, User, Password, SUB_LIMIT, POLL_MS);
 Connected = flpMqttBlocks().mqtt.connected();
 Busy = flpMqttBlocks().mqtt.busy();
 ERR = flpMqttBlocks().error();
 Error = ERR != 0;
 State = flpMqttBlocks().mqtt.state();
 Subscriptions = (long)flpMqttBlocks().mqtt.subscriptionCount();
-SubBytes = (long)flpMqttBlocks().mqtt.subscriptionMemoryBytes();''', [], info='Один Core на проект. Сеть из проекта: NET_KIND 1=W5500, 2=WiFi, 0=реестр; NET_NUM номер интерфейса 1..8. SUB_LIMIT=0: динамическое расширение по RAM; >0: явный лимит. Subscriptions: подтверждённые фильтры, SubBytes: память таблицы. SPI/Ethernet не изменяет. EN: автоподключение; CON/DIS: фронт. Настройки применяются при EN или CON. MQTT 3.1.1 QoS0 TCP. One Core per project; settings applied on enable/connect.')
+SubBytes = (long)flpMqttBlocks().mqtt.subscriptionMemoryBytes();''', [], info='Один Core на проект. Сеть из проекта: NET_KIND 1=W5500, 2=WiFi, 0=реестр; NET_NUM номер интерфейса 1..8. POLL_MS: 0=10 мс, 1..1000 мс — опрос в простое; при обмене 1 мс, порция 64 байта. Блоки вызывать каждый цикл: фронты сохраняются, сеть обслуживается по таймеру. SUB_LIMIT=0: динамическое расширение по RAM; >0: явный лимит. Subscriptions: подтверждённые фильтры, SubBytes: память таблицы. SPI/Ethernet не изменяет. EN: автоподключение; CON/DIS: фронт. Настройки применяются при EN или CON. MQTT 3.1.1 QoS0 TCP. One Core per project; settings applied on enable/connect.')
 build('Publish',[('Send',B),('Topic',S),('Message',S),('Retain',B)],[('Accepted',B),('ERR',N)],
  '''Accepted = false;
 if (Send && !mqttPrevSend) {

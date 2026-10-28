@@ -1,3 +1,4 @@
+# coding: utf-8
 """Compile the actual MQTT header and all implementation methods with platform stubs."""
 from pathlib import Path
 import re, subprocess, argparse
@@ -7,8 +8,8 @@ parser.add_argument('--output',type=Path,default=Path(__file__).resolve().parent
 parser.add_argument('--compiler',type=Path,default=Path(r'E:\FLP\Flprog_network\audit\host-tools\ziglang\zig.exe'))
 args=parser.parse_args()
 W=args.output.parent;L=args.library;T=args.output;T.mkdir(parents=True,exist_ok=True)
-h=(L/'src/service/flprogNetworkMqttClient.h').read_text()
-cpp=(L/'src/service/flprogNetworkMqttClient.cpp').read_text()
+h=(L/'src/service/flprogNetworkMqttClient.h').read_text(encoding='utf-8')
+cpp=(L/'src/service/flprogNetworkMqttClient.cpp').read_text(encoding='utf-8')
 helper=(L/'src/flprogMqttUserBlocks.h').read_text(encoding='utf-8-sig')
 helper=re.sub(r'^#include.*$','',helper,flags=re.M)
 h=re.sub(r'^#include.*$', '', h, flags=re.M).replace('private:','public:')
@@ -21,7 +22,10 @@ pre=r'''
 #include <cassert>
 #include <string>
 #include <vector>
-using String=std::string;
+class String : public std::string { public:
+ using std::string::string; using std::string::operator=;
+ bool concat(const char*p,unsigned int n){append(p,n);return true;}
+};
 struct IPAddress { uint8_t bytes[4]; IPAddress(int a=0,int b=0,int c=0,int d=0):bytes{(uint8_t)a,(uint8_t)b,(uint8_t)c,(uint8_t)d}{} uint8_t operator[](int i)const{return bytes[i];} };
 static uint32_t ticks=0; uint32_t millis(){return ticks;}
 class FLProgNetworkInterface {};
@@ -34,8 +38,16 @@ class FLProgNetworkService {public: virtual ~FLProgNetworkService(){} virtual vo
 #define FLPROG_SOCKET_STATE_ERROR 9
 #define FLPROG_SOCKET_STATE_UNSUPPORTED 10
 class FLProgNetworkTcpClient {public:
+ virtual ~FLProgNetworkTcpClient(){} virtual void pool(){++pollCalls;}
+ size_t pollCalls=0,availableCalls=0,readCalls=0,writeCalls=0,byteReads=0,maxRead=0,maxWrite=0;
+ size_t rxOffset=0,shortRead=9999,shortWrite=9999; bool link=true;
+ std::vector<uint8_t> rx,tx;
  bool begin(FLProgNetworkInterface&,uint8_t){return true;} void end(){} void setRoute(uint8_t){} void setAutoReconnect(bool){} void setReconnectOnInitialFailure(bool){} void setDnsPolicy(int){} void setNoDelay(bool){} void setTimeout(uint32_t){}
- bool connect(const char*,uint16_t){return true;} bool connect(IPAddress,uint16_t){return true;} bool connected(){return true;} bool busy(){return false;} uint8_t state(){return 0;} uint8_t error(){return 0;} uint8_t clientError()const{return 0;} void clearClientError(){} uint8_t dnsError()const{return 0;} void stop(){} void cancel(){} int available(){return 0;} int read(){return -1;} size_t write(const uint8_t*,size_t n){return n;}
+ bool connect(const char*,uint16_t){link=true;return true;} bool connect(IPAddress,uint16_t){link=true;return true;} bool connected(){return link;} bool busy(){return false;} uint8_t state(){return 0;} uint8_t error(){return 0;} uint8_t clientError()const{return 0;} void clearClientError(){} uint8_t dnsError()const{return 0;} void stop(){link=false;} void cancel(){}
+ int available(){++availableCalls;return (int)(rx.size()-rxOffset);}
+ int read(){++byteReads; if(rxOffset==rx.size())return -1;return rx[rxOffset++];}
+ int read(uint8_t*p,size_t n){++readCalls; if(n>maxRead)maxRead=n; n=std::min(n,shortRead);n=std::min(n,rx.size()-rxOffset);if(n)std::memcpy(p,rx.data()+rxOffset,n);rxOffset+=n;return (int)n;}
+ size_t write(const uint8_t*p,size_t n){++writeCalls;if(n>maxWrite)maxWrite=n;n=std::min(n,shortWrite);tx.insert(tx.end(),p,p+n);return n;}
 };
 static bool failAllocation=false;
 static size_t allocatedBytes=0;
@@ -47,6 +59,7 @@ static void testFree(void*p){if(p)allocatedBytes=0;std::free(p);}
 tests=r'''
 void session(FLProgNetworkMqttClient& c){c._sessionConnected=true;c._state=FLPROG_MQTT_STATE_CONNECTED;}
 void ack(FLProgNetworkMqttClient& c,uint8_t result=0){c._state=FLPROG_MQTT_STATE_WAIT_SUBACK;uint8_t b[]={(uint8_t)(c._waitingPacketId>>8),(uint8_t)c._waitingPacketId,result};assert(c.handleSuback(b,3));}
+void performanceTests();
 int main(){
  {
  FLProgNetworkMqttClient c; session(c);
@@ -81,10 +94,12 @@ int main(){
  assert(b.matches("home/+/temp","home/room/temp"));assert(!b.matches("home/+/temp","home/room/humidity"));
  assert(!b.matches("#","$SYS/broker"));assert(b.matches("home/#","home"));
  }
+ performanceTests();
  puts("PASS: 300 subscriptions, duplicate, optional limit, pending limit, OOM/retry, SUBACK rejection, 301 reconnect filters, clear/end/destructor, invalid filters");
  puts("PASS: Core missing interface, reconnect configuration, invalid port, MQTT wildcard matching");
 }
 '''
+tests += (Path(__file__).resolve().parent/'performance_tests.cpp').read_text(encoding='utf-8')
 (T/'tests.cpp').write_text(pre+'\n'+h+'\n'+cpp+'\n'+helper+'\n'+tests,encoding='utf-8')
 zig=args.compiler
 subprocess.run([str(zig),'c++','-std=c++11','-O0','-Wall','-Wextra',str(T/'tests.cpp'),'-o',str(T/'tests.exe')],check=True)

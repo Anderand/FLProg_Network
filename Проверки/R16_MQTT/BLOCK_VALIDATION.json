@@ -1,0 +1,17 @@
+{
+  "Core": {
+    "inputs": 12,
+    "outputs": 7,
+    "loop_equivalent": true
+  },
+  "Publish": {
+    "inputs": 4,
+    "outputs": 2,
+    "loop_equivalent": true
+  },
+  "Subscribe": {
+    "inputs": 2,
+    "outputs": 6,
+    "loop_equivalent": true
+  }
+}

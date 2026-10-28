@@ -70,6 +70,18 @@ class FLProgNetworkInterface;
 #define FLPROG_MQTT_WRITE_BUDGET 256U
 #endif
 
+// Idle socket polling period; 0 restores polling on every network.pool().
+#ifndef FLPROG_MQTT_POLL_INTERVAL_MS
+#define FLPROG_MQTT_POLL_INTERVAL_MS 10U
+#endif
+// One bulk read OR write per active pass; existing packet buffers stay unchanged.
+#ifndef FLPROG_MQTT_IO_CHUNK_SIZE
+#define FLPROG_MQTT_IO_CHUNK_SIZE 64U
+#endif
+static_assert(FLPROG_MQTT_IO_CHUNK_SIZE > 0 &&
+              FLPROG_MQTT_IO_CHUNK_SIZE <= FLPROG_MQTT_MAX_PACKET_SIZE,
+              "MQTT IO chunk must fit the packet buffer");
+
 #define FLPROG_MQTT_HOST_NONE 0
 #define FLPROG_MQTT_HOST_NAME 1
 #define FLPROG_MQTT_HOST_IP   2
@@ -142,6 +154,11 @@ public:
     bool begin(FLProgNetworkInterface &network, uint8_t route = 0);
     void end();
     void pool() override;
+
+    // Call network.pool() every PLC scan. Only due MQTT passes touch its TCP
+    // socket. Pending work runs at 1 ms; newly queued commands wake immediately.
+    void setPollInterval(uint16_t milliseconds) { _pollIntervalMs = milliseconds; }
+    uint16_t pollInterval() const { return _pollIntervalMs; }
 
     void setRoute(uint8_t value);
     uint8_t route() const { return _route; }
@@ -323,7 +340,22 @@ private:
     void resetReconnectBackoff();
     void advanceReconnectBackoff();
 
-    FLProgNetworkTcpClient _tcp;
+    // This socket remains registered for ownership/lifecycle, but its hardware
+    // progress belongs to MQTT. Otherwise updateSocketLayer() would poll it
+    // every PLC scan independently of the service's timer.
+    class ScheduledTcpClient : public FLProgNetworkTcpClient
+    {
+    public:
+        void pool() override {}
+        void service() { FLProgNetworkTcpClient::pool(); }
+    };
+    bool pollDue(uint32_t now) const;
+    ScheduledTcpClient _tcp;
+    uint32_t _lastPollAt = 0;
+    uint16_t _pollIntervalMs = FLPROG_MQTT_POLL_INTERVAL_MS;
+    bool _pollStarted = false;
+    bool _pollRequested = false;
+    bool _rxBacklog = false;
     bool _tcpAttached = false;
 
     uint8_t _route = 0;

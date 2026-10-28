@@ -1,10 +1,12 @@
-# FLProg Network — r15, 28.10.2026
+> Новое в r16: [MQTT Basic/Professional, POLL_MS и порядок вызова](Документация/MQTT_RU.md).
+
+# FLProg Network — r16, 28.10.2026
 
 Полный комплект: **FLProg_Network + FLProg_WebUI + Flprog_Modbus**,
 блоки FLProg, Web-редактор с EXE, переносимый OTA-менеджер **0.7.13**.
 
-**[Скачать готовый архив с EXE](https://github.com/Anderand/FLProg_Network/releases/tag/v2026.10.28-r15)**
-— файл **FLProg_Network_2026-10-28_r15.zip**. Кнопка GitHub Code → Download ZIP
+**[Скачать готовый архив с EXE](https://github.com/Anderand/FLProg_Network/releases/tag/v2026.10.28-r16)**
+— файл **FLProg_Network_2026-10-28_r16.zip**. Кнопка GitHub Code → Download ZIP
 скачивает исходники; готовые программы находятся в Releases.
 
 ## Быстрый запуск
@@ -26,7 +28,7 @@
 ## Что обновлено
 
 - MQTT: снят предел четырёх подписок, память таблицы расширяется при добавлении
-  фильтров. Новые блоки Core/Publish/Subscribe v0.2, счётчики и диагностика RAM.
+  фильтров. Новые блоки Core/Publish/Subscribe v0.3 (Basic и Professional), счётчики и диагностика RAM.
 - Веб: объединены CSS/JS и описания виджетов, выдача потоком из Flash,
   исправлен затянувшийся экран «Чтение данных ПЛК» при позднем запросе.
   Аппаратный замер a123 на FLE4D: 29 → 6 запросов, медиана холодной загрузки
@@ -74,7 +76,7 @@
 - [Менеджер](OTA_Менеджер/README_RU.md) · [блоки](Блоки_FLProg).
 - [Карта развития](Исходники/WebUI/ROADMAP_RU.md).
 - [API для Сергея и интеграций](API_для_интеграции/README.md).
-- [Проверки выпуска](Проверки/RELEASE_R15.md) · [сравнение загрузки](Документация/WIDGET_CATALOG_RU.md).
+- [Проверки выпуска](Проверки/RELEASE_R16.md) · [сравнение загрузки](Документация/WIDGET_CATALOG_RU.md).
 
 MQTT проверен на host и сборкой F407; работу с реальным брокером на плате
 в этом выпуске ещё не испытывали. ПЛК при публикации не перепрошивался.

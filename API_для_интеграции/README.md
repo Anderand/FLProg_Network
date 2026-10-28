@@ -1,4 +1,4 @@
-# API для интеграции — r15
+# API для интеграции — r16
 
 [Индекс](ИНДЕКС.md) · [API редактора](API_РЕДАКТОРА.md).
 MANIFEST_API.json связывает каждую копию заголовка с оригиналом и SHA-256.
@@ -14,3 +14,7 @@ subscriptionMemoryBytes(), clearSubscriptions(); новые ошибки 17/18.
 widgetCatalog=true, /item?widgets=ID возвращает {page,items:[[index,widget],...]};
 старый /item?index=N сохранён. Каналы, маршруты и интерфейсы Start/OTA прежние.
 [Ресурсы](Справка/FLASH_BUNDLE_RU.md) · [каталоги](Справка/WIDGET_CATALOG_RU.md).
+
+MQTT r16: setPollInterval()/pollInterval(), вход Core POLL_MS, Basic и Professional v0.3.
+Сокет клиента обслуживает сам MQTT-сервис; не вызывайте tcp()->pool() отдельно.
+См. [отчёт](Network/Контракты/MQTT_PERFORMANCE_RU.md).

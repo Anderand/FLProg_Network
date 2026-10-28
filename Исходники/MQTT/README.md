@@ -1,12 +1,17 @@
-# Исходники проверок MQTT
+# Исходники MQTT v0.3
 
-build_mqtt_blocks.py --output <папка> воспроизводит три UBI (Python 3).
-test_mqtt.py --library <FLProg_Network> --output <рабочая папка> --compiler <zig.exe>
-компилирует реальный класс MQTT со стендом часов/транспорта/отказа выделения RAM.
-В output создаются tests.cpp/tests.exe и отчёт рядом. Zig надо установить отдельно.
-Для другого C++ компилятора используйте сгенерированный tests.cpp как C++11.
+`build_mqtt_blocks.py --output <Basic>` создаёт три базовых UBI.
+`build_mqtt_professional_blocks.py --basic <Basic> --output <Professional>`
+создаёт три профессиональных UBI из тех же определений. Нужен Python 3 и
+соседний `Исходники/WebUI/tools/build_start_block.py` из общего комплекта.
 
-mqtt_gate.ino — compile-only пример всех трёх блоков, EN=false, сеть не настраивает.
-Поместите в папку mqtt_gate и соберите для FLE4D-30MT с библиотекой этого выпуска.
-Это проверка компиляции, не готовая прошивка профиля и не аппаратный MQTT-тест.
-run_fix33_host_tests.py / fix33_host_harness.cpp.in — 26 сетевых регрессий.
+`test_mqtt.py --library <FLProg_Network> --output <рабочая папка> --compiler <zig.exe>`
+компилирует полный класс MQTT со стендом времени/транспорта/отказа RAM.
+performance_tests.cpp должен оставаться рядом. tests.cpp/tests.exe создаются
+в output; отчёт — рядом. Zig устанавливается отдельно. Сгенерированный C++11
+можно собрать другим компилятором. Проверка не обращается к ПЛК или брокеру.
+
+mqtt_gate.ino и mqtt_professional_gate.ino — контрольные скетчи извлечённого
+кода UBI. EN=false, только компиляция. Положите каждый в одноимённую папку.
+Professional проверяет два Publish и два Subscribe с отдельным состоянием.
+Это не готовые прошивки профиля. Сеть и SPI контрольные скетчи не настраивают.

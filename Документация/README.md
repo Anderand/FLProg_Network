@@ -1,3 +1,5 @@
+> r16: [Обслуживание MQTT и сравнение памяти](MQTT_PERFORMANCE_RU.md), [блоки Basic/Professional](MQTT_RU.md).
+
 # Документация FLProg Network r15
 
 [Общая инструкция](../Инструкция.md) · [Установка](УСТАНОВКА.md) ·

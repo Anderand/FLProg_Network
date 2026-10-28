@@ -1,0 +1,4 @@
+{
+  "r15": "idle socket=100000 available=100000\npacket bytes=286 available=287 byteRead=286 bulkRead=0 drain_ms=0\n",
+  "new": "idle socket=100 available=100\npacket bytes=286 available=5 byteRead=0 bulkRead=5 drain_ms=4\n"
+}

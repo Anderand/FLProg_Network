@@ -157,6 +157,9 @@ void FLProgNetworkMqttClient::end()
         _tcpAttached = false;
     }
     detach();
+    _pollStarted = false;
+    _pollRequested = false;
+    _rxBacklog = false;
     _state = FLPROG_MQTT_STATE_IDLE;
     _error = FLPROG_MQTT_ERROR_NONE;
     resetTransaction();
@@ -289,6 +292,9 @@ bool FLProgNetworkMqttClient::connect()
         _error = FLPROG_MQTT_ERROR_NO_CLIENT_ID;
         return false;
     }
+    if (!_wantConnected || _state == FLPROG_MQTT_STATE_IDLE ||
+        _state == FLPROG_MQTT_STATE_ERROR || _state == FLPROG_MQTT_STATE_BACKOFF)
+        _pollRequested = true;
     _wantConnected = true;
     _disconnectRequested = false;
     _cancelRequested = false;
@@ -304,12 +310,14 @@ void FLProgNetworkMqttClient::disconnect()
 {
     _wantConnected = false;
     _disconnectRequested = true;
+    _pollRequested = true;
 }
 
 void FLProgNetworkMqttClient::cancel()
 {
     _wantConnected = false;
     _cancelRequested = true;
+    _pollRequested = true;
 }
 
 bool FLProgNetworkMqttClient::writeUtf(size_t &offset, const char *value, size_t maxLength)
@@ -465,7 +473,9 @@ bool FLProgNetworkMqttClient::publish(
         return false;
     }
     _error = FLPROG_MQTT_ERROR_NONE;
-    return buildPublishPacket(topic, payload, length, retained);
+    const bool accepted = buildPublishPacket(topic, payload, length, retained);
+    if (accepted) _pollRequested = true;
+    return accepted;
 }
 
 bool FLProgNetworkMqttClient::subscribe(const char *topicFilter)
@@ -496,11 +506,14 @@ bool FLProgNetworkMqttClient::subscribe(const char *topicFilter)
         if (!reserveSubscriptions(_subscriptionCount + 1)) return false;
     }
     _error = FLPROG_MQTT_ERROR_NONE;
-    return buildSubscribePacket(topicFilter, FLPROG_MQTT_TX_SUBSCRIBE);
+    const bool accepted = buildSubscribePacket(topicFilter, FLPROG_MQTT_TX_SUBSCRIBE);
+    if (accepted) _pollRequested = true;
+    return accepted;
 }
 
 void FLProgNetworkMqttClient::resetRxParser()
 {
+    _rxBacklog = false;
     _rxHeader = 0;
     _rxStage = 0;
     _rxLengthBytes = 0;
@@ -654,16 +667,17 @@ void FLProgNetworkMqttClient::serviceSend()
         fail(FLPROG_MQTT_ERROR_TCP);
         return;
     }
-    size_t budget = FLPROG_MQTT_WRITE_BUDGET;
-    while (_txOffset < _txLength && budget != 0)
+    if (_txOffset < _txLength && FLPROG_MQTT_WRITE_BUDGET != 0)
     {
         size_t count = _txLength - _txOffset;
-        if (count > budget) count = budget;
+        if (count > FLPROG_MQTT_WRITE_BUDGET) count = FLPROG_MQTT_WRITE_BUDGET;
+        if (count > FLPROG_MQTT_IO_CHUNK_SIZE) count = FLPROG_MQTT_IO_CHUNK_SIZE;
         const size_t written = _tcp.write(_txBuffer + _txOffset, count);
-        if (written == 0) break;
-        _txOffset += written;
-        budget -= written;
-        _lastProgressAt = millis();
+        if (written != 0)
+        {
+            _txOffset += written;
+            _lastProgressAt = millis();
+        }
     }
     if (_txOffset < _txLength)
     {
@@ -979,29 +993,35 @@ bool FLProgNetworkMqttClient::handlePacket(uint8_t header, const uint8_t *body, 
 
 void FLProgNetworkMqttClient::serviceReceive()
 {
-    if (!_tcp.connected()) return;
-    size_t budget = FLPROG_MQTT_READ_BUDGET;
-    while (budget != 0)
+    _rxBacklog = false;
+    if (!_tcp.connected() || FLPROG_MQTT_READ_BUDGET == 0) return;
+    const int available = _tcp.available();
+    if (available <= 0) return;
+    uint8_t bytes[FLPROG_MQTT_IO_CHUNK_SIZE];
+    size_t count = (size_t)available;
+    if (count > sizeof(bytes)) count = sizeof(bytes);
+    if (count > FLPROG_MQTT_READ_BUDGET) count = FLPROG_MQTT_READ_BUDGET;
+    const int received = _tcp.read(bytes, count);
+    if (received <= 0)
     {
-        const int available = _tcp.available();
-        if (available <= 0) break;
-        int value = _tcp.read();
-        if (value < 0) break;
-        budget--;
-        if (!feedRxByte((uint8_t)value))
+        // W5500 may still be completing the previous RECV command.
+        _rxBacklog = true;
+        return;
+    }
+    for (int i = 0; i < received; ++i)
+    {
+        if (!feedRxByte(bytes[i]))
         {
-            if (_error == FLPROG_MQTT_ERROR_PACKET_TOO_LARGE)
-            {
-                fail(FLPROG_MQTT_ERROR_PACKET_TOO_LARGE);
-            }
-            else
-            {
-                fail(FLPROG_MQTT_ERROR_PROTOCOL);
-            }
+            fail(_error == FLPROG_MQTT_ERROR_PACKET_TOO_LARGE
+                     ? FLPROG_MQTT_ERROR_PACKET_TOO_LARGE : FLPROG_MQTT_ERROR_PROTOCOL);
             return;
         }
-        if (_state == FLPROG_MQTT_STATE_BACKOFF || _state == FLPROG_MQTT_STATE_ERROR) return;
+        if (!isAttached() || _cancelRequested ||
+            _state == FLPROG_MQTT_STATE_IDLE ||
+            _state == FLPROG_MQTT_STATE_BACKOFF || _state == FLPROG_MQTT_STATE_ERROR) return;
     }
+    // resetRxParser() may have run at a packet boundary inside this chunk.
+    _rxBacklog = available > received;
 }
 
 void FLProgNetworkMqttClient::serviceConnectedIdle()
@@ -1071,9 +1091,28 @@ void FLProgNetworkMqttClient::processCancelRequest()
     _events |= FLPROG_MQTT_EVENT_CANCELED;
 }
 
+bool FLProgNetworkMqttClient::pollDue(uint32_t now) const
+{
+    if (!_pollStarted || _pollRequested || _pollIntervalMs == 0) return true;
+    // Protocol deadlines must not be extended by a slow idle poll setting.
+    if (_state == FLPROG_MQTT_STATE_BACKOFF && _wantConnected &&
+        timeReached(now, _reconnectAt)) return true;
+    if (_state == FLPROG_MQTT_STATE_CONNECTED && _keepAliveSeconds != 0 &&
+        (uint32_t)(now - _lastTxAt) >= (uint32_t)_keepAliveSeconds * 1000UL) return true;
+    const bool active = busy() || _rxStage != 0 || _rxBacklog ||
+                        _resubscribeActive || _disconnectRequested;
+    const uint16_t interval = active ? 1U : _pollIntervalMs;
+    return (uint32_t)(now - _lastPollAt) >= interval;
+}
+
 void FLProgNetworkMqttClient::pool()
 {
     if (!isAttached() || !_tcpAttached) return;
+    const uint32_t now = millis();
+    if (!pollDue(now)) return;
+    _lastPollAt = now;
+    _pollStarted = true;
+    _pollRequested = false;
 
     if (_cancelRequested)
     {
@@ -1081,6 +1120,7 @@ void FLProgNetworkMqttClient::pool()
         return;
     }
 
+    _tcp.service();
     processDisconnectRequest();
 
     if (_sessionConnected && !_tcp.connected() &&

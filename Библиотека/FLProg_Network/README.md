@@ -1,4 +1,4 @@
-> r15: [MQTT: динамические подписки и новые блоки](docs/MQTT_DYNAMIC_RU.md).
+> r16: [MQTT: опрос по периоду, Basic и Professional](docs/MQTT_DYNAMIC_RU.md).
 
 # FLProg_Network dev.17-pr28
 

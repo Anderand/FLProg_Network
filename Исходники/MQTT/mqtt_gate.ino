@@ -3,7 +3,7 @@
 FLProgWiznetInterface mqttEthernet(PB12,0);
 #define FLPROG_WIZNET_INTERFACE1 mqttEthernet
 bool EN=false, CON=false, DIS=false, Connected, Busy, Error;
-long NET_KIND=1,NET_NUM=1,SUB_LIMIT=0, Port=1883,ERR,State,Subscriptions,SubBytes;
+long NET_KIND=1,NET_NUM=1,SUB_LIMIT=0,POLL_MS=0, Port=1883,ERR,State,Subscriptions,SubBytes;
 String Broker="127.0.0.1",ClientID="compile-only",User="",Password="";
 bool Send=false,Retain=false,Accepted,Subscribe=false,Received,Retained;
 String Topic="home/+/value",Message="42",RxTopic;
@@ -62,7 +62,7 @@ if (NET_KIND == 2 && NET_NUM == 8) mqttSelectedNetwork = &FLPROG_WIFI_INTERFACE8
 #endif
 if (NET_KIND == 0 && NET_NUM >= 0 && NET_NUM < 255)
     mqttSelectedNetwork = flprogNetworkDevices.getDevice((FLProgNetworkDeviceId)NET_NUM);
-flpMqttBlocks().control(mqttSelectedNetwork, EN, CON, DIS, Broker, Port, ClientID, User, Password, SUB_LIMIT);
+flpMqttBlocks().control(mqttSelectedNetwork, EN, CON, DIS, Broker, Port, ClientID, User, Password, SUB_LIMIT, POLL_MS);
 Connected = flpMqttBlocks().mqtt.connected();
 Busy = flpMqttBlocks().mqtt.busy();
 ERR = flpMqttBlocks().error();

@@ -3,7 +3,7 @@
 #include <string.h>
 #include <device/flprogNetworkDeviceRegistry.h>
 
-// RU: РћРґРёРЅ РєР»РёРµРЅС‚ РЅР° РїСЂРѕРµРєС‚; SPI/Ethernet/WiFi Рё pool() Р·Р°РґР°С‘С‚ РїСЂРѕРµРєС‚ FLProg.
+// RU: Один клиент на проект; сеть и network.pool() задаёт проект FLProg.
 // EN: One client per project; the existing network block owns network.pool().
 class FLProgMqttUserBlocks;
 inline FLProgMqttUserBlocks &flpMqttBlocks();
@@ -22,10 +22,10 @@ public:
         control(&network, en, con, dis, broker, port, id, user, password, 0);
     }
     uint8_t error() const { return configError ? configError : mqtt.error(); }
-    // 19: selected interface not found; 20: invalid SUB_LIMIT/port.
+    // 19: selected interface not found; 20: invalid SUB_LIMIT/port/POLL_MS.
     void control(FLProgNetworkInterface *network, bool en, bool con, bool dis,
                  const String &broker, long port, const String &id,
-                 const String &user, const String &password, long limit) {
+                 const String &user, const String &password, long limit, long pollMs = 0) {
         const bool start = en && (!prevEn || (con && !prevCon));
         const bool stop = (!en && prevEn) || (dis && !prevDis);
         prevEn = en; prevCon = con; prevDis = dis;
@@ -35,8 +35,9 @@ public:
         if (bound) { mqtt.end(); bound = false; }
         configError = 0;
         if (!network) { configError = 19; return; }
-        if (limit < 0 || port < 1 || port > 65535) { configError = 20; return; }
+        if (limit < 0 || port < 1 || port > 65535 || pollMs < 0 || pollMs > 1000) { configError = 20; return; }
         if (!mqtt.setSubscriptionLimit((size_t)limit)) return;
+        mqtt.setPollInterval((uint16_t)(pollMs == 0 ? FLPROG_MQTT_POLL_INTERVAL_MS : pollMs));
         mqtt.setBroker(broker.c_str());
         mqtt.setPort((uint16_t)port);
         if (!mqtt.setClientId(id.c_str())) return;
@@ -71,7 +72,7 @@ private:
     static void receive(const char *t, const uint8_t *p, size_t n, bool r) {
         FLProgMqttUserBlocks &b=flpMqttBlocks();
         b.topic=t; b.message="";
-        for (size_t i=0;i<n;++i) b.message+=(char)p[i];
+        b.message.concat(reinterpret_cast<const char *>(p), (unsigned int)n);
         b.retained=r; ++b.sequence;
     }
 };

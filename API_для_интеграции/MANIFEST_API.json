@@ -5,7 +5,7 @@
   },
   "C++/FLProg_Network/src/flprogMqttUserBlocks.h": {
     "source": "Библиотека/FLProg_Network/src/flprogMqttUserBlocks.h",
-    "sha256": "9baf46f81bf1d80bc0add4606a6754e87a6f8412c63d528f1a71ba99142e50c1"
+    "sha256": "d816c8cf778cbc2e92a7f54b6a39da76321c40cbcc7f73b78f2bf2cc8d5c41be"
   },
   "C++/FLProg_Network/src/flprogNetwork.h": {
     "source": "Библиотека/FLProg_Network/src/flprogNetwork.h",
@@ -113,7 +113,7 @@
   },
   "C++/FLProg_Network/src/service/flprogNetworkMqttClient.h": {
     "source": "Библиотека/FLProg_Network/src/service/flprogNetworkMqttClient.h",
-    "sha256": "017c08fbd3c5741cc613f25cd2dedede50d907e1613ccf236d33f700012ba0f8"
+    "sha256": "7c00a77e3df6a20709a7a1f00c483b8ad903a29ba1309bb79b3c282b6863af1e"
   },
   "C++/FLProg_Network/src/service/flprogNetworkNtp.h": {
     "source": "Библиотека/FLProg_Network/src/service/flprogNetworkNtp.h",
@@ -349,7 +349,7 @@
   },
   "C++/FLProg_Network/README.md": {
     "source": "Библиотека/FLProg_Network/README.md",
-    "sha256": "0000730398aa36039460ca2d2efc0ff6b0aeadfa55da9c05a069ddd7463021e7"
+    "sha256": "66373ddd548c6da2efe161c96f640d59a586974718a0749a5d6b04a3ddae024f"
   },
   "C++/FLProg_Network/README_EN.md": {
     "source": "Библиотека/FLProg_Network/README_EN.md",
@@ -417,18 +417,42 @@
   },
   "Справка/MQTT_RU.md": {
     "source": "Документация/MQTT_RU.md",
-    "sha256": "6801404bd5dc1fa36e7a4a9dbb50f388a39a6613276fd8a46c78f33ae764b5ee"
+    "sha256": "611c5bfac234e6f3aa3411c722fe42d96bb9ad1ef94bbd96665ccc52a33b40c5"
   },
-  "C++/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_2/flprogMqttUserBlocks.h": {
-    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_2/flprogMqttUserBlocks.h",
-    "sha256": "9baf46f81bf1d80bc0add4606a6754e87a6f8412c63d528f1a71ba99142e50c1"
+  "Network/user_blocks/MQTT_User_Blocks_v0_3/MQTT_PERFORMANCE_RU.md": {
+    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_3/MQTT_PERFORMANCE_RU.md",
+    "sha256": "c158f638203ba84e28b0a75ba7003be7bf57984e825549eb6b6765071ba2f3fb"
   },
-  "C++/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_2/README_EN.md": {
-    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_2/README_EN.md",
-    "sha256": "0076d92a0d0b6495e1ec2815a5b6fd76630f9111e59593ae2a942b8584d4d151"
+  "Network/user_blocks/MQTT_User_Blocks_v0_3/README_RU.md": {
+    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_3/README_RU.md",
+    "sha256": "611c5bfac234e6f3aa3411c722fe42d96bb9ad1ef94bbd96665ccc52a33b40c5"
   },
-  "C++/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_2/README_RU.md": {
-    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_2/README_RU.md",
-    "sha256": "6801404bd5dc1fa36e7a4a9dbb50f388a39a6613276fd8a46c78f33ae764b5ee"
+  "Network/user_blocks/MQTT_User_Blocks_v0_3/Basic/FLProg_Network_MQTT_Core.ubi": {
+    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_3/Basic/FLProg_Network_MQTT_Core.ubi",
+    "sha256": "b4f68225989c0860a8656375e2fdce8c19ff766803c679391f05ed10ea2dee8d"
+  },
+  "Network/user_blocks/MQTT_User_Blocks_v0_3/Basic/FLProg_Network_MQTT_Publish.ubi": {
+    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_3/Basic/FLProg_Network_MQTT_Publish.ubi",
+    "sha256": "a19958af492a5b01e5c83ad6e84acb1cb7a98f770e8209d23f9948efd1c743a4"
+  },
+  "Network/user_blocks/MQTT_User_Blocks_v0_3/Basic/FLProg_Network_MQTT_Subscribe.ubi": {
+    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_3/Basic/FLProg_Network_MQTT_Subscribe.ubi",
+    "sha256": "6762dbde8ecb47360d04d8339cad2e76e5a156635575b72f3cf95991e54d4689"
+  },
+  "Network/user_blocks/MQTT_User_Blocks_v0_3/Professional/FLProg_Network_MQTT_Core_Professional.ubi": {
+    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_3/Professional/FLProg_Network_MQTT_Core_Professional.ubi",
+    "sha256": "3024612de3efe39fad1ed6df0983286d56d7995ac84d24640e83ea606098b9da"
+  },
+  "Network/user_blocks/MQTT_User_Blocks_v0_3/Professional/FLProg_Network_MQTT_Publish_Professional.ubi": {
+    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_3/Professional/FLProg_Network_MQTT_Publish_Professional.ubi",
+    "sha256": "6dc53490e940c9965c1ed2cff38a489e511876e6aeb89bbdf2e85f71f775bf05"
+  },
+  "Network/user_blocks/MQTT_User_Blocks_v0_3/Professional/FLProg_Network_MQTT_Subscribe_Professional.ubi": {
+    "source": "Библиотека/FLProg_Network/user_blocks/MQTT_User_Blocks_v0_3/Professional/FLProg_Network_MQTT_Subscribe_Professional.ubi",
+    "sha256": "e7f1539b12dc98c00bee322d9093b1a262229cd9923c825f068f55e466e23835"
+  },
+  "Network/Контракты/MQTT_PERFORMANCE_RU.md": {
+    "source": "Документация/MQTT_PERFORMANCE_RU.md",
+    "sha256": "c158f638203ba84e28b0a75ba7003be7bf57984e825549eb6b6765071ba2f3fb"
   }
 }
