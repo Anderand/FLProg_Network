@@ -349,7 +349,7 @@
   },
   "C++/FLProg_Network/README.md": {
     "source": "Библиотека/FLProg_Network/README.md",
-    "sha256": "66373ddd548c6da2efe161c96f640d59a586974718a0749a5d6b04a3ddae024f"
+    "sha256": "cb41db28b6db654d52ef623e992e61f4a9a61570398a10adc9c2fe9c72bb7718"
   },
   "C++/FLProg_Network/README_EN.md": {
     "source": "Библиотека/FLProg_Network/README_EN.md",
@@ -462,5 +462,21 @@
   "C++/FLProg_Network/src/service/flprogNtpTimeZone.h": {
     "source": "Библиотека/FLProg_Network/src/service/flprogNtpTimeZone.h",
     "sha256": "ff337a662b189863cfcbfbcdd6d68b5ecc7414e1187fd54ad42585f30d3819b6"
+  },
+  "Network/NTP_TIMEZONES_RU.md": {
+    "source": "Документация/NTP_TIMEZONES_RU.md",
+    "sha256": "456c02c5219d74bf0cfce71a6037356b97ed6f291e9b164b089cac3e39a69614"
+  },
+  "Network/user_blocks/NTP_TimeZones_v0_1/README_RU.md": {
+    "source": "Библиотека/FLProg_Network/user_blocks/NTP_TimeZones_v0_1/README_RU.md",
+    "sha256": "456c02c5219d74bf0cfce71a6037356b97ed6f291e9b164b089cac3e39a69614"
+  },
+  "Network/user_blocks/NTP_TimeZones_v0_1/Basic/FLProg_NTP_LocalTime.ubi": {
+    "source": "Библиотека/FLProg_Network/user_blocks/NTP_TimeZones_v0_1/Basic/FLProg_NTP_LocalTime.ubi",
+    "sha256": "18fbe90949ddbb74d68c7ca26a6fcbfb0584ae565ed81186b9ebf67d3b36e8f4"
+  },
+  "Network/user_blocks/NTP_TimeZones_v0_1/Professional/FLProg_NTP_LocalTime_Professional.ubi": {
+    "source": "Библиотека/FLProg_Network/user_blocks/NTP_TimeZones_v0_1/Professional/FLProg_NTP_LocalTime_Professional.ubi",
+    "sha256": "3e9bca9851c446c04ec266d49bf29504547b6d7d8e7d2822c6bf0cc20e6e634a"
   }
 }

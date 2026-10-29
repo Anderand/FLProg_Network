@@ -1,0 +1,14 @@
+{
+  "release": "r17",
+  "folder": "E:\\SAI\\FLProg_Network\\releases\\FLProg_Network_2026-10-29_r17",
+  "archive": "E:\\SAI\\FLProg_Network\\releases\\FLProg_Network_2026-10-29_r17.zip",
+  "archive_bytes": 31065176,
+  "archive_sha256": "37415721a4c01813aa4abd99bacf957a6783d76c5697be570afa5d1b277f4e25",
+  "files": 1911,
+  "profiles_verified": 21,
+  "api_files_verified": 120,
+  "three_libraries": true,
+  "ntp_blocks": 2,
+  "exes_unchanged_from_r16": true,
+  "ntp_hardware_tested": false
+}

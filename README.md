@@ -1,13 +1,13 @@
-# FLProg Network — r16 + NTP TimeZones0.1 (29.10.2026)
+# FLProg Network — r17, 29.10.2026
 
 Полный комплект: **FLProg_Network + FLProg_WebUI + Flprog_Modbus**,
 блоки FLProg, Web-редактор с EXE, переносимый OTA-менеджер **0.7.13**.
 
-**[Скачать готовый архив с EXE](https://github.com/Anderand/FLProg_Network/releases/tag/v2026.10.28-r16)**
-— файл **FLProg_Network_2026-10-28_r16.zip**. Кнопка GitHub Code → Download ZIP
+**[Скачать готовый архив с EXE](https://github.com/Anderand/FLProg_Network/releases/tag/v2026.10.29-r17)**
+— файл **FLProg_Network_2026-10-29_r17.zip**. Кнопка GitHub Code → Download ZIP
 скачивает исходники; готовые программы находятся в Releases.
 
-## Новое в main: NTP TimeZones0.1
+## Новое в r17: NTP TimeZones0.1
 
 Часовые пояса в минутах, летнее/зимнее время (ЕС/США и свои правила C++),
 местная дата и признак DST. Старый UTC API сохранён.
@@ -16,8 +16,9 @@
 [исходники и тесты](Исходники/NTP), [проверки](Проверки/NTP_TimeZones_v0.1).
 12592 сравнений и контрольная сборка F407 прошли; аппаратный NTP ещё не испытывался.
 
-**Архив r16 с EXE ниже пока не содержит это дополнение.** Для NTP возьмите
-библиотеку и блоки из main (Code → Download ZIP). EXE менять не требуется.
+**Архив r17 уже содержит NTP, оба блока и инструкцию.** Для применения
+обновите FLProg_Network и пересоберите свой проект. EXE и готовые BIN сохранены
+из r16 без изменения; сами по себе они новые возможности NTP не получают.
 
 ## Быстрый запуск
 
