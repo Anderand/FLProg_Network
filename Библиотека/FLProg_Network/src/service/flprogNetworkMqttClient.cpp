@@ -145,6 +145,12 @@ bool FLProgNetworkMqttClient::begin(FLProgNetworkInterface &network, uint8_t rou
     return true;
 }
 
+bool FLProgNetworkMqttClient::beginExternal(FLProgMqttTransport &transport)
+{
+    end();_externalTcp=&transport;_tcpAttached=true;
+    _state=FLPROG_MQTT_STATE_IDLE;_error=FLPROG_MQTT_ERROR_NONE;resetRxParser();return true;
+}
+
 void FLProgNetworkMqttClient::end()
 {
     _wantConnected = false;
@@ -153,9 +159,10 @@ void FLProgNetworkMqttClient::end()
     _sessionConnected = false;
     if (_tcpAttached)
     {
-        _tcp.end();
+        if(_externalTcp)_externalTcp->stop();else _tcp.end();
         _tcpAttached = false;
     }
+    _externalTcp=nullptr;
     detach();
     _pollStarted = false;
     _pollRequested = false;
@@ -170,7 +177,7 @@ void FLProgNetworkMqttClient::setRoute(uint8_t value)
 {
     if (_route == value) return;
     _route = value;
-    _tcp.setRoute(value);
+    if(!_externalTcp)_tcp.setRoute(value);
     if (_wantConnected)
     {
         scheduleReconnect(FLPROG_MQTT_ERROR_TCP);
@@ -277,7 +284,7 @@ uint32_t FLProgNetworkMqttClient::reconnectIn() const
 
 bool FLProgNetworkMqttClient::connect()
 {
-    if (!_tcpAttached || !isAttached())
+    if (!_tcpAttached || (!isAttached() && !_externalTcp))
     {
         _error = FLPROG_MQTT_ERROR_SERVICE_LIMIT;
         return false;
@@ -556,7 +563,7 @@ void FLProgNetworkMqttClient::scheduleReconnect(uint8_t errorValue)
     _sessionConnected = false;
     resetTransaction();
     resetRxParser();
-    if (_tcpAttached) _tcp.stop();
+    if (_tcpAttached) transportStop();
     if (wasConnected)
     {
         _disconnectCount++;
@@ -592,7 +599,7 @@ void FLProgNetworkMqttClient::fail(uint8_t errorValue, bool reconnectAllowed)
         _error = errorValue;
         _state = FLPROG_MQTT_STATE_ERROR;
         _sessionConnected = false;
-        if (_tcpAttached) _tcp.stop();
+        if (_tcpAttached) transportStop();
         _events |= FLPROG_MQTT_EVENT_FAILED;
     }
 }
@@ -607,10 +614,8 @@ void FLProgNetworkMqttClient::startTcpConnect()
              false);
         return;
     }
-    _tcp.stop();
-    _tcp.clearClientError();
-    _tcp.setRoute(_route);
-    _tcp.setTimeout(_connectTimeoutMs);
+    transportStop();
+    if(!_externalTcp){_tcp.clearClientError();_tcp.setRoute(_route);_tcp.setTimeout(_connectTimeoutMs);}
     _connectIssued = false;
     _sessionConnected = false;
     _state = FLPROG_MQTT_STATE_TCP_CONNECTING;
@@ -625,17 +630,17 @@ void FLProgNetworkMqttClient::serviceTcpConnecting()
     {
         if (_brokerMode == FLPROG_MQTT_HOST_IP)
         {
-            (void)_tcp.connect(_brokerIp, _port);
+            if(_externalTcp){char host[16];snprintf(host,sizeof(host),"%u.%u.%u.%u",_brokerIp[0],_brokerIp[1],_brokerIp[2],_brokerIp[3]);(void)_externalTcp->connect(host,_port);}else (void)_tcp.connect(_brokerIp, _port);
         }
         else
         {
-            (void)_tcp.connect(_brokerName, _port);
+            if(_externalTcp)(void)_externalTcp->connect(_brokerName,_port);else (void)_tcp.connect(_brokerName, _port);
         }
         _connectIssued = true;
         _lastProgressAt = millis();
     }
 
-    if (_tcp.connected())
+    if (transportConnected())
     {
         _connectIssued = false;
         if (!buildConnectPacket())
@@ -645,9 +650,7 @@ void FLProgNetworkMqttClient::serviceTcpConnecting()
         return;
     }
 
-    if (_tcp.clientError() != FLPROG_TCP_CLIENT_ERROR_NONE ||
-        _tcp.state() == FLPROG_SOCKET_STATE_ERROR ||
-        _tcp.state() == FLPROG_SOCKET_STATE_UNSUPPORTED)
+    if (transportFailed())
     {
         fail(FLPROG_MQTT_ERROR_TCP);
         return;
@@ -662,7 +665,7 @@ void FLProgNetworkMqttClient::serviceTcpConnecting()
 
 void FLProgNetworkMqttClient::serviceSend()
 {
-    if (!_tcp.connected())
+    if (!transportConnected())
     {
         fail(FLPROG_MQTT_ERROR_TCP);
         return;
@@ -672,7 +675,7 @@ void FLProgNetworkMqttClient::serviceSend()
         size_t count = _txLength - _txOffset;
         if (count > FLPROG_MQTT_WRITE_BUDGET) count = FLPROG_MQTT_WRITE_BUDGET;
         if (count > FLPROG_MQTT_IO_CHUNK_SIZE) count = FLPROG_MQTT_IO_CHUNK_SIZE;
-        const size_t written = _tcp.write(_txBuffer + _txOffset, count);
+        const size_t written = transportWrite(_txBuffer + _txOffset, count);
         if (written != 0)
         {
             _txOffset += written;
@@ -718,7 +721,7 @@ void FLProgNetworkMqttClient::serviceSend()
     }
     else if (purpose == FLPROG_MQTT_TX_DISCONNECT)
     {
-        _tcp.stop();
+        transportStop();
         if (_sessionConnected)
         {
             _sessionConnected = false;
@@ -994,14 +997,14 @@ bool FLProgNetworkMqttClient::handlePacket(uint8_t header, const uint8_t *body, 
 void FLProgNetworkMqttClient::serviceReceive()
 {
     _rxBacklog = false;
-    if (!_tcp.connected() || FLPROG_MQTT_READ_BUDGET == 0) return;
-    const int available = _tcp.available();
+    if (!transportConnected() || FLPROG_MQTT_READ_BUDGET == 0) return;
+    const int available = transportAvailable();
     if (available <= 0) return;
     uint8_t bytes[FLPROG_MQTT_IO_CHUNK_SIZE];
     size_t count = (size_t)available;
     if (count > sizeof(bytes)) count = sizeof(bytes);
     if (count > FLPROG_MQTT_READ_BUDGET) count = FLPROG_MQTT_READ_BUDGET;
-    const int received = _tcp.read(bytes, count);
+    const int received = transportRead(bytes, count);
     if (received <= 0)
     {
         // W5500 may still be completing the previous RECV command.
@@ -1016,7 +1019,7 @@ void FLProgNetworkMqttClient::serviceReceive()
                      ? FLPROG_MQTT_ERROR_PACKET_TOO_LARGE : FLPROG_MQTT_ERROR_PROTOCOL);
             return;
         }
-        if (!isAttached() || _cancelRequested ||
+        if ((!isAttached() && !_externalTcp) || _cancelRequested ||
             _state == FLPROG_MQTT_STATE_IDLE ||
             _state == FLPROG_MQTT_STATE_BACKOFF || _state == FLPROG_MQTT_STATE_ERROR) return;
     }
@@ -1052,9 +1055,9 @@ void FLProgNetworkMqttClient::serviceConnectedIdle()
 void FLProgNetworkMqttClient::processDisconnectRequest()
 {
     if (!_disconnectRequested) return;
-    if (!_sessionConnected || !_tcp.connected())
+    if (!_sessionConnected || !transportConnected())
     {
-        _tcp.stop();
+        transportStop();
         _sessionConnected = false;
         _disconnectRequested = false;
         _state = FLPROG_MQTT_STATE_IDLE;
@@ -1064,7 +1067,7 @@ void FLProgNetworkMqttClient::processDisconnectRequest()
     {
         if (!buildDisconnectPacket())
         {
-            _tcp.stop();
+            transportStop();
             _sessionConnected = false;
             _disconnectRequested = false;
             _state = FLPROG_MQTT_STATE_IDLE;
@@ -1076,7 +1079,7 @@ void FLProgNetworkMqttClient::processCancelRequest()
 {
     if (!_cancelRequested) return;
     const bool wasConnected = _sessionConnected;
-    _tcp.stop();
+    transportStop();
     _sessionConnected = false;
     _cancelRequested = false;
     _disconnectRequested = false;
@@ -1107,7 +1110,7 @@ bool FLProgNetworkMqttClient::pollDue(uint32_t now) const
 
 void FLProgNetworkMqttClient::pool()
 {
-    if (!isAttached() || !_tcpAttached) return;
+    if ((!isAttached() && !_externalTcp) || !_tcpAttached) return;
     const uint32_t now = millis();
     if (!pollDue(now)) return;
     _lastPollAt = now;
@@ -1120,10 +1123,10 @@ void FLProgNetworkMqttClient::pool()
         return;
     }
 
-    _tcp.service();
+    if(_externalTcp)_externalTcp->pool();else _tcp.service();
     processDisconnectRequest();
 
-    if (_sessionConnected && !_tcp.connected() &&
+    if (_sessionConnected && !transportConnected() &&
         _state != FLPROG_MQTT_STATE_IDLE &&
         _state != FLPROG_MQTT_STATE_BACKOFF)
     {

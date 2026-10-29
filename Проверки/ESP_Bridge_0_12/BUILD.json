@@ -1,0 +1,29 @@
+{
+  "board": "classic ESP32",
+  "fqbn": "esp32:esp32:esp32",
+  "core": "3.3.11",
+  "files": {
+    "boot_app0.bin": "f94c5d786a7a8fab06ac5d10e33bf37711a6697636dc037559ea19cc410a17f0",
+    "FLProgBridgeEsp32.ino.bin": "018c2b6b939e21bff571d5d250d4acd3126d6f0c6b56f123e2a206aa2141a7e6",
+    "FLProgBridgeEsp32.ino.bootloader.bin": "427f96e10c620c4f062dab15da54fc45494d897e8397ae6f3aecc98c42d7e379",
+    "FLProgBridgeEsp32.ino.merged.bin": "8b2b6b775d46f8bdffd97fd9765fdb69927bbeabfa73abd17285a7349d45923b",
+    "FLProgBridgeEsp32.ino.partitions.bin": "148b959cbff1c38aa8e1d5c0ba9d612c54997b945e56a63f41223eef650653a1"
+  },
+  "flashed": true,
+  "credentials_configured": false,
+  "universal_plc_bridge": true,
+  "runtime_setup": true,
+  "runtime_configuration": true,
+  "config_namespace": "flpbridge/config2",
+  "config_schema": 2,
+  "prototype_only": true,
+  "network_backends": [
+    "WiFi",
+    "Wiznet",
+    "RMII"
+  ],
+  "web_settings_integrated": true,
+  "autonomous_lan_web": true,
+  "version": "Universal0.12",
+  "network_config_retained": true
+}

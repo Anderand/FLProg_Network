@@ -1,0 +1,8 @@
+{
+  "shared_context_test": "PASS shared context: owner exclusion, abandoned reservation/wrap, timeout invalidates both, cancel releases owner, sequence overflow requires HELLO",
+  "shared_uart_test": "PASS shared UART: web reads=201, TCP writes100, chunk224, one HELLO/socket, independent results, new-session close; context=48",
+  "tcp_proxy_test": "PASS TCP proxy bounds/busy, partial UART, lost RESULT ACK/no replay, deadline, PLC reset, link loss; PLC=480 ESP=1112",
+  "tcp_eof_test": "PASS PLC TCP EOF: last bytes survive FIN, partial drain persists, EOF after drain, explicit stop discards RX",
+  "relay_test": "PASS: duplex, bounded work, no overflow, zero/short writes, order, disconnect reset; relay size=160 bytes",
+  "universal_config_test": "PASS: saved config validation, GPIO/PSRAM, UART formats, idle, lengths, version, unsigned overflow; config=144 bytes"
+}

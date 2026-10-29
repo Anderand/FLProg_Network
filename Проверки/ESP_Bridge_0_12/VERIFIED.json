@@ -1,0 +1,12 @@
+{
+  "version": "Universal0.12",
+  "headers_match": true,
+  "object_newer_than_source": true,
+  "application_sha256": "018c2b6b939e21bff571d5d250d4acd3126d6f0c6b56f123e2a206aa2141a7e6",
+  "application_bytes": 1208080,
+  "software_stress_pass": true,
+  "regressions_pass": true,
+  "backpressure_pass": true,
+  "esp_heap_tested": false,
+  "plc_uart_hardware_tested": false
+}

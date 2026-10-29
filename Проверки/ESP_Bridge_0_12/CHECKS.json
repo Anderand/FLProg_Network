@@ -1,0 +1,67 @@
+{
+  "shared_stress": {
+    "software_only": true,
+    "cycles": 200,
+    "mqtt_publications": 201,
+    "broker_disconnects": 9,
+    "tcp_connections": 10,
+    "publications_replayed": 0,
+    "web_reads": 2070,
+    "flash_chunks": 690,
+    "complete_flash_packages": 10,
+    "flash_bytes": 154380,
+    "native_private_samples": [
+      1101824,
+      1101824,
+      1101824,
+      1101824,
+      1101824,
+      1101824,
+      1101824,
+      1101824,
+      1073152,
+      1073152
+    ],
+    "native_private_after_warmup": 1101824,
+    "native_private_end": 1073152,
+    "esp_heap_measured": false,
+    "hardware_tested": false
+  },
+  "regressions": {
+    "shared_context_test": "PASS shared context: owner exclusion, abandoned reservation/wrap, timeout invalidates both, cancel releases owner, sequence overflow requires HELLO",
+    "shared_uart_test": "PASS shared UART: web reads=201, TCP writes100, chunk224, one HELLO/socket, independent results, new-session close; context=48",
+    "tcp_proxy_test": "PASS TCP proxy bounds/busy, partial UART, lost RESULT ACK/no replay, deadline, PLC reset, link loss; PLC=480 ESP=1112",
+    "tcp_eof_test": "PASS PLC TCP EOF: last bytes survive FIN, partial drain persists, EOF after drain, explicit stop discards RX",
+    "relay_test": "PASS: duplex, bounded work, no overflow, zero/short writes, order, disconnect reset; relay size=160 bytes",
+    "universal_config_test": "PASS: saved config validation, GPIO/PSRAM, UART formats, idle, lengths, version, unsigned overflow; config=144 bytes"
+  },
+  "backpressure": {
+    "bytes_each_direction": 65536,
+    "byte_equal": true,
+    "partial_and_zero_writes": true,
+    "slow_consumer": true,
+    "millis_wrap": true,
+    "plc_rx_tx_buffers": 220
+  },
+  "shared_faults": {
+    "cases": 7,
+    "pass": true
+  },
+  "device_flash_pending": false,
+  "esp_hardware": {
+    "version": "Universal0.12",
+    "port": "COM3",
+    "mac": "08:d1:f9:e2:a7:c8",
+    "application_offset": "0x10000",
+    "hash_verified": true,
+    "boot_banner_verified": true,
+    "ip": "192.168.100.14",
+    "settings_http": 200,
+    "login_verified": true,
+    "config_exactly_retained": true,
+    "com_closed": true,
+    "plc_flashed": false,
+    "physical_plc_uart_mqtt_tested": false,
+    "esp_heap_measured": false
+  }
+}

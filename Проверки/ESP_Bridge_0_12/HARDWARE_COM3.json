@@ -1,0 +1,16 @@
+{
+  "version": "Universal0.12",
+  "port": "COM3",
+  "mac": "08:d1:f9:e2:a7:c8",
+  "application_offset": "0x10000",
+  "hash_verified": true,
+  "boot_banner_verified": true,
+  "ip": "192.168.100.14",
+  "settings_http": 200,
+  "login_verified": true,
+  "config_exactly_retained": true,
+  "com_closed": true,
+  "plc_flashed": false,
+  "physical_plc_uart_mqtt_tested": false,
+  "esp_heap_measured": false
+}

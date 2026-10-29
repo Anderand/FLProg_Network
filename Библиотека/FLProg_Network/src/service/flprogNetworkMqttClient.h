@@ -143,6 +143,22 @@ typedef void (*FLProgNetworkMqttMessageCallback)(
 
 // MQTT 3.1.1 baseline client. One service object owns one route-aware TCP
 // client. DNS/TCP/protocol progress happens only from network.pool().
+// Optional cooperative TCP transport owned by PLC, independent of NetworkDevice.
+class FLProgMqttTransport {
+public:
+ virtual ~FLProgMqttTransport(){}
+ virtual bool connect(const char*,uint16_t)=0;
+ virtual bool connected()=0;
+ virtual int available()=0;
+ virtual int read(uint8_t*,size_t)=0;
+ virtual size_t write(const uint8_t*,size_t)=0;
+ virtual void stop()=0;
+ virtual void pool()=0;
+ virtual bool failed()=0;
+};
+inline FLProgMqttTransport**flprogMqttBridgeRegistry(){static FLProgMqttTransport*slots[8]{};return slots;}
+inline FLProgMqttTransport*flprogMqttBridgeTransport(long number){return number>=1&&number<=8?flprogMqttBridgeRegistry()[number-1]:nullptr;}
+
 class FLProgNetworkMqttClient : public FLProgNetworkService
 {
 public:
@@ -152,6 +168,7 @@ public:
     ~FLProgNetworkMqttClient() override;
 
     bool begin(FLProgNetworkInterface &network, uint8_t route = 0);
+    bool beginExternal(FLProgMqttTransport &transport);
     void end();
     void pool() override;
 
@@ -351,6 +368,14 @@ private:
     };
     bool pollDue(uint32_t now) const;
     ScheduledTcpClient _tcp;
+    FLProgMqttTransport *_externalTcp = nullptr;
+    void transportStop(){if(_externalTcp)_externalTcp->stop();else _tcp.stop();}
+    bool transportConnected(){return _externalTcp?_externalTcp->connected():_tcp.connected();}
+    int transportAvailable(){return _externalTcp?_externalTcp->available():_tcp.available();}
+    int transportRead(uint8_t*p,size_t n){return _externalTcp?_externalTcp->read(p,n):_tcp.read(p,n);}
+    size_t transportWrite(const uint8_t*p,size_t n){return _externalTcp?_externalTcp->write(p,n):_tcp.write(p,n);}
+    bool transportFailed(){return _externalTcp?_externalTcp->failed():(_tcp.clientError()!=FLPROG_TCP_CLIENT_ERROR_NONE||_tcp.state()==FLPROG_SOCKET_STATE_ERROR||_tcp.state()==FLPROG_SOCKET_STATE_UNSUPPORTED);}
+
     uint32_t _lastPollAt = 0;
     uint16_t _pollIntervalMs = FLPROG_MQTT_POLL_INTERVAL_MS;
     bool _pollStarted = false;

@@ -63,6 +63,7 @@ def resolve_code():
                 'if (NET_KIND == '+str(kind)+' && NET_NUM == '+str(i)+') mqttSelectedNetwork = &FLPROG_'+macro+'_INTERFACE'+str(i)+';', '#endif']
     lines += ['if (NET_KIND == 0 && NET_NUM >= 0 && NET_NUM < 255)',
               '    mqttSelectedNetwork = flprogNetworkDevices.getDevice((FLProgNetworkDeviceId)NET_NUM);']
+    lines += ['flpMqttBlocks().useExternalTransport(NET_KIND == 3 ? flprogMqttBridgeTransport(NET_NUM) : nullptr);']
     return '\n'.join(lines)+'\n'
 
 B='Boolean'; S='String'; N='Long' 
@@ -75,7 +76,7 @@ ERR = flpMqttBlocks().error();
 Error = ERR != 0;
 State = flpMqttBlocks().mqtt.state();
 Subscriptions = (long)flpMqttBlocks().mqtt.subscriptionCount();
-SubBytes = (long)flpMqttBlocks().mqtt.subscriptionMemoryBytes();''', [], info='Один Core на проект. Сеть из проекта: NET_KIND 1=W5500, 2=WiFi, 0=реестр; NET_NUM номер интерфейса 1..8. POLL_MS: 0=10 мс, 1..1000 мс — опрос в простое; при обмене 1 мс, порция 64 байта. Блоки вызывать каждый цикл: фронты сохраняются, сеть обслуживается по таймеру. SUB_LIMIT=0: динамическое расширение по RAM; >0: явный лимит. Subscriptions: подтверждённые фильтры, SubBytes: память таблицы. SPI/Ethernet не изменяет. EN: автоподключение; CON/DIS: фронт. Настройки применяются при EN или CON. MQTT 3.1.1 QoS0 TCP. One Core per project; settings applied on enable/connect.')
+SubBytes = (long)flpMqttBlocks().mqtt.subscriptionMemoryBytes();''', [], info='Один Core на проект. Сеть из проекта: NET_KIND 1=W5500, 2=WiFi, 0=реестр, 3=TCP через ESP; NET_NUM номер интерфейса 1..8. POLL_MS: 0=10 мс, 1..1000 мс — опрос в простое; при обмене 1 мс, порция 64 байта. Блоки вызывать каждый цикл: фронты сохраняются, сеть обслуживается по таймеру. SUB_LIMIT=0: динамическое расширение по RAM; >0: явный лимит. Subscriptions: подтверждённые фильтры, SubBytes: память таблицы. SPI/Ethernet не изменяет. EN: автоподключение; CON/DIS: фронт. Настройки применяются при EN или CON. MQTT 3.1.1 QoS0 TCP. One Core per project; settings applied on enable/connect.')
 build('Publish',[('Send',B),('Topic',S),('Message',S),('Retain',B)],[('Accepted',B),('ERR',N)],
  '''Accepted = false;
 if (Send && !mqttPrevSend) {

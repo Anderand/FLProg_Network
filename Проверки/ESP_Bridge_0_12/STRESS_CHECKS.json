@@ -1,0 +1,28 @@
+{
+  "software_only": true,
+  "cycles": 200,
+  "mqtt_publications": 201,
+  "broker_disconnects": 9,
+  "tcp_connections": 10,
+  "publications_replayed": 0,
+  "web_reads": 2070,
+  "flash_chunks": 690,
+  "complete_flash_packages": 10,
+  "flash_bytes": 154380,
+  "native_private_samples": [
+    1101824,
+    1101824,
+    1101824,
+    1101824,
+    1101824,
+    1101824,
+    1101824,
+    1101824,
+    1073152,
+    1073152
+  ],
+  "native_private_after_warmup": 1101824,
+  "native_private_end": 1073152,
+  "esp_heap_measured": false,
+  "hardware_tested": false
+}

@@ -1,0 +1,23 @@
+#pragma once
+static const char FLPROG_READ_PAGE[] PROGMEM=R"HTML(<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FLProg Bridge — чтение ПЛК</title><style>body{font:16px system-ui;background:#101827;color:#eef;margin:0}main{max-width:760px;margin:30px auto;padding:20px}section{padding:20px;background:#1c2a39;border:1px solid #53728c;border-radius:12px;margin:16px 0}input,button{font:inherit;padding:10px;border-radius:7px;margin:8px 6px 8px 0}input{width:90px}button{cursor:pointer}button:disabled{opacity:.5}output{display:block;font-size:28px;overflow-wrap:anywhere}p{white-space:pre-line}small{color:#bdc}a{color:#6ee}</style><main><small>ESP · УНИВЕРСАЛЬНЫЙ МОСТ · ПРОТОТИП ЧТЕНИЯ</small><h1>Данные ПЛК через ESP</h1><p>Без программы на компьютере. Проект и значения находятся в ПЛК; здесь универсальная сервисная страница.</p><section><button id="check">Проверить ПЛК</button><p id="status" role="status">Нажмите проверку. Автоматического обмена по UART нет.</p><p id="identity"></p></section><section><label for="channel">Номер канала0..255</label><br><input id="channel" type="number" min="0" max="255" value="101"><button id="read">Прочитать</button><output id="value">—</output><p id="meta"></p><small>Только чтение. Команды и управление выходами в этом прототипе отсутствуют.</small></section><p>Если программа PC Bridge подключена поTCP, освободите соединение: UART используется одним владельцем.</p><a href="/">Настройки ESP</a></main><script>
+const $=id=>document.getElementById(id);let token='',running=false;
+async function api(path,options){const r=await fetch(path,{cache:'no-store',...options}),d=await r.json();if(!r.ok)throw Error(d.error||'Ошибка '+r.status);return d}
+function bytes(hex){if(typeof hex!=='string'||hex.length%2||!/^[0-9a-f]*$/.test(hex))throw Error('Неверный ответ шлюза');return Uint8Array.from(hex.match(/../g)||[],s=>parseInt(s,16))}
+async function request(op,channel=0){
+ if(!token)token=(await api('/plc-api/session')).token;
+ const started=await api('/plc-api/start',{method:'POST',body:new URLSearchParams({op,channel:String(channel),token})});
+ for(let i=0;i<25;i++){
+  const result=await api('/plc-api/result?ticket='+started.ticket);
+  if(result.state===3)return bytes(result.payloadHex);
+  if(result.state===4)throw Error('Нет ответа ПЛК по UART. Проверьте проводку, скорость и прошивку.');
+  if(result.state===5)throw Error('ПЛК отклонил запрос, код '+result.status);
+  if(result.state===6)throw Error('Обмен отменён при потере сети. Запустите проверку заново.');
+  await new Promise(resolve=>setTimeout(resolve,100));
+ }
+ throw Error('Операция не завершилась. Автоматического повтора нет.');
+}
+async function hello(){const raw=await request('hello'),info=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(raw));if(info.protocol!==1||!Array.isArray(info.services))throw Error('Несовместимый протокол ПЛК');const id=info.identity||{};$('identity').textContent=[id.model,id.projectId,id.firmware].filter(Boolean).join(' · ');return info}
+function typed(data){const d=new DataView(data.buffer,data.byteOffset,data.byteLength);if(data[0]===0&&data.length===2&&data[1]<=1)return !!data[1];if(data[0]===1&&data.length===5)return d.getInt32(1,true);if(data[0]===2&&data.length===5){const v=d.getFloat32(1,true);if(Number.isFinite(v))return v}if(data[0]===3&&data.length>=1&&data.length<=64)return new TextDecoder('utf-8',{fatal:true}).decode(data.slice(1));throw Error('Неверный тип/размер значения')}
+async function run(read){if(running)return;running=true;$('check').disabled=$('read').disabled=true;$('status').textContent='Чтение по UART…';$('value').textContent='—';$('meta').textContent='';try{const raw=$('channel').value.trim(),n=Number(raw);if(read&&(!raw||!Number.isInteger(n)||n<0||n>255))throw Error('Введите целый номер канала0..255');const info=await hello();if(read){if(!info.services.includes(1))throw Error('ПЛК не объявил службу WebUI');const meta=await request('meta',n);if(meta.length<3||meta[0]!==n||meta[1]>3||meta[2]>2)throw Error('Неверное описание канала');const value=await request('read',n);if(value[0]!==meta[1])throw Error('Тип канала изменился; прочитайте заново');$('value').textContent=String(typed(value));$('meta').textContent=new TextDecoder('utf-8',{fatal:true}).decode(meta.slice(3))+' · '+['bool','int32','float','text'][meta[1]]+' · '+['publish','command','duplex'][meta[2]]}$('status').textContent='ПЛК ответил · '+new Date().toLocaleTimeString()}catch(e){$('status').textContent=e.message;token=''}finally{running=false;$('check').disabled=$('read').disabled=false}}
+$('check').onclick=()=>run(false);$('read').onclick=()=>run(true);
+</script></html>)HTML";
