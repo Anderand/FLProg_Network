@@ -1,0 +1,8 @@
+{
+  "cpp_iana_comparisons": 12592,
+  "custom_negative_new_year": true,
+  "north_south": true,
+  "half_hour_dst": true,
+  "epoch_edges": true,
+  "invalid_settings_preserve_previous": true
+}

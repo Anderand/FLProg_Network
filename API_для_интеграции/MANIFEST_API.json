@@ -117,7 +117,7 @@
   },
   "C++/FLProg_Network/src/service/flprogNetworkNtp.h": {
     "source": "Библиотека/FLProg_Network/src/service/flprogNetworkNtp.h",
-    "sha256": "382594a538154d28cdd1e315914fcada1a37f56970aed016ce118de3d0e79d88"
+    "sha256": "8f24174a0ac94933d44273f322792044e15dbb608c29e4b579b52355f177a1e8"
   },
   "C++/FLProg_Network/src/service/flprogNetworkOta.h": {
     "source": "Библиотека/FLProg_Network/src/service/flprogNetworkOta.h",
@@ -454,5 +454,13 @@
   "Network/Контракты/MQTT_PERFORMANCE_RU.md": {
     "source": "Документация/MQTT_PERFORMANCE_RU.md",
     "sha256": "c158f638203ba84e28b0a75ba7003be7bf57984e825549eb6b6765071ba2f3fb"
+  },
+  "C++/FLProg_Network/src/flprogNtpUserBlocks.h": {
+    "source": "Библиотека/FLProg_Network/src/flprogNtpUserBlocks.h",
+    "sha256": "c5479229327705e0fb9770b541e67029d5a794322bc168bd55b498701e9f43c7"
+  },
+  "C++/FLProg_Network/src/service/flprogNtpTimeZone.h": {
+    "source": "Библиотека/FLProg_Network/src/service/flprogNtpTimeZone.h",
+    "sha256": "ff337a662b189863cfcbfbcdd6d68b5ecc7414e1187fd54ad42585f30d3819b6"
   }
 }
