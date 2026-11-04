@@ -141,6 +141,21 @@ private:
 // транзакцию, если шина занята внешним устройством.
 // -----------------------------------------------------------------------------
 
+namespace flprog_spi_detail {
+// Older RT_HW-compatible backends may not expose a bus lookup API.
+template <typename T>
+auto rtBusAvailable(T *base, uint8_t bus, int)
+    -> decltype(base->spiGetLink(bus), bool())
+{
+    return base->spiGetLink(bus) != nullptr;
+}
+template <typename T>
+bool rtBusAvailable(T *, uint8_t, ...)
+{
+    return true;
+}
+}
+
 template <typename TRtHwBase, typename TDevice>
 class FLProgRtHwSpiBackend : public FLProgSpiBackend
 {
@@ -177,7 +192,7 @@ public:
 
     virtual bool begin()
     {
-        if (_base == nullptr || _device.cs < 0)
+        if (!busAvailable() || _device.cs < 0)
         {
             _status = FLPROG_SPI_STATUS_UNAVAILABLE;
             return false;
@@ -190,7 +205,7 @@ public:
 
     virtual bool beginTransaction()
     {
-        if (_base == nullptr)
+        if (!busAvailable() || _device.cs < 0)
         {
             _status = FLPROG_SPI_STATUS_UNAVAILABLE;
             return false;
@@ -250,7 +265,11 @@ public:
 
     virtual uint8_t bus() const { return _device.bus; }
     virtual int cs() const { return _device.cs; }
-    virtual bool busAvailable() const { return _base != nullptr; }
+    virtual bool busAvailable() const
+    {
+        return _base != nullptr &&
+            flprog_spi_detail::rtBusAvailable(_base, _device.bus, 0);
+    }
     virtual bool pinsSupported() const { return true; }
     virtual uint8_t kind() const { return FLPROG_SPI_BACKEND_RT_HW; }
     virtual uint8_t status() const { return _status; }

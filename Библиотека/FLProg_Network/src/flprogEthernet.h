@@ -32,3 +32,10 @@
 #include "tcp/flprogEthernetServer.h"
 #include "udp/flprogUdp.h"
 #include "udp/flprogDns.h"
+
+// The FLProg legacy Ethernet contract always uses RT_HW logical SPI buses.
+// The sketch's bus number and CS are forwarded without Arduino bus inference.
+#if FLPROG_NETWORK_COMPILE_WIRED
+#include <RT_HW_BASE.h>
+#include "hardware/flprogRtHwWiznet.h"
+#endif
