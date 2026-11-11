@@ -1,3 +1,6 @@
+//==================================================================================================
+//                                  Доработка EIS 05.11.2026 v.02
+//==================================================================================================
 /*
  * FLProg_Network — flprogWiznetHardware.h
  * Назначение: Низкоуровневый драйвер Wiznet/W5500 для FLProg_Network.
@@ -52,6 +55,21 @@
 #define FLPROG_WIZNET_HW_WAIT  0
 #define FLPROG_WIZNET_HW_READY 1
 #define FLPROG_WIZNET_HW_ERROR 2
+
+//-------------------------------------------------------------------------------------------------
+// Владелец аппаратного RESET. GPIO не используется в NONE/EXTERNAL.
+// MANAGED требует явно заданного writer: RT_HW подключает его optional-header.
+//-------------------------------------------------------------------------------------------------
+enum FLProgEthernetResetMode : uint8_t {
+    FLPROG_ETH_RESET_NONE=0,       //--Сброс обеспечивает схема модуля, включая RC;
+    FLPROG_ETH_RESET_EXTERNAL=1,   //--Сброс выполняет профиль/приложение; не повторять;
+    FLPROG_ETH_RESET_MANAGED=2     //--Библиотека формирует импульс один раз при старте;
+};
+// RESET API добавлен нами: его пины сразу следуют формату RT_HW, uint8_t/255.
+// Writer получает только назначенный пин 0..254; 255 отсеивается до начала запуска.
+// Результат writer: uint8_t, 1=запись принята, 0=ошибка. Старый callback(int,...) нужно
+// явно привести к новому контракту изменением его объявления, не cast указателя функции.
+typedef uint8_t (*FLProgEthernetResetWriter)(uint8_t pin,uint8_t level);
 
 class FLProgWiznetHardware
 {
@@ -125,6 +143,17 @@ public:
     void resetSpiStatistics();
 
     // Обнаружение / возможности -----------------------------------------------
+    //=============================================================================================
+    // Дополнение: uint8_t=1 принято, 0 отказ. Новые методы, не меняют прежний setSpiSpeed().
+    uint8_t setStartupDelayMs(uint32_t ms);
+    uint8_t setSpiSpeedRuntime(uint32_t hz);
+    //--Пассивная настройка RESET до первого init(); 1=принято, 0=отказ.
+    // 255 = отсутствие пина. MANAGED требует назначенный пин; NONE/EXTERNAL его игнорируют.
+    // Это новый API, поэтому прежний сетевой int/-1 здесь не распространяем.
+    uint8_t setResetMode(uint8_t mode,uint8_t pin=255,uint8_t activeLevel=0,
+                         uint32_t holdUs=2000,FLProgEthernetResetWriter writer=nullptr);
+    uint8_t startupState() const {return _startupStep;}
+    uint8_t resetMode() const {return _resetMode;}
     uint8_t init();
     void resetInit();
 
@@ -263,6 +292,22 @@ private:
     int _pinCs = -1;
     uint8_t _spiBus = 255;
     uint32_t _spiSpeed = 14000000UL;
+    //--Однократное ожидание включения Ethernet, без GPIO RESET и отдельного guard-класса.
+    //--0=не начато; 1=RESET активен; 2=восстановление; 3=готово; 4=ошибка GPIO.
+    bool _startupConfigured=false; // Legacy init is unchanged until RESET/delay is configured.
+    uint8_t  _startupStep=0;
+    uint32_t _startupWaitAt=0;
+    uint32_t _startupWaitMs=500;
+    uint8_t _resetMode=FLPROG_ETH_RESET_NONE;
+    // Единый маркер отсутствия пина в новом RESET-состоянии, как в RT_HW_BASE.
+    // Не путать со старыми _pinCs/_spiSckPin/...: они принадлежат прежнему int API сети.
+    uint8_t _resetPin=255;
+    uint8_t _resetActiveLevel=0;
+    uint32_t _resetHoldUs=2000;
+    uint32_t _resetAtUs=0;
+    FLProgEthernetResetWriter _resetWriter=nullptr;
+    uint8_t serviceStartup(); //--Сетевой lifecycle WAIT/READY/ERROR, не новый SPI API;
+
 
     FLProgArduinoSpiBackend _arduinoSpiBackend;
     FLProgSpiBackend *_spiBackend = &_arduinoSpiBackend;

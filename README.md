@@ -1,3 +1,5 @@
+> Обновление исходников 12.11.2026: совместимость `setPinRST` и `setSpeedSPI` для сгенерированных проектов FLProg. [Описание](Документация/NETWORK_SETTERS_RU.md). Готовый архив r17 остаётся прежним.
+
 # FLProg Network — r17, 29.10.2026
 
 Полный комплект: **FLProg_Network + FLProg_WebUI + Flprog_Modbus**,

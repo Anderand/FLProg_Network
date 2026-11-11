@@ -1,3 +1,6 @@
+//==================================================================================================
+//                                  Доработка EIS 05.11.2026 v.02
+//==================================================================================================
 /*
  * FLProg_Network — flprogWiznetHardware.cpp
  * Назначение: Низкоуровневый драйвер Wiznet/W5500 для FLProg_Network.
@@ -68,6 +71,8 @@ void FLProgWiznetHardware::setSpiBus(uint8_t bus)
     resetInit();
 }
 
+// LEGACY: сохраняем resetInit() для существующих вызывающих проектов.
+// Для изменения между pool() без переинициализации добавлен setSpiSpeedRuntime().
 void FLProgWiznetHardware::setSpiSpeed(uint32_t speed)
 {
     if (_spiSpeed == speed)
@@ -439,6 +444,10 @@ uint8_t FLProgWiznetHardware::init()
         return FLPROG_WIZNET_HW_READY;
     }
 
+    //--Единая последовательность RESET/восстановления. Ни одного SPI-доступа до READY.
+    uint8_t startup=serviceStartup();
+    if(startup!=FLPROG_WIZNET_HW_READY){return startup;}
+
     syncSpiBackendConfiguration();
 
     if (
@@ -461,6 +470,8 @@ uint8_t FLProgWiznetHardware::init()
 
         if (!busStarted)
         {
+            //--Занятость общей RT_HW-шины откладывает запуск, не объявляет отказ чипа.
+            if(_lastSpiStatus==FLPROG_SPI_STATUS_BUSY){return FLPROG_WIZNET_HW_WAIT;}
             return FLPROG_WIZNET_HW_ERROR;
         }
 
@@ -1648,5 +1659,86 @@ void FLProgWiznetHardware::applyBroadcastBlocking(bool value)
         setSocketBroadcastBlocking(socket, value);
     }
 }
+
+//=================================================================================================
+//                         Настройка однократного ожидания питания / внешнего RESET
+// Вызывать до первого init(). 500 мс по умолчанию; loop() продолжает выполняться.
+// 1=принято; 0=таймер уже запущен либо длительность не принята.
+//=================================================================================================
+  uint8_t FLProgWiznetHardware::setStartupDelayMs(uint32_t ms){
+    if(_startupStep || ms>0x7fffffffUL){return 0;}
+    _startupWaitMs=ms; _startupConfigured=true; return 1;
+  }
+//=================================================================================================
+//                         Частота следующей сессии без RESET/DHCP-restart
+// Вызывать из loop МЕЖДУ вызовами pool(), не из ISR/внутреннего SPI-callback.
+// configure() у штатных Arduino и RT_HW backend меняет только параметры.
+// Старый setSpiSpeed() оставлен без изменений: его resetInit() — прежний контракт.
+// Custom backend требует отдельного подтверждения пассивного configure().
+//=================================================================================================
+  uint8_t FLProgWiznetHardware::setSpiSpeedRuntime(uint32_t hz){
+    if(!hz || FLProgSpiArbiter::isOwnedBy(normalizedBus(),this)){return 0;}
+    uint8_t backendKind=spiBackendKind();
+    if(backendKind!=FLPROG_SPI_BACKEND_RT_HW && backendKind!=FLPROG_SPI_BACKEND_ARDUINO){return 0;}
+    _spiSpeed=hz;
+    syncSpiBackendConfiguration(); //--Нет begin/transfer/resetInit; SCK применится в следующей сессии;
+    return 1;
+  }
+
+//=================================================================================================
+//                         RESET: только параметры, никаких GPIO в setter
+// NONE и EXTERNAL намеренно игнорируют pin/writer: аппаратный сброс им не принадлежит.
+// Старый внешний импульс допускается, но нельзя одновременно включать MANAGED.
+//=================================================================================================
+  uint8_t FLProgWiznetHardware::setResetMode(uint8_t mode,uint8_t pin,uint8_t activeLevel,
+                                           uint32_t holdUs,FLProgEthernetResetWriter writer){
+    if(_startupStep || mode>FLPROG_ETH_RESET_MANAGED || activeLevel>1){return 0;}
+    // uint8_t не бывает отрицательным: прежняя проверка pin<0 здесь бессмысленна.
+    // В MANAGED отсутствие пина отклоняем сразу, даже если передан собственный writer.
+    // Никаких GPIO-действий при проверке и сохранении параметров не выполняется.
+    if(mode==FLPROG_ETH_RESET_MANAGED && (pin==255 || !writer || !holdUs || holdUs>0x7fffffffUL)){return 0;}
+    if(mode==FLPROG_ETH_RESET_MANAGED && pin==_pinCs){return 0;} //--RESET не должен совпадать с CS;
+    _startupConfigured=true;
+    _resetMode=mode;
+    // В NONE/EXTERNAL сохраняем именно 255 и убираем writer: пин не принадлежит сети.
+    _resetPin=(mode==FLPROG_ETH_RESET_MANAGED) ? pin : uint8_t(255);
+    _resetWriter=(mode==FLPROG_ETH_RESET_MANAGED) ? writer : nullptr;
+    _resetActiveLevel=activeLevel; _resetHoldUs=holdUs;
+    return 1;
+  }
+//=================================================================================================
+//                         Однократный старт из init()/pool(), без delay и spin
+// 2 мс LOW по умолчанию -> отпускание RESET -> 500 мс восстановления -> SPI.
+// Для NONE/EXTERNAL только 500 мс; writer в этих режимах не вызывается.
+// micros/millis вычитаются как uint32_t: переход через 0 не нарушает выдержку.
+// resetInit()/DHCP retry НЕ сбрасывают _startupStep: повторного GPIO-импульса нет.
+// Горячее выключение питания модуля требует отдельного restart-контракта в будущем.
+//=================================================================================================
+  uint8_t FLProgWiznetHardware::serviceStartup(){
+    if(!_startupConfigured){_startupStep=3; return FLPROG_WIZNET_HW_READY;}
+    if(_startupStep==3){return FLPROG_WIZNET_HW_READY;}
+    if(_startupStep==4){return FLPROG_WIZNET_HW_ERROR;}
+    if(_startupStep==0){
+        if(_resetMode==FLPROG_ETH_RESET_MANAGED){
+            if(!_resetWriter || !_resetWriter(_resetPin,_resetActiveLevel)){
+                _startupStep=4; return FLPROG_WIZNET_HW_ERROR;
+            }
+            _resetAtUs=micros(); _startupStep=1;
+            return FLPROG_WIZNET_HW_WAIT;
+        }
+        _startupWaitAt=millis(); _startupStep=2;
+    }
+    if(_startupStep==1){
+        if(uint32_t(micros()-_resetAtUs)<_resetHoldUs){return FLPROG_WIZNET_HW_WAIT;}
+        if(!_resetWriter(_resetPin,uint8_t(!_resetActiveLevel))){
+            _startupStep=4; return FLPROG_WIZNET_HW_ERROR;
+        }
+        //--Восстановление считаем ПОСЛЕ фактического отпускания GPIO, а не вместе с LOW.
+        _startupWaitAt=millis(); _startupStep=2;
+    }
+    if(uint32_t(millis()-_startupWaitAt)<_startupWaitMs){return FLPROG_WIZNET_HW_WAIT;}
+    _startupStep=3;
+    return FLPROG_WIZNET_HW_READY;
+  }
 
 #endif // FLPROG_NETWORK_COMPILE_WIRED
