@@ -598,6 +598,17 @@ public:
     // Wiznet SPI backend. The default is standalone Arduino SPI.
     void setWiznetSpiBackend(FLProgSpiBackend *backend);
     void useArduinoWiznetSpiBackend();
+
+    // Compatibility with generated FLProg sketches: 1 = accepted, 0 = rejected.
+    // RESET is configured in setup, before the first pool(); 255 means no GPIO.
+    // GPIO is touched only by the cooperative startup sequence inside pool().
+    // SPI frequency is in Hz; runtime changes are allowed between pool() calls,
+    // without resetting the chip or restarting DHCP. Zero Hz is invalid.
+    uint8_t setPinRST(uint8_t pin = 255);
+    uint8_t setSpeedSPI(uint32_t hz);
+    uint8_t pinRST() const { return _poolPinRST; }
+    uint8_t poolConfigurationStatus() const { return _poolPreparation; }
+
     uint8_t wiznetSpiBackendKind() const { return wiznetRef().spiBackendKind(); }
     uint8_t effectiveWiznetSpiBus() const { return wiznetRef().effectiveSpiBus(); }
     int effectiveWiznetPinCs() const { return wiznetRef().effectivePinCs(); }
@@ -1210,6 +1221,14 @@ public:
     uint8_t linkStatus() const;
 
 private:
+    // Pending legacy configuration, applied once after setup on the first pool.
+    uint8_t _poolPreparation = 0; // 0 = pending, 1 = accepted, 2 = invalid.
+    uint8_t _poolEntered = 0;
+    uint8_t _poolPinRST = 255;
+    uint8_t _poolPinRSTRequested = 0;
+    uint32_t _poolSpeedSPI = 0;
+    uint8_t _poolSpeedSPIRequested = 0;
+    uint8_t prepareWiznetPool();
     static FLProgNetworkInterface *_legacyInterfaceList[FLPROG_NETWORK_MAX_DEVICES];
     static uint8_t _legacyInterfaceCount;
     void registerLegacyInterface();

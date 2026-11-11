@@ -1,3 +1,5 @@
+> Обновление исходников 12.11.2026: совместимость `setPinRST` и `setSpeedSPI` для сгенерированных проектов FLProg. [Описание](Документация/NETWORK_SETTERS_RU.md). Готовый архив r17 остаётся прежним.
+
 > Новое в r16: [MQTT Basic/Professional, POLL_MS и порядок вызова](Документация/MQTT_RU.md).
 
 # FLProg Network — r16, 28.10.2026

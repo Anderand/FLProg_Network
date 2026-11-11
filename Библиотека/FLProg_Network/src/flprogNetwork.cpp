@@ -20,6 +20,81 @@
 #include "flprogNetwork.h"
 #include <new>
 
+// Legacy FLProg RESET/SPI configuration. Keep the installed backend and all
+// current Network services; no automatic RT_HW backend substitution is needed.
+#if FLPROG_NETWORK_COMPILE_WIRED && !FLPROG_NETWORK_PROFILE_WIFI_ONLY
+static uint8_t flprogLegacyArduinoResetWrite(uint8_t pin, uint8_t level)
+{
+    if (pin == 255) return 0;
+#if defined(NUM_DIGITAL_PINS)
+    if (pin >= NUM_DIGITAL_PINS) return 0;
+#endif
+#if defined(digitalPinCanOutput)
+    if (!digitalPinCanOutput(pin)) return 0;
+#endif
+    digitalWrite(pin, level);
+    pinMode(pin, OUTPUT);
+    return 1;
+}
+#endif
+
+uint8_t FLProgNetworkInterface::setPinRST(uint8_t pin)
+{
+#if FLPROG_NETWORK_COMPILE_WIRED && !FLPROG_NETWORK_PROFILE_WIFI_ONLY
+    if (_poolEntered || networkMode() != FLPROG_NETWORK_MODE_ETHERNET || !wiznetMode() || rmiiMode()) return 0;
+    // A non-Arduino backend owns its GPIO policy. It can use the explicit
+    // low-level setResetMode(..., writer) API for a managed reset instead.
+    if (pin != 255 && wiznetRef().spiBackendKind() != FLPROG_SPI_BACKEND_ARDUINO) return 0;
+    _poolPinRST = pin;
+    _poolPinRSTRequested = 1;
+    return 1;
+#else
+    (void)pin;
+    return 0;
+#endif
+}
+
+uint8_t FLProgNetworkInterface::setSpeedSPI(uint32_t hz)
+{
+#if FLPROG_NETWORK_COMPILE_WIRED && !FLPROG_NETWORK_PROFILE_WIFI_ONLY
+    if (networkMode() != FLPROG_NETWORK_MODE_ETHERNET || !wiznetMode() || rmiiMode()) return 0;
+    if (!_poolEntered) {
+        _poolSpeedSPI = hz;
+        _poolSpeedSPIRequested = 1;
+        return hz ? uint8_t(1) : uint8_t(0);
+    }
+    if (_poolPreparation != 1) return 0;
+    return wiznetRef().setSpiSpeedRuntime(hz);
+#else
+    (void)hz;
+    return 0;
+#endif
+}
+
+uint8_t FLProgNetworkInterface::prepareWiznetPool()
+{
+#if FLPROG_NETWORK_COMPILE_WIRED && !FLPROG_NETWORK_PROFILE_WIFI_ONLY
+    if (networkMode() != FLPROG_NETWORK_MODE_ETHERNET || !wiznetMode() || rmiiMode()) return 1;
+    if (_poolPreparation) return _poolPreparation == 1 ? uint8_t(1) : uint8_t(0);
+    _poolPreparation = 1;
+    if (_poolSpeedSPIRequested && !wiznetRef().setSpiSpeedRuntime(_poolSpeedSPI)) {
+        _poolPreparation = 2;
+        return 0;
+    }
+    if (_poolPinRSTRequested) {
+        const uint8_t mode = _poolPinRST == 255 ? FLPROG_ETH_RESET_NONE : FLPROG_ETH_RESET_MANAGED;
+        auto writer = wiznetRef().spiBackendKind() == FLPROG_SPI_BACKEND_ARDUINO
+            ? flprogLegacyArduinoResetWrite : nullptr;
+        if (!wiznetRef().setResetMode(mode, _poolPinRST, 0, 2000, writer)) {
+            _poolPreparation = 2;
+            return 0;
+        }
+    }
+#endif
+    return 1;
+}
+
+
 // EXP-2A: real wired accessor definitions exist only when the wired backend
 // is compiled. Wi-Fi-only live code contains no wired references.
 #if FLPROG_NETWORK_COMPILE_WIRED
@@ -3117,7 +3192,15 @@ void FLProgNetworkInterface::syncBlockOutputs()
 // Это единственный метод, который требуется вызывать в LoopSection FLProg.
 uint8_t FLProgNetworkInterface::pool()
 {
+    _poolEntered = 1;
     syncBlockInputs();
+    if (!prepareWiznetPool()) {
+        _ethernetReady = false;
+        _status = FLPROG_NETWORK_ERROR_STATUS;
+        _error = FLPROG_NETWORK_ETHERNET_HARDWARE_ERROR;
+        syncBlockOutputs();
+        return FLPROG_NETWORK_ERROR;
+    }
 
     uint8_t result = FLPROG_NETWORK_SUCCESS;
 
