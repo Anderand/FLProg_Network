@@ -1,0 +1,39 @@
+{
+  "api_manifest_entries": 121,
+  "api_exact_hashes": "PASS",
+  "api_equals_sources": "PASS",
+  "archive_sources": [
+    {
+      "archive": "FLProg_Network_dev20_r18_2026-11-14.zip",
+      "source": "Библиотека/FLProg_Network/",
+      "files": 170,
+      "distribution_archives_excluded_by_gitignore": [],
+      "result": "PASS; Git text EOL normalization allowed"
+    },
+    {
+      "archive": "FLProg_WebUI_Editor_transfer_2026-11-14.zip",
+      "source": "Исходники/WebUI/",
+      "files": 204,
+      "distribution_archives_excluded_by_gitignore": [
+        "FLProg_WebUI_Editor/Source/flprog_webui_next/runtime/FLProg_WebUI/FLProg_WebUI_Universal_Blocks_1.0_2026-10-10.zip"
+      ],
+      "result": "PASS; Git text EOL normalization allowed"
+    },
+    {
+      "archive": "FLProg_WebUI_Editor_transfer_2026-11-14.zip",
+      "source": "Библиотека/FLProg_WebUI/",
+      "files": 51,
+      "distribution_archives_excluded_by_gitignore": [
+        "FLProg_WebUI_Editor/Libraries/FLProg_WebUI/FLProg_WebUI_Universal_Blocks_1.0_2026-10-10.zip"
+      ],
+      "result": "PASS; Git text EOL normalization allowed"
+    },
+    {
+      "archive": "FLProg_WebUI_Editor_transfer_2026-11-14.zip",
+      "source": "Исходники/WebUI_legacy/",
+      "files": 17,
+      "distribution_archives_excluded_by_gitignore": [],
+      "result": "PASS; Git text EOL normalization allowed"
+    }
+  ]
+}

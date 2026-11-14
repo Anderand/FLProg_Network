@@ -408,7 +408,7 @@ def descriptor(project_id: str, channels: List[Dict], pages: List[Dict], theme: 
         "}",
         "",
     ]
-    return "\n".join(rows) + widget_catalog_header(project_id, channels, pages)
+    return "\n".join(rows) + '#ifndef FLPROG_WEBUI_NO_HTTP_CATALOG\n#include "'+namespace+'_widget_catalog.h"\n#endif\n'
 
 
 def config_ubi(project_id: str, transport_id: str = "wifi-http") -> str:
@@ -448,6 +448,7 @@ def project_entry_header(project_id: str, transport_id: str) -> str:
 #endif
 #define FLPROG_WEBUI_SELECTED_PROJECT "{project_id}"
 #include "{safe}_descriptor.h"
+#include "{safe}_widget_catalog.h"
 #include <adapters/FLProgWebUiFlprogNetworkPagedHttp.h>
 namespace flprog_webui_{safe} {{
 inline bool begin(FLProgNetworkInterface &network) {{
@@ -484,9 +485,11 @@ def build(source: Path, destination: Path) -> Path:
         "category=Other\narchitectures=*\ndepends=FLProg_WebUI\n", encoding="utf-8")
     (source_dir / f"{safe_identifier(project_id)}_descriptor.h").write_text(
         descriptor(project_id, channels, document.get("pages", []), document.get("theme", {}), polling_settings(document)), encoding="utf-8")
+    catalog=source_dir / f"{safe_identifier(project_id)}_widget_catalog.h"
+    catalog.write_text('#pragma once\n'+widget_catalog_header(project_id,channels,document.get('pages',[])),encoding='utf-8')
     (source_dir / f"{project_id}_webui.h").write_text(project_entry_header(project_id, transport_id), encoding="utf-8")
-    headers = [source_dir / f"{safe_identifier(project_id)}_descriptor.h", source_dir / f"{project_id}_webui.h"]
-    manifest = dict(schema=SCHEMA, projectId=project_id, descriptorApi=DESCRIPTOR_API,
+    headers = [source_dir / f"{safe_identifier(project_id)}_descriptor.h", source_dir / f"{project_id}_webui.h",catalog]
+    manifest = dict(schema=SCHEMA, projectId=project_id, descriptorApi=DESCRIPTOR_API,catalogApi=1,
                     files={p.relative_to(target).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in headers})
     (target / MANIFEST).write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     (target / START_NAME).write_bytes(start_block_bytes())

@@ -1,0 +1,22 @@
+[
+  {
+    "name": "FLProg_Network_dev20_r18_2026-11-14.zip",
+    "bytes": 1943915,
+    "sha256": "e011e0fe853033f5596e0ffe41c49ba1e00a7d3f203317fce7116a87ca695100"
+  },
+  {
+    "name": "FLProg_WebUI_Editor_transfer_2026-11-14.zip",
+    "bytes": 7973399,
+    "sha256": "4c5980624e144618630f138d6a5a133b808afe49ca846d51ffa835ad5f06712b"
+  },
+  {
+    "name": "FLProg_Network_dev20_r18_2026-11-14.zip.sha256",
+    "bytes": 107,
+    "sha256": "a9de6d6bae7cdeddb94b408dbc54756dcd5e41b0a614ed2f966c9d86f2925559"
+  },
+  {
+    "name": "FLProg_WebUI_Editor_transfer_2026-11-14.zip.sha256",
+    "bytes": 111,
+    "sha256": "9fb05679d05ae0ec1d94ed9699dbf0d7ace30d26e70afc2448068bd1a2ae293b"
+  }
+]

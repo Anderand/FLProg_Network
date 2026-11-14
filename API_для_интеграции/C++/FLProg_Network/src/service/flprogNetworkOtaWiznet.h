@@ -6,6 +6,9 @@
 #pragma once
 
 #include <Arduino.h>
+// This header is also compiled as a separate .cpp on ESP8266, where Arduino.h
+// does not necessarily expose IPAddress (the ESP32-only OTA remains disabled).
+#include <IPAddress.h>
 #include "flprogNetworkService.h"
 #include "../flprogNetworkProfile.h"
 

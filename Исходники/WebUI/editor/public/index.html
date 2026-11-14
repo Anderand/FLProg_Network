@@ -27,6 +27,8 @@
       <button id="save" type="button" title="Сохранить проект в файл .flpui">Сохранить</button>
       <button id="validateProject" type="button">Проверить проект</button>
       <button id="compatibilityCheck" type="button">Совместимость</button>
+      <button id="launchBridge" type="button" title="Открыть отдельную программу связи через COM">Мост связи</button>
+      <button id="exportBridge" type="button" title="Экспорт полного интерфейса для COM-моста">Экспорт для моста</button>
       <button id="channelContract" type="button" title="Номера CHANNEL, типы, направления и связи для универсальных блоков">Каналы FLProg</button>
       <button id="previewProject" type="button">Предпросмотр</button>
       <button id="previewDemo" type="button" title="Открыть демопроект и запустить локальный предпросмотр">Демо: уставка и busy/result</button>
@@ -265,6 +267,7 @@
     <div class="preview-workspace"><section aria-label="Каналы предпросмотра"><h3>Значения каналов</h3><div id="previewChannels"></div><p id="previewStatus" role="status"></p><pre id="previewLog" aria-label="Журнал предпросмотра"></pre></section><iframe id="previewFrame" title="Веб-интерфейс предпросмотра" sandbox="allow-scripts"></iframe></div>
   </dialog>
   <script src="compatibility.js?v=20261027-1"></script>
+  <script src="bridge-launch.js?v=20261028-1"></script>
   <script src="validation.js?v=20261027-compatibility1"></script>
   <script src="diagnostics.js?v=20261025-memory"></script>
   <script src="draft.js?v=20261025-draft2"></script>

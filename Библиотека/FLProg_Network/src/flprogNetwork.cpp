@@ -20,8 +20,6 @@
 #include "flprogNetwork.h"
 #include <new>
 
-// Legacy FLProg RESET/SPI configuration. Keep the installed backend and all
-// current Network services; no automatic RT_HW backend substitution is needed.
 #if FLPROG_NETWORK_COMPILE_WIRED && !FLPROG_NETWORK_PROFILE_WIFI_ONLY
 static uint8_t flprogLegacyArduinoResetWrite(uint8_t pin, uint8_t level)
 {
@@ -38,62 +36,75 @@ static uint8_t flprogLegacyArduinoResetWrite(uint8_t pin, uint8_t level)
 }
 #endif
 
-uint8_t FLProgNetworkInterface::setPinRST(uint8_t pin)
-{
+
+FLProgSpiBackend *(*FLProgNetworkInterface::_wiznetPoolFactory)()=nullptr;
+FLProgEthernetResetWriter FLProgNetworkInterface::_wiznetPoolResetWriter=nullptr;
+
+uint8_t FLProgNetworkInterface::setWiznetPoolFactory(FLProgSpiBackend *(*factory)(),
+                                                   FLProgEthernetResetWriter writer){
+    if(!factory || !writer || (_wiznetPoolFactory && _wiznetPoolFactory!=factory)){return 0;}
+    _wiznetPoolFactory=factory; _wiznetPoolResetWriter=writer; return 1;
+}
+
+uint8_t FLProgNetworkInterface::setPinRST(uint8_t pin){
 #if FLPROG_NETWORK_COMPILE_WIRED && !FLPROG_NETWORK_PROFILE_WIFI_ONLY
-    if (_poolEntered || networkMode() != FLPROG_NETWORK_MODE_ETHERNET || !wiznetMode() || rmiiMode()) return 0;
-    // A non-Arduino backend owns its GPIO policy. It can use the explicit
-    // low-level setResetMode(..., writer) API for a managed reset instead.
-    if (pin != 255 && wiznetRef().spiBackendKind() != FLPROG_SPI_BACKEND_ARDUINO) return 0;
-    _poolPinRST = pin;
-    _poolPinRSTRequested = 1;
-    return 1;
+    if(_poolEntered || networkMode()!=FLPROG_NETWORK_MODE_ETHERNET || !wiznetMode() || rmiiMode()){return 0;}
+    // Check the backend that the first pool will use. Explicit selections win.
+    const uint8_t kind=(!_wiznetBackendExplicit && _wiznetPoolFactory)
+        ? uint8_t(FLPROG_SPI_BACKEND_RT_HW) : wiznetRef().spiBackendKind();
+    if(pin!=255 && kind!=FLPROG_SPI_BACKEND_ARDUINO &&
+       !(kind==FLPROG_SPI_BACKEND_RT_HW && _wiznetPoolResetWriter)){return 0;}
+    _poolPinRST=pin; _poolPinRSTRequested=1; return 1; //--Только параметры; никаких GPIO;
 #else
-    (void)pin;
-    return 0;
+    (void)pin; return 0;
 #endif
 }
 
-uint8_t FLProgNetworkInterface::setSpeedSPI(uint32_t hz)
-{
+uint8_t FLProgNetworkInterface::setSpeedSPI(uint32_t hz){
 #if FLPROG_NETWORK_COMPILE_WIRED && !FLPROG_NETWORK_PROFILE_WIFI_ONLY
-    if (networkMode() != FLPROG_NETWORK_MODE_ETHERNET || !wiznetMode() || rmiiMode()) return 0;
-    if (!_poolEntered) {
-        _poolSpeedSPI = hz;
-        _poolSpeedSPIRequested = 1;
-        return hz ? uint8_t(1) : uint8_t(0);
+    if(networkMode()!=FLPROG_NETWORK_MODE_ETHERNET || !wiznetMode() || rmiiMode()){return 0;}
+    if(!_poolEntered){
+        // Запоминаем и недопустимый ноль: если вызывающий проигнорировал отказ, первый
+        // pool сообщит ошибку конфигурации, а не молча запустит сеть на другой частоте.
+        _poolSpeedSPI=hz; _poolSpeedSPIRequested=1; return hz ? uint8_t(1) : uint8_t(0);
     }
-    if (_poolPreparation != 1) return 0;
-    return wiznetRef().setSpiSpeedRuntime(hz);
+    if(_poolPreparation!=1){return 0;}
+    return wiznetRef().setSpiSpeedRuntime(hz); //--Не менять CS/bus и не вызывать resetInit;
 #else
-    (void)hz;
-    return 0;
+    (void)hz; return 0;
 #endif
 }
 
-uint8_t FLProgNetworkInterface::prepareWiznetPool()
-{
+uint8_t FLProgNetworkInterface::prepareWiznetPool(){
 #if FLPROG_NETWORK_COMPILE_WIRED && !FLPROG_NETWORK_PROFILE_WIFI_ONLY
-    if (networkMode() != FLPROG_NETWORK_MODE_ETHERNET || !wiznetMode() || rmiiMode()) return 1;
-    if (_poolPreparation) return _poolPreparation == 1 ? uint8_t(1) : uint8_t(0);
-    _poolPreparation = 1;
-    if (_poolSpeedSPIRequested && !wiznetRef().setSpiSpeedRuntime(_poolSpeedSPI)) {
-        _poolPreparation = 2;
-        return 0;
+    // Wi-Fi/RMII не должны зависеть от готовности SPI. Если режим позднее переключён
+    // на Wiznet, его backend будет подготовлен при первом pool именно в этом режиме.
+    // Отдельная _poolEntered уже закрыла назначение RESET при самом первом вызове pool.
+    if(networkMode()!=FLPROG_NETWORK_MODE_ETHERNET || !wiznetMode() || rmiiMode()){return 1;}
+    if(_poolPreparation){return _poolPreparation==1 ? uint8_t(1) : uint8_t(0);}
+    _poolPreparation=1;
+    if(!_wiznetBackendExplicit && _wiznetPoolFactory){
+        auto *backend=_wiznetPoolFactory(); //--Отдельный backend с временем жизни приложения;
+        if(!backend){_poolPreparation=2; return 0;}
+        setWiznetSpiBackend(backend);       //--Существующая пассивная привязка; не begin();
     }
-    if (_poolPinRSTRequested) {
-        const uint8_t mode = _poolPinRST == 255 ? FLPROG_ETH_RESET_NONE : FLPROG_ETH_RESET_MANAGED;
-        auto writer = wiznetRef().spiBackendKind() == FLPROG_SPI_BACKEND_ARDUINO
-            ? flprogLegacyArduinoResetWrite : nullptr;
-        if (!wiznetRef().setResetMode(mode, _poolPinRST, 0, 2000, writer)) {
-            _poolPreparation = 2;
-            return 0;
+    if(_poolSpeedSPIRequested && !wiznetRef().setSpiSpeedRuntime(_poolSpeedSPI)){
+        _poolPreparation=2; return 0;
+    }
+    if(_poolPinRSTRequested){
+        uint8_t mode=(_poolPinRST==255) ? FLPROG_ETH_RESET_NONE : FLPROG_ETH_RESET_MANAGED;
+        // Keep GPIO ownership with the selected backend. Custom backends use
+        // the explicit low-level setResetMode(..., writer) API.
+        const uint8_t kind=wiznetRef().spiBackendKind();
+        auto writer=kind==FLPROG_SPI_BACKEND_ARDUINO ? flprogLegacyArduinoResetWrite
+            : (kind==FLPROG_SPI_BACKEND_RT_HW ? _wiznetPoolResetWriter : nullptr);
+        if(!wiznetRef().setResetMode(mode,_poolPinRST,0,2000,writer)){
+            _poolPreparation=2; return 0;
         }
     }
 #endif
     return 1;
 }
-
 
 // EXP-2A: real wired accessor definitions exist only when the wired backend
 // is compiled. Wi-Fi-only live code contains no wired references.
@@ -1643,6 +1654,7 @@ void FLProgNetworkInterface::setSpiBus(uint8_t bus)
 
 void FLProgNetworkInterface::setSpiObject(SPIClass *object)
 {
+    _wiznetBackendExplicit = 1;
     wiznetRef().setSpiObject(object);
     _ethernetStarted = false;
     _ethernetReady = false;
@@ -1663,6 +1675,7 @@ void FLProgNetworkInterface::clearSpiObject()
 void FLProgNetworkInterface::setWiznetSpiBackend(
     FLProgSpiBackend *backend)
 {
+    _wiznetBackendExplicit = 1;
     wiznetRef().setSpiBackend(backend);
     _ethernetStarted = false;
     _ethernetReady = false;
@@ -1681,6 +1694,7 @@ void FLProgNetworkInterface::useArduinoWiznetSpiBackend()
 
 void FLProgNetworkInterface::setSpiPins(int sck, int miso, int mosi)
 {
+    _wiznetBackendExplicit = 1;
     wiznetRef().setSpiPins(sck, miso, mosi);
     _ethernetStarted = false;
     _ethernetReady = false;
@@ -3194,7 +3208,11 @@ uint8_t FLProgNetworkInterface::pool()
 {
     _poolEntered = 1;
     syncBlockInputs();
-    if (!prepareWiznetPool()) {
+
+    // Lazy RT_HW binding only for eligible Wiznet instances; no SPI/GPIO in
+    // static initialization. An invalid setup stops this pool safely.
+    if (!prepareWiznetPool())
+    {
         _ethernetReady = false;
         _status = FLPROG_NETWORK_ERROR_STATUS;
         _error = FLPROG_NETWORK_ETHERNET_HARDWARE_ERROR;

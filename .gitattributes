@@ -1,4 +1,6 @@
 # Preserve exact bytes for API snapshot copies and their originals.
+"API_для_интеграции/C++/FLProg_Network/src/flprogRtHwEthernet.h" -text whitespace=cr-at-eol
+"Библиотека/FLProg_Network/src/flprogRtHwEthernet.h" -text whitespace=cr-at-eol
 "API_для_интеграции/C++/FLProg_Network/API_COMPAT_GATE_01_RU.md" -text whitespace=cr-at-eol
 "API_для_интеграции/C++/FLProg_Network/API_COMPAT_GATE_02_FIX3_RU_EN.md" -text whitespace=cr-at-eol
 "API_для_интеграции/C++/FLProg_Network/API_COMPAT_GATE_02_RU.md" -text whitespace=cr-at-eol
@@ -227,3 +229,13 @@
 "Исходники/WebUI/specification/WIDGET_IO_CONTRACT_RU.md" -text whitespace=cr-at-eol
 "Исходники/WebUI/specification/busy_guard.md" -text whitespace=cr-at-eol
 "Исходники/WebUI/specification/field_sync.md" -text whitespace=cr-at-eol
+
+# Preserve NTP API snapshot hashes across platforms.
+"API_для_интеграции/C++/FLProg_Network/src/flprogNtpUserBlocks.h" -text whitespace=cr-at-eol
+"Библиотека/FLProg_Network/src/flprogNtpUserBlocks.h" -text whitespace=cr-at-eol
+"API_для_интеграции/C++/FLProg_Network/src/service/flprogNtpTimeZone.h" -text whitespace=cr-at-eol
+"Библиотека/FLProg_Network/src/service/flprogNtpTimeZone.h" -text whitespace=cr-at-eol
+"API_для_интеграции/Network/NTP_TIMEZONES_RU.md" -text whitespace=cr-at-eol
+"Документация/NTP_TIMEZONES_RU.md" -text whitespace=cr-at-eol
+"API_для_интеграции/Network/user_blocks/NTP_TimeZones_v0_1/README_RU.md" -text whitespace=cr-at-eol
+"Библиотека/FLProg_Network/user_blocks/NTP_TimeZones_v0_1/README_RU.md" -text whitespace=cr-at-eol

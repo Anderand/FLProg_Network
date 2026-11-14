@@ -142,140 +142,113 @@ private:
 // -----------------------------------------------------------------------------
 
 template <typename TRtHwBase, typename TDevice>
-class FLProgRtHwSpiBackend : public FLProgSpiBackend
-{
+class FLProgRtHwSpiBackend : public FLProgSpiBackend {
 public:
-    explicit FLProgRtHwSpiBackend(TRtHwBase &base)
-        : _base(&base)
-    {
-    }
-
-    virtual void configure(
-        uint8_t requestedBus,
-        int requestedCs,
-        uint32_t speed)
-    {
-        if (_base == nullptr)
-        {
-            _status = FLPROG_SPI_STATUS_UNAVAILABLE;
-            return;
+    explicit FLProgRtHwSpiBackend(TRtHwBase &base) : _base(&base) {}
+//=================================================================================================
+//                         1.Пассивная настройка, без GPIO/SPI-действий
+// custom=1 нужен прежнему spiInitDevice(). Частота передаётся библиотекой сети.
+// Fallback относится к первому ETH-профилю; другим интерфейсам передавать bus/CS явно.
+// Горячее переназначение bus/CS исключено; частоту можно менять между сессиями.
+//=================================================================================================
+    void configure(uint8_t requestedBus,int requestedCs,uint32_t speed) override{
+        if(!_base){_status=FLPROG_SPI_STATUS_UNAVAILABLE; return;}
+        uint8_t bus=(requestedBus==255) ? _base->getETH_bus(0) : requestedBus;
+        //-----------------------------------------------------------------------------------------
+        //                         Доработка EIS 05.11.2026 v.02
+        // Внешняя virtual-сигнатура int сохранена для всех прежних реализаций FLProgSpiBackend.
+        // Только на этой границе принимаем старое -1 и принятое в RT_HW значение 255:
+        // оба означают «CS не задан явно, взять из первого Ethernet-профиля».
+        // Другие отрицательные значения и числа >254 не являются номерами пинов RT_HW.
+        // Сначала проверяем int, затем сужаем: 256 не должен превратиться в реальный пин 0.
+        //-----------------------------------------------------------------------------------------
+        int resolvedCs=(requestedCs==-1 || requestedCs==255) ? _base->getETH_cs(0) : requestedCs;
+        if(resolvedCs<0 || resolvedCs>=255){
+            _status=FLPROG_SPI_STATUS_PIN_ERROR; return;
         }
-
-        _device.bus =
-            (requestedBus == 255)
-                ? _base->getBusETH0()
-                : requestedBus;
-
-        _device.cs =
-            (requestedCs < 0)
-                ? _base->getCsETH0()
-                : requestedCs;
-
-        _device.speed = speed;
-        _status = FLPROG_SPI_STATUS_OK;
+        uint8_t cs=uint8_t(resolvedCs);           //--Внутренний формат RT_HW: пин 0..254;
+        if(!_base->checkPinDOT(cs)){
+            _status=FLPROG_SPI_STATUS_PIN_ERROR; return;
+        }
+        if(!_base->spiCheckBus(bus)){_status=FLPROG_SPI_STATUS_UNAVAILABLE; return;}
+        if(_device.sessionOpen){_status=FLPROG_SPI_STATUS_BUSY; return;}
+        if(_device.status==1 && (_device.bus!=bus || _device.cs!=cs)){
+            _status=FLPROG_SPI_STATUS_UNAVAILABLE; return; //--Маршрут после запуска не меняем;
+        }
+        _device.bus=bus; _device.cs=cs; _device.speed=speed;
+        _device.custom=1;                         //--Только поля прежнего дескриптора RT_HW;
+        _status=FLPROG_SPI_STATUS_OK;
     }
-
-    virtual bool begin()
-    {
-        if (_base == nullptr || _device.cs < 0)
-        {
-            _status = FLPROG_SPI_STATUS_UNAVAILABLE;
+//=================================================================================================
+//                         2.Инициализация существующим методом RT_HW
+// Прежний backend возвращал успех без проверки результата spiInitDevice().
+// status/err/codeErr принадлежат RT_HW; собственного признака begun не добавляем.
+//=================================================================================================
+    bool begin() override{
+        //--Не терять отказ последнего configure(): иначе можно запустить прежний маршрут.
+        if(_status==FLPROG_SPI_STATUS_PIN_ERROR || _status==FLPROG_SPI_STATUS_UNAVAILABLE){return false;}
+        if(!_base || !_device.custom || !_base->spiCheckBus(_device.bus)){
+            _status=FLPROG_SPI_STATUS_UNAVAILABLE; return false;
+        }
+        if(!_base->checkPinDOT(_device.cs)){_status=FLPROG_SPI_STATUS_PIN_ERROR; return false;}
+        if(_base->spiGetBusy(_device.bus)){_status=FLPROG_SPI_STATUS_BUSY; return false;}
+        _base->spiInitDevice(_device);            //--Физическую настройку выполняет RT_HW;
+        if(_device.status!=1 || _device.err || _device.codeErr){
+            _status=(_device.codeErr==152) ? FLPROG_SPI_STATUS_PIN_ERROR : FLPROG_SPI_STATUS_UNAVAILABLE;
             return false;
         }
-
-        _base->spiInitDevice(_device);
-        _status = FLPROG_SPI_STATUS_OK;
-        return true;
+        _status=FLPROG_SPI_STATUS_OK; return true;
     }
-
-    virtual bool beginTransaction()
-    {
-        if (_base == nullptr)
-        {
-            _status = FLPROG_SPI_STATUS_UNAVAILABLE;
-            return false;
+//=================================================================================================
+//                         3.Готовая сессия вместо ручного lock/CS/transaction
+// Возврат прежнего RT_HW spiBeginSession(): 1=открыто, 0=не открыто.
+// После проверки устройства/шины отказ открытия означает занятый ресурс.
+// _status — только прежний результат API сети, не копия SPI-состояния.
+//=================================================================================================
+    bool beginTransaction() override{
+        if(!_base || !_device.custom || _device.status!=1 || !_base->spiCheckBus(_device.bus)){
+            _status=FLPROG_SPI_STATUS_UNAVAILABLE; return false;
         }
-
-        if (
-            _busyProbe != nullptr &&
-            _busyProbe(_device.bus, _busyProbeContext)
-        )
-        {
-            _status = FLPROG_SPI_STATUS_BUSY;
-            return false;
+        //--Сохранённый callback прежнего API: внешняя проверка занятости, не управление SPI.
+        if(_busyProbe && _busyProbe(_device.bus,_busyProbeContext)){
+            _status=FLPROG_SPI_STATUS_BUSY; return false;
         }
-
-        _base->spiSetBusy(_device.bus);
-        _busyHeld = true;
-
-        _base->spiBeginTransaction(_device);
-        _base->spiBeginCS(_device);
-        _transactionOpen = true;
-
-        _status = FLPROG_SPI_STATUS_OK;
-        return true;
+        uint8_t opened=_base->spiBeginSession(_device);
+        _status=opened ? FLPROG_SPI_STATUS_OK : FLPROG_SPI_STATUS_BUSY;
+        return opened!=0;
     }
-
-    virtual void endTransaction()
-    {
-        if (_base == nullptr)
-        {
-            return;
-        }
-
-        if (_transactionOpen)
-        {
-            _base->spiEndCS(_device);
-            _base->spiEndTransaction(_device);
-            _transactionOpen = false;
-        }
-
-        if (_busyHeld)
-        {
-            _base->spiClearBusy(_device.bus);
-            _busyHeld = false;
-        }
+    void endTransaction() override{
+        if(_base){_base->spiEndSession(_device);} //--RT_HW закрывает CS/transaction и освобождает шину;
     }
-
-    virtual uint8_t transfer(uint8_t value)
-    {
-        if (_base == nullptr)
-        {
-            _status = FLPROG_SPI_STATUS_UNAVAILABLE;
-            return 0xFF;
-        }
-
-        return _base->spiTransfer(value, _device.bus);
+    uint8_t transfer(uint8_t value) override{
+        if(!_base || !_device.sessionOpen){_status=FLPROG_SPI_STATUS_UNAVAILABLE; return 0xff;}
+        return _base->spiLL_Transfer(_device,value); //--Не device-overload с повторным lock;
     }
-
-    virtual uint8_t bus() const { return _device.bus; }
-    virtual int cs() const { return _device.cs; }
-    virtual bool busAvailable() const { return _base != nullptr; }
-    virtual bool pinsSupported() const { return true; }
-    virtual uint8_t kind() const { return FLPROG_SPI_BACKEND_RT_HW; }
-    virtual uint8_t status() const { return _status; }
-
-    TDevice &device() { return _device; }
-    const TDevice &device() const { return _device; }
-
-    void setBusyProbe(
-        FLProgSpiBusyProbeCallback callback,
-        void *context = nullptr)
-    {
-        _busyProbe = callback;
-        _busyProbeContext = context;
+//=================================================================================================
+//                         4.Прежний интерфейс совместимости
+// Сигнатуры bool заданы FLProgSpiBackend, а тип callback — прежним typedef.
+// Имена device()/setBusyProbe() сохраняются для уже написанных проектов.
+// _busyHeld и _transactionOpen удалены: sessionOpen уже есть в RT_HW-устройстве.
+//=================================================================================================
+    uint8_t bus() const override {return _device.bus;}
+    // На выходе прежнего virtual int API сохраняем -1: старые потребители проверяют cs()<0.
+    // Дескриптор RT_HW при этом хранит uint8_t; второй копии состояния CS здесь нет.
+    int cs() const override {return _device.custom ? int(_device.cs) : -1;}
+    bool busAvailable() const override {return _base && _device.custom && _base->spiCheckBus(_device.bus);}
+    bool pinsSupported() const override {return _base && _device.custom && _base->checkPinDOT(_device.cs);}
+    uint8_t kind() const override {return FLPROG_SPI_BACKEND_RT_HW;}
+    uint8_t status() const override {return _status;}
+    TDevice &device(){return _device;}
+    const TDevice &device() const {return _device;}
+    void setBusyProbe(FLProgSpiBusyProbeCallback callback,void *context=nullptr){
+        _busyProbe=callback; _busyProbeContext=context;
     }
-
 private:
-    TRtHwBase *_base = nullptr;
+    TRtHwBase *_base=nullptr;
     TDevice _device{};
-
-    FLProgSpiBusyProbeCallback _busyProbe = nullptr;
-    void *_busyProbeContext = nullptr;
-
-    uint8_t _status = FLPROG_SPI_STATUS_OK;
-    bool _busyHeld = false;
-    bool _transactionOpen = false;
+    FLProgSpiBusyProbeCallback _busyProbe=nullptr;
+    void *_busyProbeContext=nullptr;
+    uint8_t _status=FLPROG_SPI_STATUS_UNAVAILABLE; //--Результат совместимого сетевого API;
 };
 
 // Удобный макрос для Arduino-проектов C++11.

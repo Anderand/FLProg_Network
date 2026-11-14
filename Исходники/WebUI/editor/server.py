@@ -50,6 +50,8 @@ from channel_contract import channel_contract, contract_markdown
 from project_validation import validate_project
 from preview_project import preview_html
 from build_compatibility import export_report
+from bridge_launcher import launch_bridge
+from export_bridge import export_bridge,attach_bridge_header
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -89,10 +91,37 @@ class Handler(SimpleHTTPRequestHandler):
         return super().do_GET()
 
     def do_POST(self):
-        if self.path not in ("/api/save", "/api/build", "/api/validate", "/api/preview", "/api/contract", "/api/compatibility"): return self.reply(404, {"error":"unknown API"})
+        if self.path == '/api/bridge/launch':
+            # A browser request may start only our fixed companion, without arguments.
+            # Cross-site pages must not launch desktop processes through localhost.
+            expected = '127.0.0.1:' + str(self.server.server_port)
+            if (self.headers.get('Host') != expected or
+                    self.headers.get('Origin') not in (None, 'http://' + expected) or
+                    self.headers.get('X-FLProg-Bridge') != '1'):
+                return self.reply(403, {'error': 'Запуск доступен только из этого редактора'})
+            try:
+                home = DATA_ROOT if getattr(sys, 'frozen', False) else ROOT
+                return self.reply(200, {'ok': True, 'executable': launch_bridge(home)})
+            except OSError as error:
+                return self.reply(400, {'error': str(error)})
+        if self.path not in ("/api/save", "/api/build", "/api/validate", "/api/preview", "/api/contract", "/api/compatibility", "/api/bridge/export"): return self.reply(404, {"error":"unknown API"})
         try:
             raw = self.rfile.read(int(self.headers.get("Content-Length", "0")))
             data = json.loads(raw.decode("utf-8"))
+            if self.path=='/api/bridge/export':
+                expected='127.0.0.1:'+str(self.server.server_port)
+                if self.headers.get('Host')!=expected or self.headers.get('Origin') not in (None,'http://'+expected) or self.headers.get('Content-Type','').split(';')[0]!='application/json':
+                    return self.reply(403,{'error':'Экспорт доступен только из этого редактора'})
+                source,output=project_locations(data,PROJECTS,DEFAULT_PACKAGES)
+                if '\\portable\\sketchbook\\libraries' in str(output).replace('/','\\').lower():raise ValueError('Для моста выберите папку проекта вне Arduino IDE')
+                destination=source.parent/('bridge_web' if data.get('projectFolder') else source.stem+'_bridge_web')
+                result=export_bridge(data,RESOURCE_ROOT,destination)
+                data['bridgeExport']=True;source.parent.mkdir(parents=True,exist_ok=True)
+                source.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+                package=build_project_package.build(source,output)
+                copy_tree(RESOURCE_ROOT/'runtime/FLProg_WebUI',output/'FLProg_WebUI')
+                result=attach_bridge_header(package,result)
+                return self.reply(200,dict(ok=True,**result))
             if self.path == '/api/compatibility':
                 return self.reply(200, export_report(data, RESOURCE_ROOT, PROJECTS, DEFAULT_PACKAGES, FLPROG_LIBRARIES))
             if self.path == "/api/preview":
@@ -137,6 +166,9 @@ class Handler(SimpleHTTPRequestHandler):
                 package = importlib.reload(build_project_package).build(source, output)
                 # Every export carries matching headers, including default packages.
                 copy_tree(RESOURCE_ROOT / 'runtime' / 'FLProg_WebUI', output / 'FLProg_WebUI')
+                if data.get('bridgeExport') is True:
+                    site=source.parent/('bridge_web' if data.get('projectFolder') else source.stem+'_bridge_web')
+                    attach_bridge_header(package,export_bridge(data,RESOURCE_ROOT,site))
                 installed = None
                 if data.get('installToIde') is True and FLPROG_LIBRARIES.is_dir():
                     installed = FLPROG_LIBRARIES / package.name

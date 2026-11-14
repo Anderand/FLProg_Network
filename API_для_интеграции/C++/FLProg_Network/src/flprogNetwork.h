@@ -55,9 +55,11 @@
 #define FLPROG_NETWORK_VERSION_MAJOR 1
 #define FLPROG_NETWORK_VERSION_MINOR 0
 #define FLPROG_NETWORK_VERSION_PATCH 0
-#define FLPROG_NETWORK_VERSION_DEV   16
-#define FLPROG_NETWORK_VERSION_STRING "1.0.0-rc.6a.dev.17-pr28"
+#define FLPROG_NETWORK_VERSION_DEV   20
+#define FLPROG_NETWORK_VERSION_STRING "1.0.0-rc.6a.dev.20-ntp-timezones"
 #define FLPROG_NETWORK_API_LEVEL 10006UL
+#define FLPROG_NETWORK_HAS_TYPED_DEVICE_LOOKUP 1
+#define FLPROG_NETWORK_HAS_TYPED_DEVICE_EXISTS 1
 #define FLPROG_NETWORK_HIGH_LEVEL_API_FROZEN 1
 
 // W5500 compile-gate profile: wired implementation is enabled.
@@ -332,6 +334,9 @@ struct FLProgNetworkCapacitySnapshot
 class FLProgNetworkInterface
 {
 public:
+    // Actual C++ wrapper class; independent from mutable routing/networkMode.
+    FLProgNetworkDeviceKind deviceKind() const { return _deviceKind; }
+
     // Legacy service facades constructed without an interface (notably
     // FLProgOTA) use this only for lazy compatibility binding. It returns the
     // first live interface whose Wi-Fi STA is ready, or nullptr.
@@ -598,16 +603,19 @@ public:
     // Wiznet SPI backend. The default is standalone Arduino SPI.
     void setWiznetSpiBackend(FLProgSpiBackend *backend);
     void useArduinoWiznetSpiBackend();
-
-    // Compatibility with generated FLProg sketches: 1 = accepted, 0 = rejected.
-    // RESET is configured in setup, before the first pool(); 255 means no GPIO.
-    // GPIO is touched only by the cooperative startup sequence inside pool().
-    // SPI frequency is in Hz; runtime changes are allowed between pool() calls,
-    // without resetting the chip or restarting DHCP. Zero Hz is invalid.
-    uint8_t setPinRST(uint8_t pin = 255);
+    // 1 = accepted, 0 = rejected. Configure RESET before the first pool().
+    // Pin 255 never touches GPIO. Arduino and registered RT_HW writers are supported.
+    // SPI frequency is in Hz; runtime changes between pool() calls do not reset DHCP.
+    uint8_t setPinRST(uint8_t pin=255);
     uint8_t setSpeedSPI(uint32_t hz);
-    uint8_t pinRST() const { return _poolPinRST; }
-    uint8_t poolConfigurationStatus() const { return _poolPreparation; }
+    uint8_t pinRST() const {return _poolPinRST;}
+    uint8_t poolConfigurationStatus() const {return _poolPreparation;} //--0=SPI ещё не подготовлен,1=принято,2=ошибка;
+
+    // Служебная точка optional-интеграции: регистрация двух функций без RT_HW-зависимости
+    // общего header. Она не создаёт backend, не трогает GPIO/SPI и не начинает сеть.
+    // Сам backend впервые создаётся фабрикой из pool; writer применяется автоматом RESET.
+    static uint8_t setWiznetPoolFactory(FLProgSpiBackend *(*factory)(),
+                                        FLProgEthernetResetWriter writer);
 
     uint8_t wiznetSpiBackendKind() const { return wiznetRef().spiBackendKind(); }
     uint8_t effectiveWiznetSpiBus() const { return wiznetRef().effectiveSpiBus(); }
@@ -1220,14 +1228,21 @@ public:
     /** Return wired Ethernet link status. */
     uint8_t linkStatus() const;
 
+protected:
+    // May only be set by class constructors, never by user networkMode settings.
+    void setDeviceKind(FLProgNetworkDeviceKind kind) { _deviceKind = kind; }
+
 private:
-    // Pending legacy configuration, applied once after setup on the first pool.
-    uint8_t _poolPreparation = 0; // 0 = pending, 1 = accepted, 2 = invalid.
-    uint8_t _poolEntered = 0;
-    uint8_t _poolPinRST = 255;
-    uint8_t _poolPinRSTRequested = 0;
-    uint32_t _poolSpeedSPI = 0;
-    uint8_t _poolSpeedSPIRequested = 0;
+    FLProgNetworkDeviceKind _deviceKind = FLPROG_NETWORK_DEVICE_KIND_BASE;
+    uint8_t _poolPreparation=0;           //--Подготовка выбранного SPI Ethernet;
+    uint8_t _poolEntered=0;               //--Первый вызов pool замораживает назначение RESET;
+    uint8_t _poolPinRST=255;
+    uint8_t _poolPinRSTRequested=0;
+    uint32_t _poolSpeedSPI=0;
+    uint8_t _poolSpeedSPIRequested=0;
+    uint8_t _wiznetBackendExplicit=0;     //--Уважать явно выбранный Arduino/custom/manual RT_HW;
+    static FLProgSpiBackend *(*_wiznetPoolFactory)();
+    static FLProgEthernetResetWriter _wiznetPoolResetWriter;
     uint8_t prepareWiznetPool();
     static FLProgNetworkInterface *_legacyInterfaceList[FLPROG_NETWORK_MAX_DEVICES];
     static uint8_t _legacyInterfaceCount;
@@ -1611,6 +1626,7 @@ class FLProgOnBoardWifiInterface : public FLProgNetworkInterface
 public:
     FLProgOnBoardWifiInterface()
     {
+        setDeviceKind(FLPROG_NETWORK_DEVICE_KIND_WIFI);
         networkMode(FLPROG_NETWORK_MODE_WIFI);
         workMode(true);
     }
@@ -1621,12 +1637,14 @@ class FLProgWiznetInterface : public FLProgNetworkInterface
 public:
     FLProgWiznetInterface()
     {
+        setDeviceKind(FLPROG_NETWORK_DEVICE_KIND_WIZNET);
         networkMode(FLPROG_NETWORK_MODE_ETHERNET);
         workMode(true);
     }
 
     FLProgWiznetInterface(int pinCs, uint8_t bus = 255) : FLProgNetworkInterface(pinCs, bus)
     {
+        setDeviceKind(FLPROG_NETWORK_DEVICE_KIND_WIZNET);
         networkMode(FLPROG_NETWORK_MODE_ETHERNET);
         workMode(true);
     }
@@ -1675,3 +1693,86 @@ public:
         return pool();
     }
 };
+
+
+// Safe typed NET NUM lookups: class identity is set by the actual wrapper
+// constructor, not inferred from a mutable networkMode()/active transport.
+// They do not allocate memory and require no RTTI / dynamic_cast.
+inline FLProgWiznetInterface *FLProgNetworkDeviceRegistry::getWiznet(
+    FLProgNetworkDeviceId id)
+{
+    FLProgNetworkInterface *base = getDevice(id);
+    if (!base) return nullptr;
+    if (base->deviceKind() != FLPROG_NETWORK_DEVICE_KIND_WIZNET)
+    {
+        setLast(FLPROG_NETWORK_DEVICE_TYPE_MISMATCH, id);
+        return nullptr;
+    }
+    return static_cast<FLProgWiznetInterface *>(base);
+}
+
+inline const FLProgWiznetInterface *FLProgNetworkDeviceRegistry::getWiznet(
+    FLProgNetworkDeviceId id) const
+{
+    const FLProgNetworkInterface *base = getDevice(id);
+    if (!base) return nullptr;
+    if (base->deviceKind() != FLPROG_NETWORK_DEVICE_KIND_WIZNET)
+    {
+        setLast(FLPROG_NETWORK_DEVICE_TYPE_MISMATCH, id);
+        return nullptr;
+    }
+    return static_cast<const FLProgWiznetInterface *>(base);
+}
+
+inline FLProgOnBoardWifiInterface *FLProgNetworkDeviceRegistry::getWifi(
+    FLProgNetworkDeviceId id)
+{
+    FLProgNetworkInterface *base = getDevice(id);
+    if (!base) return nullptr;
+    if (base->deviceKind() != FLPROG_NETWORK_DEVICE_KIND_WIFI)
+    {
+        setLast(FLPROG_NETWORK_DEVICE_TYPE_MISMATCH, id);
+        return nullptr;
+    }
+    return static_cast<FLProgOnBoardWifiInterface *>(base);
+}
+
+inline const FLProgOnBoardWifiInterface *FLProgNetworkDeviceRegistry::getWifi(
+    FLProgNetworkDeviceId id) const
+{
+    const FLProgNetworkInterface *base = getDevice(id);
+    if (!base) return nullptr;
+    if (base->deviceKind() != FLPROG_NETWORK_DEVICE_KIND_WIFI)
+    {
+        setLast(FLPROG_NETWORK_DEVICE_TYPE_MISMATCH, id);
+        return nullptr;
+    }
+    return static_cast<const FLProgOnBoardWifiInterface *>(base);
+}
+
+
+// Typed existence checks deliberately preserve lastResult()/lastId(), just
+// like the existing exists(id). They never downcast a base pointer, allocate
+// memory, or depend on RTTI. Identity describes the wrapper class rather
+// than the currently selected transport (e.g. RMII vs SPI).
+inline bool FLProgNetworkDeviceRegistry::existsWiznet(
+    FLProgNetworkDeviceId id) const
+{
+    if (id == FLPROG_NETWORK_DEVICE_INVALID) return false;
+    const int8_t index = findById(id);
+    if (index < 0) return false;
+    const FLProgNetworkInterface *device = _entries[(uint8_t)index].device;
+    return device != nullptr &&
+        device->deviceKind() == FLPROG_NETWORK_DEVICE_KIND_WIZNET;
+}
+
+inline bool FLProgNetworkDeviceRegistry::existsWifi(
+    FLProgNetworkDeviceId id) const
+{
+    if (id == FLPROG_NETWORK_DEVICE_INVALID) return false;
+    const int8_t index = findById(id);
+    if (index < 0) return false;
+    const FLProgNetworkInterface *device = _entries[(uint8_t)index].device;
+    return device != nullptr &&
+        device->deviceKind() == FLPROG_NETWORK_DEVICE_KIND_WIFI;
+}

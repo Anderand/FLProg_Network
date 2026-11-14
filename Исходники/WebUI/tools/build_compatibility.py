@@ -121,16 +121,31 @@ def verify_manifest(report, wrapper, project_id):
             raise ValueError('ID проекта или контракт в паспорте не совпадает со скетчем.')
         safe = re.sub(r'[^A-Za-z0-9_]', '_', project_id)
         expected = {'src/' + project_id + '_webui.h', 'src/' + safe + '_descriptor.h'}
+        if 'catalogApi' in manifest:
+            if manifest['catalogApi']!=1:raise ValueError('Неподдерживаемый API каталога виджетов.')
+            expected.add('src/'+safe+'_widget_catalog.h')
+        if 'bridgeApi' in manifest:
+            if manifest['bridgeApi']!=1 or not re.fullmatch(r'[0-9a-f]{64}',str(manifest.get('bridgeHash',''))):
+                raise ValueError('Неподдерживаемый API или хеш веб-проекта моста.')
+            expected.add('src/'+project_id+'_bridge.h')
+        if 'bridgeBlockApi' in manifest:
+            if manifest['bridgeBlockApi']!=1 or manifest.get('bridgeApi')!=1:raise ValueError('Неподдерживаемая привязка проекта моста.')
+            expected.add('src/'+project_id+'_bridge_entry.h')
         files = manifest.get('files', {})
         if not isinstance(files, dict) or set(files) != expected:
-            raise ValueError('Неполный паспорт: нужны оба сгенерированных заголовка.')
+            raise ValueError('Неполный паспорт: состав сгенерированных заголовков не совпадает.')
         for name, digest in files.items():
             target = library / name
             if library.resolve() not in target.resolve().parents:
                 raise ValueError('Заголовок находится вне библиотеки проекта.')
             if not target.is_file() or hashlib.sha256(target.read_bytes()).hexdigest() != digest:
                 raise ValueError('Отсутствует или изменён заголовок ' + name + '. Пересоберите пакет из .flpui.')
-        add(report, 'ok', 'ID проекта и оба заголовка соответствуют паспорту сборки.', path)
+        if manifest.get('bridgeApi')==1:
+            bridge=(library/('src/'+project_id+'_bridge.h')).read_text(encoding='utf-8')
+            if 'FLPROG_BRIDGE_WEB_HASH "'+manifest['bridgeHash']+'"' not in bridge:
+                raise ValueError('Хеш заголовка моста не совпал с паспортом.')
+        add(report, 'ok', 'ID проекта и сгенерированные заголовки соответствуют паспорту сборки.', path)
+        return manifest
     except (OSError, ValueError, TypeError, AttributeError) as error:
         add(report, 'error', 'Паспорт проекта: ' + str(error), path)
 
@@ -158,32 +173,36 @@ def sketch_report(sketch, ide, libraries=None):
         roots.append(ide / 'portable/sketchbook/libraries')
         text = sketch.read_text(encoding='utf-8-sig')
         text = re.sub(r'/\*.*?\*/|//[^\n]*', '', text, flags=re.S)
-        wrappers = list(dict.fromkeys(re.findall(r'^\s*#\s*include\s*[<"]([^>"\n]*_webui\.h)[>"]', text, re.M)))
+        wrappers = list(dict.fromkeys(re.findall(r'^\s*#\s*include\s*[<"]([^>"\n]*(?:_webui|_bridge_entry)\.h)[>"]', text, re.M)))
+        project_ids={re.sub(r'_(webui|bridge_entry)\.h$','',name) for name in wrappers}
         if not wrappers:
             add(report, 'info', 'В скетче нет прямого include <ID_webui.h>: проверка пакета WebUI не применяется. Вложенные и условные подключения не раскрываются.')
-        elif len(wrappers) > 1:
+        elif len(project_ids) > 1:
             add(report, 'error', 'Подключено несколько проектов WebUI. Оставьте один Web UI Start с нужным ID: ' + ', '.join(wrappers))
         else:
             name = wrappers[0]
-            project_id = name[:-len('_webui.h')]
+            project_id = re.sub(r'_(webui|bridge_entry)\.h$','',name)
             if not ID.fullmatch(project_id):
                 add(report, 'error', 'Неверный ID в include: ' + name)
             else:
                 local = sketch.parent / name
                 wrapper = local if local.is_file() else choose(report, roots, name)
-                if wrapper:
-                    verify_manifest(report, wrapper, project_id)
+                project_manifest=verify_manifest(report, wrapper, project_id) if wrapper else None
                 runtime_header = choose(report, roots, 'FLProgWebUi.h')
                 if runtime_header:
                     runtime_check(report, runtime_header.parent.parent)
+                    if project_manifest and project_manifest.get('bridgeBlockApi')==1:
+                        for required in ('FLProgBridgeProjectBinding.h','flprogBridgeUserBlocks.h','bridge/FLProgBridgeProjectBinding.h','bridge/FLProgBridgeUartBlock.h'):
+                            helper=runtime_header.parent/required
+                            if not helper.is_file():add(report,'error','Для автоматической привязки нужна FLProg_WebUI из нового комплекта: отсутствует '+required,helper)
                     if wrapper:
                         safe = re.sub(r'[^A-Za-z0-9_]', '_', project_id)
                         descriptor = wrapper.parent / (safe + '_descriptor.h')
                         helper = runtime_header.parent / 'adapters/FLProgWebUiWidgetCatalog.h'
-                        if descriptor.is_file() and 'FLProgWebUiWidgetCatalog.h' in descriptor.read_text(encoding='utf-8-sig') and not helper.is_file():
+                        if descriptor.is_file() and ('FLProgWebUiWidgetCatalog.h' in descriptor.read_text(encoding='utf-8-sig') or (wrapper.parent/(safe+'_widget_catalog.h')).is_file()) and not helper.is_file():
                             add(report, 'error', 'Для каталога виджетов нужна FLProg_WebUI из того же нового пакета проекта. Обновите только эту библиотеку.', helper)
-                choose(report, roots, 'flprogNetwork.h')
-                if not re.search(r'\bFLPROG_WEBUI_BEGIN_SELECTED\s*\(', text):
+                if name.endswith('_webui.h'):choose(report, roots, 'flprogNetwork.h')
+                if name.endswith('_webui.h') and not re.search(r'\bFLPROG_WEBUI_BEGIN_SELECTED\s*\(', text):
                     add(report, 'warning', 'Не найден FLPROG_WEBUI_BEGIN_SELECTED(). Проверьте стартовый блок и вызов после настройки Ethernet.')
     except (OSError, ValueError, TypeError) as error:
         add(report, 'error', str(error))
@@ -203,3 +222,4 @@ def require_sketch(sketch, ide, libraries=None):
     if not report['ok']:
         raise ValueError(format_report(report))
     return report
+

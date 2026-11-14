@@ -21,20 +21,22 @@ public:
                  const String &user, const String &password) {
         control(&network, en, con, dis, broker, port, id, user, password, 0);
     }
+    void useExternalTransport(FLProgMqttTransport*t){if(external==t)return;if(bound)mqtt.end();bound=false;external=t;prevEn=prevCon=false;}
     uint8_t error() const { return configError ? configError : mqtt.error(); }
     // 19: selected interface not found; 20: invalid SUB_LIMIT/port/POLL_MS.
     void control(FLProgNetworkInterface *network, bool en, bool con, bool dis,
                  const String &broker, long port, const String &id,
                  const String &user, const String &password, long limit, long pollMs = 0) {
+        if(external)external->pool();
         const bool start = en && (!prevEn || (con && !prevCon));
         const bool stop = (!en && prevEn) || (dis && !prevDis);
         prevEn = en; prevCon = con; prevDis = dis;
         if (stop) { mqtt.disconnect(); return; }
-        if (!start) return;
+        if (!start) {if(bound&&external)mqtt.pool();return;}
         // A rejected configuration must not continue an older broker session.
         if (bound) { mqtt.end(); bound = false; }
         configError = 0;
-        if (!network) { configError = 19; return; }
+        if (!network&&!external) { configError = 19; return; }
         if (limit < 0 || port < 1 || port > 65535 || pollMs < 0 || pollMs > 1000) { configError = 20; return; }
         if (!mqtt.setSubscriptionLimit((size_t)limit)) return;
         mqtt.setPollInterval((uint16_t)(pollMs == 0 ? FLPROG_MQTT_POLL_INTERVAL_MS : pollMs));
@@ -46,8 +48,8 @@ public:
         } else mqtt.clearCredentials();
         mqtt.setMessageCallback(receive);
         mqtt.setAutoReconnect(true);
-        bound = mqtt.begin(*network);
-        if (bound) mqtt.connect();
+        bound = external?mqtt.beginExternal(*external):mqtt.begin(*network);
+        if (bound) {mqtt.connect();if(external)mqtt.pool();}
     }
 
     // MQTT level matching, including empty levels and the $ topic boundary.
@@ -67,6 +69,7 @@ public:
         }
     }
 private:
+    FLProgMqttTransport*external=nullptr;
     uint8_t configError=0;
     bool bound=false, prevEn=false, prevCon=false, prevDis=false;
     static void receive(const char *t, const uint8_t *p, size_t n, bool r) {

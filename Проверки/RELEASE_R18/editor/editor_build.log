@@ -1,0 +1,67 @@
+629 INFO: PyInstaller: 6.10.0, contrib hooks: 2026.7
+630 INFO: Python: 3.8.10
+643 INFO: Platform: Windows-10-10.0.22631-SP0
+644 INFO: Python environment: C:\Users\user\AppData\Local\Programs\Python\Python38
+653 INFO: Module search paths (PYTHONPATH):
+['E:\\FLP\\Flprog_network',
+ 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python38\\python38.zip',
+ 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python38\\DLLs',
+ 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python38\\lib',
+ 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python38',
+ 'C:\\Users\\user\\AppData\\Roaming\\Python\\Python38\\site-packages',
+ 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python38\\lib\\site-packages',
+ 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python38\\lib\\site-packages\\win32',
+ 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python38\\lib\\site-packages\\win32\\lib',
+ 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python38\\lib\\site-packages\\Pythonwin',
+ 'E:\\FLP\\Flprog_network\\dist\\FLProg_WebUI_Editor_transfer_2026-11-14\\Source\\flprog_webui_next\\editor',
+ 'C:\\Users\\user\\AppData\\Local\\Temp\\flprog_editor_wn8jzbma\\tools']
+2595 INFO: Appending 'datas' from .spec
+2622 INFO: checking Analysis
+2622 INFO: Building Analysis because Analysis-00.toc is non existent
+2622 INFO: Running Analysis Analysis-00.toc
+2622 INFO: Target bytecode optimization level: 0
+2622 INFO: Initializing module dependency graph...
+2626 INFO: Caching module graph hooks...
+2686 INFO: Analyzing base_library.zip ...
+4277 INFO: Processing standard module hook 'hook-encodings.py' from 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python38\\lib\\site-packages\\PyInstaller\\hooks'
+5805 INFO: Processing standard module hook 'hook-pickle.py' from 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python38\\lib\\site-packages\\PyInstaller\\hooks'
+6460 INFO: Processing standard module hook 'hook-heapq.py' from 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python38\\lib\\site-packages\\PyInstaller\\hooks'
+6908 INFO: Caching module dependency graph...
+7102 INFO: Looking for Python shared library...
+7190 INFO: Using Python shared library: C:\Users\user\AppData\Local\Programs\Python\Python38\python38.dll
+7190 INFO: Analyzing E:\FLP\Flprog_network\dist\FLProg_WebUI_Editor_transfer_2026-11-14\Source\flprog_webui_next\editor\server.py
+7574 INFO: Processing standard module hook 'hook-xml.py' from 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python38\\lib\\site-packages\\PyInstaller\\hooks'
+7598 INFO: Processing standard module hook 'hook-xml.etree.cElementTree.py' from 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python38\\lib\\site-packages\\PyInstaller\\hooks'
+7743 INFO: Processing module hooks (post-graph stage)...
+7984 INFO: Performing binary vs. data reclassification (150 entries)
+9088 INFO: Looking for ctypes DLLs
+9090 INFO: Analyzing run-time hooks ...
+9092 INFO: Including run-time hook 'pyi_rth_inspect.py' from 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python38\\lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+9104 INFO: Looking for dynamic libraries
+9312 INFO: Extra DLL search directories (AddDllDirectory): []
+9313 INFO: Extra DLL search directories (PATH): []
+11822 INFO: Warnings written to C:\Users\user\AppData\Local\Temp\flprog_editor_wn8jzbma\build\FLProg_WebUI_Editor\warn-FLProg_WebUI_Editor.txt
+11853 INFO: Graph cross-reference written to C:\Users\user\AppData\Local\Temp\flprog_editor_wn8jzbma\build\FLProg_WebUI_Editor\xref-FLProg_WebUI_Editor.html
+11906 INFO: checking PYZ
+11906 INFO: Building PYZ because PYZ-00.toc is non existent
+11906 INFO: Building PYZ (ZlibArchive) C:\Users\user\AppData\Local\Temp\flprog_editor_wn8jzbma\build\FLProg_WebUI_Editor\PYZ-00.pyz
+12334 INFO: Building PYZ (ZlibArchive) C:\Users\user\AppData\Local\Temp\flprog_editor_wn8jzbma\build\FLProg_WebUI_Editor\PYZ-00.pyz completed successfully.
+12423 INFO: checking PKG
+12423 INFO: Building PKG because PKG-00.toc is non existent
+12423 INFO: Building PKG (CArchive) FLProg_WebUI_Editor.pkg
+12439 INFO: Building PKG (CArchive) FLProg_WebUI_Editor.pkg completed successfully.
+12441 INFO: Bootloader C:\Users\user\AppData\Local\Programs\Python\Python38\lib\site-packages\PyInstaller\bootloader\Windows-64bit-intel\runw.exe
+12441 INFO: checking EXE
+12441 INFO: Building EXE because EXE-00.toc is non existent
+12441 INFO: Building EXE from EXE-00.toc
+12442 INFO: Copying bootloader EXE to C:\Users\user\AppData\Local\Temp\flprog_editor_wn8jzbma\build\FLProg_WebUI_Editor\FLProg_WebUI_Editor.exe
+12452 INFO: Copying icon to EXE
+12461 INFO: Copying 0 resources to EXE
+12461 INFO: Embedding manifest in EXE
+12467 INFO: Appending PKG archive to EXE
+12470 INFO: Fixing EXE headers
+12602 INFO: Building EXE from EXE-00.toc completed successfully.
+12606 INFO: checking COLLECT
+12606 INFO: Building COLLECT because COLLECT-00.toc is non existent
+12607 INFO: Building COLLECT COLLECT-00.toc
+13104 INFO: Building COLLECT COLLECT-00.toc completed successfully.

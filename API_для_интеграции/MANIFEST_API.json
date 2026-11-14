@@ -1,15 +1,15 @@
 {
   "C++/FLProg_Network/src/flprogEthernet.h": {
     "source": "Библиотека/FLProg_Network/src/flprogEthernet.h",
-    "sha256": "f6397f382300afb63c436d12d8e5544bd020d0ed1cc45cf224a6fc7380845cf2"
+    "sha256": "858d16f20b67f7400097542677b84503a5a4890d39917f6f425fa13531aad933"
   },
   "C++/FLProg_Network/src/flprogMqttUserBlocks.h": {
     "source": "Библиотека/FLProg_Network/src/flprogMqttUserBlocks.h",
-    "sha256": "d816c8cf778cbc2e92a7f54b6a39da76321c40cbcc7f73b78f2bf2cc8d5c41be"
+    "sha256": "457f02263d858b080a40631711e521e8d33296dcb38491a158239e788402c279"
   },
   "C++/FLProg_Network/src/flprogNetwork.h": {
     "source": "Библиотека/FLProg_Network/src/flprogNetwork.h",
-    "sha256": "24d2be54b53d2b49f9c5c7161cbd9ee7e6bbd2ab6f9d9647b2c6e2bf0127746b"
+    "sha256": "612287ea85689934a58cbd21799171153965fc2d578dd7f417f2d0688c9f040d"
   },
   "C++/FLProg_Network/src/flprogNetworkOpticalStub.h": {
     "source": "Библиотека/FLProg_Network/src/flprogNetworkOpticalStub.h",
@@ -49,7 +49,7 @@
   },
   "C++/FLProg_Network/src/device/flprogNetworkDeviceRegistry.h": {
     "source": "Библиотека/FLProg_Network/src/device/flprogNetworkDeviceRegistry.h",
-    "sha256": "00c90d93e29a77ed1497449cb1da913f67b6f18e730e271b71494ad7ef9ce4c4"
+    "sha256": "06d28aa3eccc7eafef129b3f79fab1f95583abccf9e68cc72c9e0cb760cefdfe"
   },
   "C++/FLProg_Network/src/hardware/flprogRmiiEthernet.h": {
     "source": "Библиотека/FLProg_Network/src/hardware/flprogRmiiEthernet.h",
@@ -61,11 +61,11 @@
   },
   "C++/FLProg_Network/src/hardware/flprogSpiBackend.h": {
     "source": "Библиотека/FLProg_Network/src/hardware/flprogSpiBackend.h",
-    "sha256": "d4ec1c9d9adb88d2d09d16bfc6d78d53a759a5f76b190dcaf5824f77ed21bbc2"
+    "sha256": "7a75110840b4c225761f46a9bd5ce9b8a0fa66b3ff556be66ad45f0437e4174b"
   },
   "C++/FLProg_Network/src/hardware/flprogWiznetHardware.h": {
     "source": "Библиотека/FLProg_Network/src/hardware/flprogWiznetHardware.h",
-    "sha256": "93e5ea11cb18a19939633c79bc6b4ad09bd34d8d38491872c8518e8bec2ac659"
+    "sha256": "c0846a35458bcea195ac325506d03a88ed9861ae22317edae02542468c7ad02e"
   },
   "C++/FLProg_Network/src/protocol/flprogNetworkArpProbe.h": {
     "source": "Библиотека/FLProg_Network/src/protocol/flprogNetworkArpProbe.h",
@@ -113,7 +113,7 @@
   },
   "C++/FLProg_Network/src/service/flprogNetworkMqttClient.h": {
     "source": "Библиотека/FLProg_Network/src/service/flprogNetworkMqttClient.h",
-    "sha256": "7c00a77e3df6a20709a7a1f00c483b8ad903a29ba1309bb79b3c282b6863af1e"
+    "sha256": "6a79a3643ce971c672180dc7785cacbb21135f68c6b7ee4a8f137d37ac864585"
   },
   "C++/FLProg_Network/src/service/flprogNetworkNtp.h": {
     "source": "Библиотека/FLProg_Network/src/service/flprogNetworkNtp.h",
@@ -133,7 +133,7 @@
   },
   "C++/FLProg_Network/src/service/flprogNetworkOtaWiznet.h": {
     "source": "Библиотека/FLProg_Network/src/service/flprogNetworkOtaWiznet.h",
-    "sha256": "1b2d2132e1f629df52e832d7aee7f58f70644c6290228a58d0047087b280766f"
+    "sha256": "f2f519a30f781413b71ab06755ec0b453a796cf8b5942df7cdeffab77cdb9437"
   },
   "C++/FLProg_Network/src/service/flprogNetworkService.h": {
     "source": "Библиотека/FLProg_Network/src/service/flprogNetworkService.h",
@@ -177,7 +177,7 @@
   },
   "C++/FLProg_WebUI/src/FLProgWebUi.h": {
     "source": "Библиотека/FLProg_WebUI/src/FLProgWebUi.h",
-    "sha256": "86070d132d5d7163879ac189be535ffcb95d8a4135913cfdb40440da9194d487"
+    "sha256": "331892f766620b351187fded5481823e9357c46c56e69c89fdf613e8fc392b62"
   },
   "C++/FLProg_WebUI/src/FLProgWebUiHttpProtocol.h": {
     "source": "Библиотека/FLProg_WebUI/src/FLProgWebUiHttpProtocol.h",
@@ -193,7 +193,7 @@
   },
   "C++/FLProg_WebUI/src/adapters/FLProgWebUiAssetVersion.h": {
     "source": "Библиотека/FLProg_WebUI/src/adapters/FLProgWebUiAssetVersion.h",
-    "sha256": "be79dc0cc05090e613c2633f6618bf0ffb37c537993eebb39d2ca865901f0ee8"
+    "sha256": "3d1435c58dafdbeeccfe98c65149a576b38d5503bce52fc1d7d7844b83ba6507"
   },
   "C++/FLProg_WebUI/src/adapters/FLProgWebUiEsp8266Http.h": {
     "source": "Библиотека/FLProg_WebUI/src/adapters/FLProgWebUiEsp8266Http.h",
@@ -205,7 +205,7 @@
   },
   "C++/FLProg_WebUI/src/adapters/FLProgWebUiFlprogNetworkPagedHttp.h": {
     "source": "Библиотека/FLProg_WebUI/src/adapters/FLProgWebUiFlprogNetworkPagedHttp.h",
-    "sha256": "6d41882e1e3c10b60a2b722b90baebc32939f85b899afd3f1b4837f5a627b235"
+    "sha256": "b188d24544869ea5c08fd802aec46d8999c4ce4113c4e1c1f68f846b12ca698b"
   },
   "C++/FLProg_WebUI/src/adapters/FLProgWebUiGzipHttp.h": {
     "source": "Библиотека/FLProg_WebUI/src/adapters/FLProgWebUiGzipHttp.h",
@@ -478,5 +478,9 @@
   "Network/user_blocks/NTP_TimeZones_v0_1/Professional/FLProg_NTP_LocalTime_Professional.ubi": {
     "source": "Библиотека/FLProg_Network/user_blocks/NTP_TimeZones_v0_1/Professional/FLProg_NTP_LocalTime_Professional.ubi",
     "sha256": "3e9bca9851c446c04ec266d49bf29504547b6d7d8e7d2822c6bf0cc20e6e634a"
+  },
+  "C++/FLProg_Network/src/flprogRtHwEthernet.h": {
+    "source": "Библиотека/FLProg_Network/src/flprogRtHwEthernet.h",
+    "sha256": "beae17a881ce53881d4e9acdc3a752bc741a316c24206d756d97fb3aa1490c52"
   }
 }

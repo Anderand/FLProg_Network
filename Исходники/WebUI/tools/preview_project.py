@@ -3,7 +3,7 @@ import ast
 import copy
 import json
 import re
-from check_http_assets import embedded_assets
+from check_http_assets import embedded_assets,page_styles
 from project_validation import validate_project
 
 
@@ -21,7 +21,7 @@ def preview_html(document, root):
     boot += (public/'preview-simulator.js').read_text(encoding='utf-8')
     html = '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
     html += '<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'unsafe-inline\'; style-src \'unsafe-inline\'; img-src data:; connect-src \'none\'; form-action \'none\'">'
-    html += '<style>'+assets['/flprog-webui/app.css']['body']+'</style>'
+    html += '<style>'+page_styles(assets)+'</style>'
     html += '<main><nav id="n"></nav><div id="s">Загрузка предпросмотра…</div></main><div id="m" hidden></div>'
     html += script(boot)
     for path in order:

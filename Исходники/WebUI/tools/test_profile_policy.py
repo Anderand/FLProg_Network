@@ -39,6 +39,13 @@ class ProfilePolicyTest(unittest.TestCase):
         self.assertFalse(policy.is_visible(profile))
         self.assertTrue(policy.is_visible(profile,True))
 
+    def test_hardware_scope_requires_pinned_artifacts(self):
+        pin=copy.deepcopy(self.pin);pin['hardware_scope']='DHCP и UART6; DO/AO не проверялись'
+        with patch.dict(policy.BUNDLED_PROFILES,{'transfer_profile':pin}):
+            self.assertIn('DHCP и UART6',policy.profile_status(self.profile))
+            changed=copy.deepcopy(self.profile);changed['artifacts']['application']['sha256']='0'*64
+            self.assertNotIn('Проверено:',policy.profile_status(changed))
+
     def test_old_verified_profile_and_obsolete_filter_preserved(self):
         profile=dict(id=policy.VERIFIED_ID,firmware_version='1.0.1',artifacts={
             key:dict(sha256=value) for key,value in policy.VERIFIED_HASHES.items()})

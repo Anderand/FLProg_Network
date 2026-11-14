@@ -30,6 +30,16 @@
 #endif
 
 class FLProgNetworkInterface;
+class FLProgOnBoardWifiInterface;
+class FLProgWiznetInterface;
+
+// Describes the C++ wrapper type, NOT networkMode() or active interface.
+enum FLProgNetworkDeviceKind : uint8_t
+{
+    FLPROG_NETWORK_DEVICE_KIND_BASE = 0,
+    FLPROG_NETWORK_DEVICE_KIND_WIFI = 1,
+    FLPROG_NETWORK_DEVICE_KIND_WIZNET = 2
+};
 
 typedef uint8_t FLProgNetworkDeviceId;
 
@@ -48,7 +58,8 @@ enum FLProgNetworkDeviceRegistryResult : uint8_t
     FLPROG_NETWORK_DEVICE_ALREADY_BOUND = 13,
     FLPROG_NETWORK_DEVICE_REGISTRY_FULL = 14,
     FLPROG_NETWORK_DEVICE_NOT_FOUND = 15,
-    FLPROG_NETWORK_DEVICE_OWNER_MISMATCH = 16
+    FLPROG_NETWORK_DEVICE_OWNER_MISMATCH = 16,
+    FLPROG_NETWORK_DEVICE_TYPE_MISMATCH = 17
 };
 
 struct FLProgNetworkDeviceEntry
@@ -91,7 +102,22 @@ public:
     FLProgNetworkInterface *getDevice(FLProgNetworkDeviceId id);
     const FLProgNetworkInterface *getDevice(FLProgNetworkDeviceId id) const;
 
+    // Return nullptr when absent or registered under another concrete class.
+    // On mismatch lastResult() becomes TYPE_MISMATCH (17), not NOT_FOUND (15).
+    // Definitions are in flprogNetwork.h after both derived classes exist.
+    FLProgWiznetInterface *getWiznet(FLProgNetworkDeviceId id);
+    const FLProgWiznetInterface *getWiznet(FLProgNetworkDeviceId id) const;
+    FLProgOnBoardWifiInterface *getWifi(FLProgNetworkDeviceId id);
+    const FLProgOnBoardWifiInterface *getWifi(FLProgNetworkDeviceId id) const;
+
     bool exists(FLProgNetworkDeviceId id) const;
+
+    // Typed presence checks without RTTI or casting. Check the actual C++
+    // wrapper identity, not the mutable networkMode() or current transport.
+    // Like exists(), these read-only predicates do NOT change lastResult().
+    // Invalid (255), absent, null, BASE and wrong-kind entries return false.
+    bool existsWiznet(FLProgNetworkDeviceId id) const;
+    bool existsWifi(FLProgNetworkDeviceId id) const;
 
     FLProgNetworkDeviceId idFor(const FLProgNetworkInterface *device) const;
 

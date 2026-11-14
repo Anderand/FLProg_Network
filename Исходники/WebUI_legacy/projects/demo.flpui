@@ -1,0 +1,34 @@
+{
+  "schema": "flprog.webui/0.1",
+  "project": {
+    "title": "Мой контроллер",
+    "fileName": "my_controller",
+    "deviceProfile": "esp32"
+  },
+  "pages": [
+    {
+      "id": "main",
+      "title": "Главная",
+      "widgets": [
+        {
+          "id": "temperature",
+          "type": "indicator",
+          "label": "Температура",
+          "binding": {
+            "read": "sensors.temperature",
+            "write": ""
+          }
+        },
+        {
+          "id": "light",
+          "type": "switch",
+          "label": "Свет",
+          "binding": {
+            "read": "relay.light",
+            "write": "relay.light"
+          }
+        }
+      ]
+    }
+  ]
+}

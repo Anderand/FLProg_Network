@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FLProg Web UI Designer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header><div><strong>FLProg Web UI Designer</strong><span>прототип 0.1</span></div><div class="actions"><button id="newProject">Новый</button><button id="exportFvl">Экспорт переменных .fvl</button><button id="exportUbi">Экспорт блока .ubi</button><button id="exportProject">Экспорт .h</button><button id="installProject">Установить в библиотеку</button><button id="saveProject" class="accent">Сохранить</button></div></header>
+  <main>
+    <aside class="panel"><h2>Проект</h2><label>Название<input id="projectTitle"></label><label>Файл<input id="fileName" spellcheck="false"></label><label>Профиль<select id="deviceProfile"><option value="esp32">ESP32</option><option value="esp8266">ESP8266</option><option value="rp2040">RP2040</option><option value="avr">AVR</option></select></label><hr><h2>Переменные FLProg</h2><label>Импорт .fvl<input id="fvlFile" type="file" accept=".fvl,text/xml"></label><div id="variableList" class="list hint">Файл .fvl ещё не выбран.</div><hr><h2>Страницы</h2><div id="pageList" class="list"></div><button id="addPage">+ Страница</button><hr><h2>Виджеты</h2><div class="toolbox"><button data-type="indicator">Индикатор</button><button data-type="switch">Переключатель</button><button data-type="slider">Ползунок</button><button data-type="text">Текст</button></div></aside>
+    <section class="canvas"><div id="pageTitle" class="page-title"></div><div id="widgets" class="widgets"></div></section>
+    <aside class="panel inspector"><h2>Свойства</h2><div id="emptySelection">Выберите виджет или добавьте новый.</div><div id="properties" hidden><label>ID<input id="widgetId" spellcheck="false"></label><label>Подпись<input id="widgetLabel"></label><label>Переменная из .fvl<select id="variablePicker"></select></label><button id="bindVariable">Привязать виджет</button><label>Чтение из переменной FLProg<input id="bindingRead" spellcheck="false" placeholder="например sensors.temperature"></label><label>Запись в переменную FLProg<input id="bindingWrite" spellcheck="false" placeholder="например relay.light"></label><button id="deleteWidget" class="danger">Удалить виджет</button></div><hr><h2>Контракт</h2><p class="hint">Имя из .fvl становится каналом. Для switch и slider оно назначается в чтение и запись.</p><pre id="jsonPreview"></pre></aside>
+  </main>
+  <footer id="status">Загрузка проекта…</footer><div id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

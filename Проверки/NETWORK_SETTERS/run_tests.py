@@ -52,6 +52,7 @@ hw_methods = [('#if FLPROG_NETWORK_COMPILE_WIRED\n' + item + '\n#endif')
               if 'FLProgWiznetHardware::setSpiSpeedRuntime(' in item else item
               for item in hw_methods]
 net_methods = [method(network, sig) for sig in [
+    'uint8_t FLProgNetworkInterface::setWiznetPoolFactory(',
     'uint8_t FLProgNetworkInterface::setPinRST(', 'uint8_t FLProgNetworkInterface::setSpeedSPI(',
     'uint8_t FLProgNetworkInterface::prepareWiznetPool()']]
 writer = method(network, 'static uint8_t flprogLegacyArduinoResetWrite(')
@@ -71,19 +72,20 @@ uint32_t millis() { return clockMs; }
 uint32_t micros() { return clockUs; }
 void digitalWrite(uint8_t pin, uint8_t level) { writes.emplace_back(pin, level); }
 void pinMode(uint8_t, uint8_t) { ++pinModes; }
-struct TestRtDevice { uint8_t bus=0; int cs=-1; uint32_t speed=0; };
+struct TestRtDevice {
+    uint8_t bus=0,cs=255,custom=0,status=0,err=0,codeErr=0;
+    uint32_t speed=0; bool sessionOpen=false;
+};
 struct TestRtHw {
-    void *spiGetLink(uint8_t bus) { return bus==1 ? this : nullptr; }
-    uint8_t getBusETH0() { return 1; }
-    int getCsETH0() { return 10; }
-    void spiInitDevice(TestRtDevice &) { ++spiCalls; }
-    void spiSetBusy(uint8_t) { ++spiCalls; }
-    void spiClearBusy(uint8_t) { ++spiCalls; }
-    void spiBeginTransaction(TestRtDevice &) { ++spiCalls; }
-    void spiEndTransaction(TestRtDevice &) { ++spiCalls; }
-    void spiBeginCS(TestRtDevice &) { ++spiCalls; }
-    void spiEndCS(TestRtDevice &) { ++spiCalls; }
-    uint8_t spiTransfer(uint8_t value, uint8_t) { ++spiCalls; return value; }
+    uint8_t getETH_bus(uint8_t) { return 1; }
+    int getETH_cs(uint8_t) { return 10; }
+    bool checkPinDOT(uint8_t pin) { return pin<40; }
+    bool spiCheckBus(uint8_t bus) { return bus<4; }
+    bool spiGetBusy(uint8_t) { return false; }
+    void spiInitDevice(TestRtDevice &d) { ++spiCalls; d.status=1; }
+    uint8_t spiBeginSession(TestRtDevice &d) { ++spiCalls; d.sessionOpen=true; return 1; }
+    void spiEndSession(TestRtDevice &d) { ++spiCalls; d.sessionOpen=false; }
+    uint8_t spiLL_Transfer(TestRtDevice &, uint8_t value) { ++spiCalls; return value; }
 };
 FLProgArduinoSpiBackend::FLProgArduinoSpiBackend() {}
 bool FLProgArduinoSpiBackend::begin() { ++spiCalls; return true; }
@@ -105,8 +107,24 @@ public:
     uint8_t setPinRST(uint8_t pin=255), setSpeedSPI(uint32_t hz), prepareWiznetPool();
     uint8_t _poolPreparation=0, _poolEntered=0, _poolPinRST=255, _poolPinRSTRequested=0;
     uint32_t _poolSpeedSPI=0;
-    uint8_t _poolSpeedSPIRequested=0;
+    uint8_t _poolSpeedSPIRequested=0, _wiznetBackendExplicit=0;
+    static FLProgSpiBackend *(*_wiznetPoolFactory)();
+    static FLProgEthernetResetWriter _wiznetPoolResetWriter;
+    static uint8_t setWiznetPoolFactory(FLProgSpiBackend *(*)(), FLProgEthernetResetWriter);
+    void setWiznetSpiBackend(FLProgSpiBackend *backend) {
+        _wiznetBackendExplicit=1; hw._spiBackend=backend; hw.syncSpiBackendConfiguration();
+    }
 };
+FLProgSpiBackend *(*FLProgNetworkInterface::_wiznetPoolFactory)()=nullptr;
+FLProgEthernetResetWriter FLProgNetworkInterface::_wiznetPoolResetWriter=nullptr;
+static TestRtHw factoryBase;
+static FLProgRtHwSpiBackend<TestRtHw, TestRtDevice> factoryBackend(factoryBase);
+static int factoryCalls=0, rtWrites=0;
+static FLProgSpiBackend *testFactory() { ++factoryCalls; return &factoryBackend; }
+static FLProgSpiBackend *failedFactory() { return nullptr; }
+static uint8_t testRtWriter(uint8_t pin,uint8_t level) {
+    if(pin>=40) return 0; ++rtWrites; digitalWrite(pin,level); return 1;
+}
 '''
 tests = r'''
 int main() {
@@ -187,6 +205,34 @@ int main() {
     assert(badpin.prepareWiznetPool());
     assert(badpin.hw.serviceStartup()==FLPROG_WIZNET_HW_ERROR && writes.size()==2);
     puts("PASS: managed reset once, 2 ms pulse + 500 ms recovery, micros/millis wrap, CS collision and invalid-pin refusal");
+    writes.clear(); clockMs=0; clockUs=0;
+    assert(!FLProgNetworkInterface::setWiznetPoolFactory(nullptr,testRtWriter));
+    assert(FLProgNetworkInterface::setWiznetPoolFactory(testFactory,testRtWriter));
+    assert(FLProgNetworkInterface::setWiznetPoolFactory(testFactory,testRtWriter));
+    assert(!FLProgNetworkInterface::setWiznetPoolFactory(failedFactory,testRtWriter));
+    FLProgNetworkInterface automatic;
+    assert(automatic.setPinRST(6) && automatic.setSpeedSPI(20000000UL));
+    assert(factoryCalls==0 && rtWrites==0 && writes.empty() && spiCalls==0);
+    automatic._poolEntered=1;
+    assert(automatic.prepareWiznetPool() && factoryCalls==1);
+    assert(automatic.hw.spiBackendKind()==FLPROG_SPI_BACKEND_RT_HW);
+    assert(automatic.prepareWiznetPool() && factoryCalls==1);
+    assert(automatic.hw.serviceStartup()==FLPROG_WIZNET_HW_WAIT && rtWrites==1);
+    clockUs=2000; assert(automatic.hw.serviceStartup()==FLPROG_WIZNET_HW_WAIT && rtWrites==2);
+    clockMs=500; assert(automatic.hw.serviceStartup()==FLPROG_WIZNET_HW_READY);
+    assert(writes.size()==2 && spiCalls==0);
+    FLProgNetworkInterface explicitArduino;
+    explicitArduino._wiznetBackendExplicit=1;
+    assert(explicitArduino.setPinRST(8)); explicitArduino._poolEntered=1;
+    assert(explicitArduino.prepareWiznetPool() && factoryCalls==1);
+    assert(explicitArduino.hw.spiBackendKind()==FLPROG_SPI_BACKEND_ARDUINO);
+    assert(explicitArduino.hw.serviceStartup()==FLPROG_WIZNET_HW_WAIT && rtWrites==2);
+    FLProgNetworkInterface::_wiznetPoolFactory=failedFactory;
+    FLProgNetworkInterface exhausted; exhausted._poolEntered=1;
+    assert(!exhausted.prepareWiznetPool() && exhausted._poolPreparation==2);
+    FLProgNetworkInterface::_wiznetPoolFactory=nullptr;
+    FLProgNetworkInterface::_wiznetPoolResetWriter=nullptr;
+    puts("PASS: deferred RT_HW factory, managed RT_HW reset, explicit Arduino selection, factory failure");
 #else
     FLProgNetworkInterface wifiOnly;
     assert(!wifiOnly.setPinRST(255) && !wifiOnly.setSpeedSPI(20000000UL));

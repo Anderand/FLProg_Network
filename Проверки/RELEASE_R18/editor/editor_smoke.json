@@ -1,0 +1,9 @@
+{
+  "exe_start": "PASS",
+  "root_html": "PASS",
+  "network_catalog": "PASS",
+  "demo": "PASS",
+  "preview": "PASS",
+  "validate": "PASS",
+  "hardware_access": false
+}

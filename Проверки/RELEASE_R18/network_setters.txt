@@ -1,0 +1,16 @@
+PASS: exact pr1 calls, deferred application, pin 255 without GPIO; runtime SPI without reset and busy rejection
+PASS: invalid frequency and WiFi/RMII transport isolation
+PASS: real RT_HW backend configuration remains passive; pin 255 accepted, implicit GPIO writer rejected
+PASS: managed reset once, 2 ms pulse + 500 ms recovery, micros/millis wrap, CS collision and invalid-pin refusal
+PASS: deferred RT_HW factory, managed RT_HW reset, explicit Arduino selection, factory failure
+ALL HOST SETTER CHECKS PASSED
+
+PASS: WiFi-only API compiles and rejects Ethernet settings without hardware access
+ALL HOST SETTER CHECKS PASSED
+
+PASS: exact pr1 calls, deferred application, pin 255 without GPIO; runtime SPI without reset and busy rejection
+PASS: invalid frequency and WiFi/RMII transport isolation
+PASS: real RT_HW backend configuration remains passive; pin 255 accepted, implicit GPIO writer rejected
+PASS: managed reset once, 2 ms pulse + 500 ms recovery, micros/millis wrap, CS collision and invalid-pin refusal
+PASS: deferred RT_HW factory, managed RT_HW reset, explicit Arduino selection, factory failure
+ALL HOST SETTER CHECKS PASSED

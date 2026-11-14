@@ -1,0 +1,37 @@
+const model = {schema:"flprog.webui/0.1",project:{title:"Мой контроллер",fileName:"webui_project",deviceProfile:"esp32"},variables:[],pages:[{id:"main",title:"Главная",widgets:[]}]};
+let activePage = 0, selected = null;
+const $ = id => document.getElementById(id);
+const typeNames={indicator:"Индикатор",switch:"Переключатель",slider:"Ползунок",text:"Текст"};
+
+function widget(){ return selected===null ? null : model.pages[activePage].widgets[selected]; }
+function safeId(value){return value.toLowerCase().trim().replace(/[^a-z0-9_]+/g,"_").replace(/^_+|_+$/g,"")||"widget";}
+function render(){
+  $("projectTitle").value=model.project.title; $("fileName").value=model.project.fileName; $("deviceProfile").value=model.project.deviceProfile;
+  $("pageList").innerHTML=model.pages.map((p,i)=>`<button class="page ${i===activePage?"active":""}" data-page="${i}">${p.title||"Без названия"}</button>`).join("");
+  document.querySelectorAll("[data-page]").forEach(x=>x.onclick=()=>{activePage=+x.dataset.page;selected=null;render();});
+  const vars=model.variables||[]; $("variableList").innerHTML=vars.length?vars.map(v=>`<div class="variable">${escapeHtml(v.name)} <small>${escapeHtml(v.type)}</small></div>`).join(""):"Файл .fvl ещё не выбран.";
+  const page=model.pages[activePage]; $("pageTitle").textContent=page.title;
+  $("widgets").innerHTML=page.widgets.map((w,i)=>`<article class="widget ${i===selected?"selected":""}" data-widget="${i}"><div class="type">${typeNames[w.type]}</div><div class="name">${escapeHtml(w.label)}</div><div class="bind">↔ ${escapeHtml(w.binding.read||w.binding.write||"не привязан")}</div></article>`).join("") || '<div class="hint">Добавьте виджет слева — так будет собрана первая страница интерфейса.</div>';
+  document.querySelectorAll("[data-widget]").forEach(x=>x.onclick=()=>{selected=+x.dataset.widget;render();});
+  const w=widget(); $("properties").hidden=!w; $("emptySelection").hidden=!!w;
+  if(w){$("widgetId").value=w.id;$("widgetLabel").value=w.label;$("bindingRead").value=w.binding.read;$("bindingWrite").value=w.binding.write;$("variablePicker").innerHTML='<option value="">— выбрать переменную —</option>'+vars.map(v=>`<option value="${escapeHtml(v.name)}">${escapeHtml(v.name)} (${escapeHtml(v.type)})</option>`).join("");}
+  $("jsonPreview").textContent=JSON.stringify(model,null,2);
+}
+function escapeHtml(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML;}
+function changeProject(){model.project.title=$("projectTitle").value;model.project.fileName=$("fileName").value;model.project.deviceProfile=$("deviceProfile").value;render();}
+$("projectTitle").oninput=changeProject;$("fileName").oninput=changeProject;$("deviceProfile").onchange=changeProject;
+$("addPage").onclick=()=>{const n=model.pages.length+1;model.pages.push({id:"page_"+n,title:"Страница "+n,widgets:[]});activePage=n-1;selected=null;render();};
+document.querySelectorAll("[data-type]").forEach(b=>b.onclick=()=>{const type=b.dataset.type;const list=model.pages[activePage].widgets;const id=safeId(type+"_"+(list.length+1));list.push({id,type,label:typeNames[type],binding:{read:"",write:""}});selected=list.length-1;render();});
+[["widgetId","id"],["widgetLabel","label"],["bindingRead","read"],["bindingWrite","write"]].forEach(([field,key])=>$(field).oninput=()=>{const w=widget();if(!w)return;if(key==="read"||key==="write")w.binding[key]=$(field).value;else w[key]=$(field).value;render();});
+$("deleteWidget").onclick=()=>{if(selected===null)return;model.pages[activePage].widgets.splice(selected,1);selected=null;render();};
+$("bindVariable").onclick=()=>{const w=widget(),name=$("variablePicker").value;if(!w||!name)return;w.binding.read=name;if(w.type==="switch"||w.type==="slider")w.binding.write=name;render();};
+$("fvlFile").onchange=async event=>{const file=event.target.files[0];if(!file)return;try{const buffer=await file.arrayBuffer();const text=new TextDecoder("utf-16").decode(buffer);const xml=new DOMParser().parseFromString(text,"text/xml");if(xml.querySelector("parsererror"))throw new Error("неверный XML");const found=[];for(const node of xml.getElementsByTagName("sixx.object")){if(node.getAttribute("sixx.type")!=="FBDVariableTag")continue;let name="",type="";for(const item of node.children){if(item.getAttribute("sixx.name")==="name")name=item.textContent.trim();if(item.getAttribute("sixx.name")==="type")type=item.getAttribute("sixx.type")||"";}if(name)found.push({name,type:type.replace("DataType class","").replace("DataType","").trim()||"value"});}if(!found.length)throw new Error("переменные не найдены");model.variables=found;status("Импортировано переменных FLProg: "+found.length);render();}catch(error){status("Ошибка импорта .fvl: "+error.message);}};
+$("newProject").onclick=()=>{if(!confirm("Создать новый проект? Несохранённые изменения останутся только в браузере."))return;model.project={title:"Новый контроллер",fileName:"webui_project",deviceProfile:"esp32"};model.variables=[];model.pages=[{id:"main",title:"Главная",widgets:[]}];activePage=0;selected=null;render();status("Создан новый проект");};
+$("saveProject").onclick=async()=>{try{const result=await fetch("/api/project",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(model)});const data=await result.json();if(!result.ok)throw new Error(data.error);status("Сохранено: projects/"+data.file);}catch(error){status("Ошибка сохранения: "+error.message);}};
+$("exportProject").onclick=async()=>{try{const result=await fetch("/api/export",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(model)});const data=await result.json();if(!result.ok)throw new Error(data.error);status("Экспортировано: exports/"+data.file+" (виджетов: "+data.widgets+")");}catch(error){status("Ошибка экспорта: "+error.message);}};
+$('exportFvl').onclick=async()=>{try{const result=await fetch('/api/export-fvl',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(model)});const data=await result.json();if(!result.ok)throw new Error(data.error);status('Экспорт переменных: '+data.file+' (переменных: '+data.variables+'). Скачивание началось.');window.location.assign(data.download);}catch(error){status('Ошибка экспорта .fvl: '+error.message);}};
+$("exportUbi").onclick=async()=>{try{const result=await fetch('/api/export-ubi',{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(model)});const data=await result.json();if(!result.ok)throw new Error(data.error);status("Экспорт блока: "+data.file+" (каналов: "+data.channels+"). Скачивание началось.");window.location.assign(data.download);}catch(error){status("Ошибка экспорта .ubi: "+error.message);}};
+$("installProject").onclick=async()=>{try{const result=await fetch("/api/install",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(model)});const data=await result.json();if(!result.ok)throw new Error(data.error);status("Установлено в FLProg_Network (виджетов: "+data.widgets+")");}catch(error){status("Ошибка установки: "+error.message);}};
+let statusTimer=0;function status(text){$('status').textContent=text;const toast=$('toast');toast.textContent=text;toast.classList.add('show');clearTimeout(statusTimer);statusTimer=setTimeout(()=>toast.classList.remove('show'),4500);}
+async function load(){try{const r=await fetch("/api/project?name=my_controller.flpui");Object.assign(model,await r.json());status("Открыт проект: my_controller.flpui");}catch(e){status("Новый проект: серверный пример недоступен");}render();}
+load();

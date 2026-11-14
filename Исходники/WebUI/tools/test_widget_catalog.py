@@ -25,7 +25,7 @@ class WidgetCatalogTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             path=Path(d)/'demo.flpui';path.write_text(json.dumps(self.doc),encoding='utf-8')
             package=build(path,Path(d)/'libraries')
-            header=next((package/'src').glob('*_descriptor.h')).read_text(encoding='utf-8')
+            header=next((package/'src').glob('*_widget_catalog.h')).read_text(encoding='utf-8')
             arrays=re.findall(r'static const unsigned char data\[\] PROGMEM = \{([^}]+)\}',header)
             texts=re.findall(r'static const char data\[\] PROGMEM = (".*");',header)
             self.assertEqual(len(arrays),len(self.doc['pages']));self.assertEqual(len(texts),len(arrays))

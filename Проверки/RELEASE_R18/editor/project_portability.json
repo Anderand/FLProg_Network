@@ -1,0 +1,7 @@
+{
+  "normalized_projects": [
+    "Editor/FLProg_WebUI_Editor/projects/new_project.flpui",
+    "Editor/FLProg_WebUI_Editor/_internal/projects/new_project.flpui",
+    "Source/flprog_webui_next/projects/new_project.flpui"
+  ]
+}

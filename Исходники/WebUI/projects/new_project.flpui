@@ -14,7 +14,7 @@
     "text": "#e5e7eb",
     "accent": "#6366f1"
   },
-  "packageOutput": "E:\\FLP\\Flprog_network\\flprog_webui_next\\project_packages",
+  "packageOutput": "",
   "channels": [
     {
       "id": "network_ip",

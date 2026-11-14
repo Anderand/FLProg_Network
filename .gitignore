@@ -13,3 +13,8 @@ __pycache__/
 settings.json
 build_env*/
 _build*/
+
+# Generated ZIP integrity index; release archives contain the verified manifest.
+/Библиотека/FLProg_Network/MANIFEST_SHA256.json
+/Исходники/WebUI/editor/server-*.out
+/Исходники/WebUI/editor/server-*.err

@@ -145,6 +145,8 @@ public:
     float floatAt(uint8_t index) const { return index < _count ? _slots[index].value.floatValue : 0.0f; }
     const char *textAt(uint8_t index) const { return index < _count ? _slots[index].value.text : ""; }
     uint16_t revision() const { return _revision; }
+    // Shared by optional transports: do not overwrite an unconsumed command.
+    bool commandPending(uint8_t index) const { return index < _count && _slots[index].pending; }
     bool changedSince(uint8_t index, uint16_t revision) const { return index < _count && _slots[index].revision != 0 && _slots[index].revision > revision; }
 
 private:

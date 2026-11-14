@@ -7,6 +7,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def page_styles(assets):
+    """Preserve the native root-inline -> app.css cascade for local exports."""
+    inline=re.findall(r'<style>(.*?)</style>',assets['/']['body'],re.S)
+    return '\n'.join(inline+[assets['/flprog-webui/app.css']['body']])
+
+
 def embedded_assets(adapter):
     text = Path(adapter).read_text(encoding="utf-8")
     handlers = dict((callback, path) for path, callback in re.findall(
