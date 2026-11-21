@@ -29,6 +29,8 @@
 #include "flprogStm32TcpBackend.h"
 #if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
 #include <ESP8266WiFi.h>
+#elif FLPROG_NETWORK_HAS_RP_WIFI_TCP
+#include <WiFi.h>
 #endif
 
 class FLProgNetworkInterface;
@@ -122,9 +124,9 @@ public:
         uint16_t localPort,
         IPAddress remoteIp,
         uint16_t remotePort);
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
-    // ESP8266 core 3.x has LWIP_SOCKET=0. Accepted clients are transferred
-    // through the native WiFiClient wrapper instead of a POSIX descriptor.
+#if FLPROG_NETWORK_HAS_NATIVE_WIFI_TCP
+    // ESP8266 and Arduino-Pico accepted clients are transferred through the
+    // native WiFiClient wrapper instead of a POSIX descriptor.
     bool adoptAcceptedClient(
         const WiFiClient &client,
         uint16_t localPort,
@@ -176,8 +178,8 @@ private:
     FLProgSocketEndpoint _endpoint;
 
     int _socketFd = -1;
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
-    WiFiClient _esp8266Client;
+#if FLPROG_NETWORK_HAS_NATIVE_WIFI_TCP
+    WiFiClient _nativeWifiClient;
 #endif
     bool _connecting = false;
     bool _connected = false;

@@ -26,6 +26,10 @@
 #include "../socket/flprogSocketBackends.h"
 #include "flprogNetworkTcpClient.h"
 
+#if FLPROG_NETWORK_HAS_RP_WIFI_TCP
+#include <WiFi.h>
+#endif
+
 class FLProgNetworkInterface;
 
 // -----------------------------------------------------------------------------
@@ -42,8 +46,8 @@ class FLProgNetworkInterface;
 // ESP32 POSIX/lwIP:
 //   one non-blocking listener accepts fds; each accepted fd is adopted by the
 //   same stream backend used by FLProgNetworkTcpClient.
-// ESP8266 core 3.x:
-//   LWIP_SOCKET is disabled; WiFiServer/WiFiClient wrap the raw-lwIP path.
+// ESP8266 core 3.x and Arduino-Pico RP Wi-Fi:
+//   the native WiFiServer/WiFiClient wrappers own the raw-lwIP path.
 // -----------------------------------------------------------------------------
 
 #ifndef FLPROG_TCP_SERVER_MAX_CLIENTS
@@ -142,8 +146,8 @@ private:
         uint32_t keepAliveIdleSeconds,
         uint32_t keepAliveIntervalSeconds,
         uint8_t keepAliveProbeCount);
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
-    bool adoptEsp8266(
+#if (defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI) || FLPROG_NETWORK_HAS_RP_WIFI_TCP
+    bool adoptWifiClient(
         FLProgNetworkInterface &network,
         uint8_t transportId,
         const WiFiClient &client,
@@ -222,7 +226,7 @@ public:
         int &socketFd,
         IPAddress &remoteIp,
         uint16_t &remotePort);
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
+#if (defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI) || FLPROG_NETWORK_HAS_RP_WIFI_TCP
     int acceptOne(
         WiFiClient &client,
         IPAddress &remoteIp,
@@ -231,9 +235,9 @@ public:
 
 private:
     int _socketFd = -1;
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
-    alignas(WiFiServer) uint8_t _esp8266ServerStorage[sizeof(WiFiServer)];
-    WiFiServer *_esp8266Server = nullptr;
+#if (defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI) || FLPROG_NETWORK_HAS_RP_WIFI_TCP
+    alignas(WiFiServer) uint8_t _nativeWifiServerStorage[sizeof(WiFiServer)];
+    WiFiServer *_nativeWifiServer = nullptr;
 #endif
     uint8_t _transportId = FLPROG_TRANSPORT_NONE;
     uint16_t _localPort = 0;

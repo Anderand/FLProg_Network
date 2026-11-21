@@ -49,9 +49,16 @@ bool FLProgPosixTcpClientBackend::ipIsZero(IPAddress ip)
 void FLProgPosixTcpClientBackend::resetSocket()
 {
 #if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
-    if (_esp8266Client || _connected)
+    if (_nativeWifiClient || _connected)
     {
-        (void)_esp8266Client.stop(1);
+        (void)_nativeWifiClient.stop(1);
+    }
+#elif FLPROG_NETWORK_HAS_RP_WIFI_TCP
+    if (_nativeWifiClient || _connected)
+    {
+        // Arduino-Pico stop(0) selects its default flush wait. Use a tiny
+        // explicit bound while closing a socket from the cooperative backend.
+        (void)_nativeWifiClient.stop(1);
     }
 #elif FLPROG_NETWORK_HAS_POSIX_TCP
     if (_socketFd >= 0)
@@ -73,14 +80,14 @@ void FLProgPosixTcpClientBackend::applySocketOptions()
     _lastOptionError = 0;
     _keepAliveApplied = false;
 
-    if (!_connected && !_esp8266Client)
+    if (!_connected && !_nativeWifiClient)
     {
         return;
     }
 
-    _esp8266Client.setNoDelay(_noDelay);
+    _nativeWifiClient.setNoDelay(_noDelay);
 
-    _esp8266Client.setSync(false);
+    _nativeWifiClient.setSync(false);
 
     if (_keepAliveEnabled)
     {
@@ -89,13 +96,22 @@ void FLProgPosixTcpClientBackend::applySocketOptions()
         const uint16_t interval = (uint16_t)(_keepAliveIntervalSeconds == 0 ? 1 :
             (_keepAliveIntervalSeconds > 65535UL ? 65535UL : _keepAliveIntervalSeconds));
         const uint8_t count = _keepAliveProbeCount == 0 ? 1 : _keepAliveProbeCount;
-        _esp8266Client.keepAlive(idle, interval, count);
-        _keepAliveApplied = _esp8266Client.isKeepAliveEnabled();
+        _nativeWifiClient.keepAlive(idle, interval, count);
+        _keepAliveApplied = _nativeWifiClient.isKeepAliveEnabled();
     }
     else
     {
-        _esp8266Client.disableKeepAlive();
+        _nativeWifiClient.disableKeepAlive();
     }
+#elif FLPROG_NETWORK_HAS_RP_WIFI_TCP
+    _lastOptionError = 0;
+    _keepAliveApplied = false;
+    if (!_connected && !_nativeWifiClient)
+    {
+        return;
+    }
+    _nativeWifiClient.setNoDelay(_noDelay);
+    _nativeWifiClient.setSync(false);
 #elif FLPROG_NETWORK_HAS_POSIX_TCP
     _lastOptionError = 0;
     _keepAliveApplied = false;
@@ -222,7 +238,7 @@ bool FLProgPosixTcpClientBackend::adoptAcceptedSocket(
 #endif
 }
 
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
+#if FLPROG_NETWORK_HAS_NATIVE_WIFI_TCP
 bool FLProgPosixTcpClientBackend::adoptAcceptedClient(
     const WiFiClient &client,
     uint16_t localPortValue,
@@ -235,12 +251,12 @@ bool FLProgPosixTcpClientBackend::adoptAcceptedClient(
     }
 
     resetSocket();
-    _esp8266Client = client;
-    if (!_esp8266Client)
+    _nativeWifiClient = client;
+    if (!_nativeWifiClient)
     {
         return false;
     }
-    _localPort = localPortValue != 0 ? localPortValue : _esp8266Client.localPort();
+    _localPort = localPortValue != 0 ? localPortValue : _nativeWifiClient.localPort();
     _endpoint.localPort = _localPort;
     _endpoint.remoteIP = remoteIpValue;
     _endpoint.remotePort = remotePortValue;
@@ -274,14 +290,14 @@ uint8_t FLProgPosixTcpClientBackend::open(
         return FLPROG_SOCKET_RESULT_UNSUPPORTED;
     }
 
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
+#if FLPROG_NETWORK_HAS_NATIVE_WIFI_TCP
     if (_transportId != FLPROG_TRANSPORT_WIFI &&
         _transportId != FLPROG_TRANSPORT_WIFI_AP)
     {
         return FLPROG_SOCKET_RESULT_UNSUPPORTED;
     }
 
-    if (_connected && (_esp8266Client.connected() || _esp8266Client.available() > 0))
+    if (_connected && (_nativeWifiClient.connected() || _nativeWifiClient.available() > 0))
     {
         return FLPROG_SOCKET_RESULT_SUCCESS;
     }
@@ -300,16 +316,31 @@ uint8_t FLProgPosixTcpClientBackend::open(
     _started = millis();
     _connecting = true;
 
-    // ESP8266 core 3.1.2 exposes raw-lwIP through WiFiClient, not BSD sockets.
-    // Its connect() call is synchronous inside the core. Keep the requested
-    // timeout bounded and preserve the public FLProg_Network state machine.
-    _esp8266Client.setTimeout(timeout == 0 ? 5000UL : timeout);
+    // ESP8266 and Arduino-Pico expose their raw-lwIP path through WiFiClient,
+    // not BSD sockets. connect() is synchronous inside either core. The RP
+    // backend passes FLProg's timeout through WiFiClient::setTimeout(); the
+    // Arduino-Pico core uses it for ClientContext's connect wait. This is a
+    // bounded synchronous compromise, not a non-blocking connect operation.
+    // A defective/older core can still exceed this timeout while waiting on
+    // lwIP (the Arduino-Pico project has documented such connect hang reports).
+#if FLPROG_NETWORK_HAS_RP_WIFI_TCP
+    // Arduino-Pico interprets timeout values below 100 as seconds. Preserve
+    // FLProg's millisecond intent by using its 5 s default or clamping to 100 ms.
+    const uint32_t rpConnectTimeout = timeout == 0
+        ? 5000UL
+        : (timeout < 100UL ? 100UL : timeout);
+    _nativeWifiClient.setTimeout(rpConnectTimeout);
+#else
+    _nativeWifiClient.setTimeout(timeout == 0 ? 5000UL : timeout);
+#endif
+#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
     if (endpoint.localPort != 0)
     {
         WiFiClient::setLocalPortStart(endpoint.localPort);
     }
+#endif
 
-    const int result = _esp8266Client.connect(endpoint.remoteIP, endpoint.remotePort);
+    const int result = _nativeWifiClient.connect(endpoint.remoteIP, endpoint.remotePort);
     _connecting = false;
 
     if (result != 1)
@@ -324,7 +355,7 @@ uint8_t FLProgPosixTcpClientBackend::open(
     }
 
     _connected = true;
-    _localPort = _esp8266Client.localPort();
+    _localPort = _nativeWifiClient.localPort();
     applySocketOptions();
     return FLPROG_SOCKET_RESULT_SUCCESS;
 #elif FLPROG_NETWORK_HAS_POSIX_TCP
@@ -433,8 +464,8 @@ uint8_t FLProgPosixTcpClientBackend::open(
 
 uint8_t FLProgPosixTcpClientBackend::pollConnect()
 {
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
-    if (_connected && (_esp8266Client.connected() || _esp8266Client.available() > 0))
+#if FLPROG_NETWORK_HAS_NATIVE_WIFI_TCP
+    if (_connected && (_nativeWifiClient.connected() || _nativeWifiClient.available() > 0))
     {
         return FLPROG_SOCKET_RESULT_SUCCESS;
     }
@@ -527,12 +558,12 @@ uint8_t FLProgPosixTcpClientBackend::pollConnect()
 
 bool FLProgPosixTcpClientBackend::peerClosed()
 {
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
+#if FLPROG_NETWORK_HAS_NATIVE_WIFI_TCP
     if (!_connected)
     {
         return true;
     }
-    if (_esp8266Client.connected() || _esp8266Client.available() > 0)
+    if (_nativeWifiClient.connected() || _nativeWifiClient.available() > 0)
     {
         return false;
     }
@@ -579,7 +610,7 @@ bool FLProgPosixTcpClientBackend::peerClosed()
 
 uint8_t FLProgPosixTcpClientBackend::pool()
 {
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
+#if FLPROG_NETWORK_HAS_NATIVE_WIFI_TCP
     if (!_connected)
     {
         return FLPROG_SOCKET_RESULT_WAIT;
@@ -618,12 +649,12 @@ uint8_t FLProgPosixTcpClientBackend::close()
 
 int FLProgPosixTcpClientBackend::available()
 {
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
+#if FLPROG_NETWORK_HAS_NATIVE_WIFI_TCP
     if (!_connected)
     {
         return 0;
     }
-    return _esp8266Client.available();
+    return _nativeWifiClient.available();
 #elif FLPROG_NETWORK_HAS_POSIX_TCP
     if (!_connected || _socketFd < 0)
     {
@@ -651,17 +682,17 @@ int FLProgPosixTcpClientBackend::read()
 
 int FLProgPosixTcpClientBackend::read(uint8_t *buffer, size_t length)
 {
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
+#if FLPROG_NETWORK_HAS_NATIVE_WIFI_TCP
     if (!_connected || buffer == nullptr || length == 0)
     {
         return 0;
     }
-    const int result = _esp8266Client.read(buffer, length);
+    const int result = _nativeWifiClient.read(buffer, length);
     if (result > 0)
     {
         return result;
     }
-    if (!_esp8266Client.connected() && _esp8266Client.available() <= 0)
+    if (!_nativeWifiClient.connected() && _nativeWifiClient.available() <= 0)
     {
         _lastBackendEvent = FLPROG_TCP_BACKEND_EVENT_PEER_CLOSED;
         resetSocket();
@@ -703,12 +734,12 @@ int FLProgPosixTcpClientBackend::read(uint8_t *buffer, size_t length)
 
 int FLProgPosixTcpClientBackend::peek()
 {
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
+#if FLPROG_NETWORK_HAS_NATIVE_WIFI_TCP
     if (!_connected)
     {
         return -1;
     }
-    return _esp8266Client.peek();
+    return _nativeWifiClient.peek();
 #elif FLPROG_NETWORK_HAS_POSIX_TCP
     if (!_connected || _socketFd < 0)
     {
@@ -737,13 +768,13 @@ int FLProgPosixTcpClientBackend::peek()
 
 size_t FLProgPosixTcpClientBackend::write(const uint8_t *buffer, size_t length)
 {
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
+#if FLPROG_NETWORK_HAS_NATIVE_WIFI_TCP
     if (!_connected || buffer == nullptr || length == 0)
     {
         return 0;
     }
-    const size_t result = _esp8266Client.write(buffer, length);
-    if (result == 0 && !_esp8266Client.connected())
+    const size_t result = _nativeWifiClient.write(buffer, length);
+    if (result == 0 && !_nativeWifiClient.connected())
     {
         _lastBackendEvent = FLPROG_TCP_BACKEND_EVENT_IO_ERROR;
         _lastNativeError = -1;

@@ -195,8 +195,8 @@ bool FLProgNetworkTcpServerClient::adoptPosix(
     return true;
 }
 
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
-bool FLProgNetworkTcpServerClient::adoptEsp8266(
+#if (defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI) || FLPROG_NETWORK_HAS_RP_WIFI_TCP
+bool FLProgNetworkTcpServerClient::adoptWifiClient(
     FLProgNetworkInterface &network,
     uint8_t transportIdValue,
     const WiFiClient &client,
@@ -454,19 +454,27 @@ bool FLProgPosixTcpServerListener::begin(
         return false;
     }
 
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
+#if (defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI) || FLPROG_NETWORK_HAS_RP_WIFI_TCP
+#if FLPROG_NETWORK_HAS_RP_WIFI_TCP
+    if (transportIdValue != FLPROG_TRANSPORT_WIFI)
+#else
     if (
         transportIdValue != FLPROG_TRANSPORT_WIFI &&
         transportIdValue != FLPROG_TRANSPORT_WIFI_AP)
+#endif
     {
         return false;
     }
 
-    _esp8266Server = new (_esp8266ServerStorage) WiFiServer(localIp, portValue);
+    _nativeWifiServer = new (_nativeWifiServerStorage) WiFiServer(localIp, portValue);
 
     const uint8_t backlog = backlogValue == 0 ? 1 : backlogValue;
-    _esp8266Server->begin(portValue, backlog);
-    if (_esp8266Server->status() == CLOSED)
+    _nativeWifiServer->begin(portValue, backlog);
+#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
+    if (_nativeWifiServer->status() == CLOSED)
+#else
+    if (!(*_nativeWifiServer))
+#endif
     {
         _lastNativeError = -2;
         close();
@@ -474,7 +482,7 @@ bool FLProgPosixTcpServerListener::begin(
     }
 
     _transportId = transportIdValue;
-    _localPort = _esp8266Server->port();
+    _localPort = _nativeWifiServer->port();
     _listening = true;
     _lastNativeError = 0;
     return true;
@@ -547,12 +555,12 @@ bool FLProgPosixTcpServerListener::begin(
 
 void FLProgPosixTcpServerListener::close()
 {
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
-    if (_esp8266Server != nullptr)
+#if (defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI) || FLPROG_NETWORK_HAS_RP_WIFI_TCP
+    if (_nativeWifiServer != nullptr)
     {
-        _esp8266Server->close();
-        _esp8266Server->~WiFiServer();
-        _esp8266Server = nullptr;
+        _nativeWifiServer->close();
+        _nativeWifiServer->~WiFiServer();
+        _nativeWifiServer = nullptr;
     }
 #elif FLPROG_NETWORK_HAS_POSIX_TCP
     if (_socketFd >= 0)
@@ -615,7 +623,7 @@ int FLProgPosixTcpServerListener::acceptOne(
 #endif
 }
 
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
+#if (defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI) || FLPROG_NETWORK_HAS_RP_WIFI_TCP
 int FLProgPosixTcpServerListener::acceptOne(
     WiFiClient &client,
     IPAddress &remoteIp,
@@ -625,17 +633,17 @@ int FLProgPosixTcpServerListener::acceptOne(
     remoteIp = IPAddress(0, 0, 0, 0);
     remotePort = 0;
 
-    if (!_listening || _esp8266Server == nullptr)
+    if (!_listening || _nativeWifiServer == nullptr)
     {
         return -1;
     }
 
-    if (!_esp8266Server->hasClient())
+    if (!_nativeWifiServer->hasClient())
     {
         return 0;
     }
 
-    WiFiClient accepted = _esp8266Server->accept();
+    WiFiClient accepted = _nativeWifiServer->accept();
     if (!accepted)
     {
         return 0;
@@ -1596,7 +1604,7 @@ void FLProgNetworkTcpServer::acceptPosixClients()
         IPAddress remoteIp;
         uint16_t remotePort = 0;
 
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
+#if (defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI) || FLPROG_NETWORK_HAS_RP_WIFI_TCP
         WiFiClient acceptedClient;
         const int result = _posixListener.acceptOne(
             acceptedClient,
@@ -1625,7 +1633,7 @@ void FLProgNetworkTcpServer::acceptPosixClients()
 
         if (slot < 0 || clientCount() >= _maxClients || !leaseCapacity)
         {
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
+#if (defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI) || FLPROG_NETWORK_HAS_RP_WIFI_TCP
             (void)acceptedClient.stop(1);
 #else
             FLProgPosixTcpClientBackend rejectBackend;
@@ -1644,8 +1652,8 @@ void FLProgNetworkTcpServer::acceptPosixClients()
             continue;
         }
 
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
-        const bool adopted = _clients[slot].adoptEsp8266(
+#if (defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI) || FLPROG_NETWORK_HAS_RP_WIFI_TCP
+        const bool adopted = _clients[slot].adoptWifiClient(
             *_network,
             _boundTransportId,
             acceptedClient,
@@ -1676,7 +1684,7 @@ void FLProgNetworkTcpServer::acceptPosixClients()
 
         if (!adopted)
         {
-#if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
+#if (defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI) || FLPROG_NETWORK_HAS_RP_WIFI_TCP
             (void)acceptedClient.stop(1);
 #else
             FLProgPosixTcpClientBackend rejectBackend;

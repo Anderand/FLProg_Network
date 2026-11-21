@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-20",
+  "date": "2026-11-21",
   "files": [
     {
       "path": "0900_Развитие/0100_Развитие_Network.md",
@@ -398,8 +398,8 @@
     },
     {
       "path": "src/flprogNetwork.cpp",
-      "bytes": 91865,
-      "sha256": "d9c8be216f115b5aa53200a689301be17a5d0dff31a4eb9a4f1bba9ac45c8eda"
+      "bytes": 94410,
+      "sha256": "e92de060ee5ec81a5dd78a28e7492e013efb30524f222964ada3673a785ea35d"
     },
     {
       "path": "src/flprogNetwork.h",
@@ -413,8 +413,8 @@
     },
     {
       "path": "src/flprogNetworkPlatform.h",
-      "bytes": 9864,
-      "sha256": "2d91ef7b1215b851b39f446802bdedd71617a29724041dc4ba4bd8aa8a866aef"
+      "bytes": 10969,
+      "sha256": "0bf7392162c6d92455a21278e70c4a5cd59458dee4074db540c8252183e0a63f"
     },
     {
       "path": "src/flprogNetworkProfile.h",
@@ -533,33 +533,33 @@
     },
     {
       "path": "src/protocol/flprogNetworkTcpClient.cpp",
-      "bytes": 40631,
-      "sha256": "7e3d4f1cf929f1a240c33d6d158fa9369f5fde8bb0ebf586e85e387f0d9d403a"
+      "bytes": 41871,
+      "sha256": "e67fb221c23d4ac8d36824c8e950a2ee08661930ead52dc2f5386ceeec805996"
     },
     {
       "path": "src/protocol/flprogNetworkTcpClient.h",
-      "bytes": 14400,
-      "sha256": "f76268980d10c0e48e38031870a520ceb5fab23c9c0a48b18568ff109ebd683b"
+      "bytes": 14421,
+      "sha256": "3ef460a8d95d4fc4b708a8bdf87305d5971e7d7aa8a31dc02e7f0f6a516d9fbd"
     },
     {
       "path": "src/protocol/flprogNetworkTcpServer.cpp",
-      "bytes": 49292,
-      "sha256": "b59ea41cf3e03a550dabe0efcda77381ee6ca8d753886485054253716a80b99b"
+      "bytes": 49817,
+      "sha256": "3ebb2bc296405386e6b23a85463dd0f0a56f4fd62c726fc3d31faac4d48243ae"
     },
     {
       "path": "src/protocol/flprogNetworkTcpServer.h",
-      "bytes": 16691,
-      "sha256": "af710198a151c010a071c89cdddb93b543d91f46e16d8d45fb0fb2d12675b96c"
+      "bytes": 16889,
+      "sha256": "869c8c17b70ef792ba342aac92b2b7a746078fe18009f1fa038454b2b9815408"
     },
     {
       "path": "src/protocol/flprogNetworkUdp.cpp",
-      "bytes": 44587,
-      "sha256": "ab6e5787da3522454a1f50b7de3259e7c856c9f2c7c0dc6b4f673a90968856d0"
+      "bytes": 47727,
+      "sha256": "9384d5a387d1e871a2c3bfcd6d8fad4ef569392c99c30b262b695a9f6304d88a"
     },
     {
       "path": "src/protocol/flprogNetworkUdp.h",
-      "bytes": 24100,
-      "sha256": "8e8d082797ea716305d9fd14c237cc7ddfceedf9b99c9dd8d9a1e027f34082ee"
+      "bytes": 24400,
+      "sha256": "7c2a103b7f0103327ec00957b25617a37d39fa4895dba461cb6c11ffd4611490"
     },
     {
       "path": "src/protocol/flprogStm32TcpBackend.cpp",

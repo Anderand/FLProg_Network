@@ -1,3 +1,7 @@
+# RMII и Wi-Fi для Pico W и Pico 2 W — 21.11.2026
+
+Добавлен встроенный Wi-Fi backend для Arduino-Pico на RP2040/RP2350 с CYW43 (Pico W, Pico 2 W и совместимые платы): STA, TCP client/server и UDP через native Arduino-Pico API. POSIX-сокеты для RP не включаются; платы без `PICO_CYW43_SUPPORTED` сохраняют сборку без Wi-Fi. AP и сканирование в FLProg пока не заявлены. TCP-подключение использует синхронный `WiFiClient.connect()` с таймаутом; при проблемах ядра он может занять больше заданного времени. Сборка подтверждена на Arduino-Pico 6.0.0 из FLProg F985 для профилей flp_rpipicow и flp_rpipico2w. Подключение к сети и обмен данными на платах пока не проверялись.
+
 # r18 — Network dev20 и отдельный комплект редактора
 
 14.11.2026. В опубликованные исходники включены финальные изменения EIS: RT_HW session API и отложенная фабрика backend, типизированный реестр устройств, дополнения RESET/SPI и отдельный include IPAddress для OTA. Метки версии заголовка и library.properties согласованы: dev20, API 10006.

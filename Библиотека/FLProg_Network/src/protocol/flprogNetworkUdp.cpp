@@ -1205,6 +1205,52 @@ uint8_t FLProgPosixUdpBackend::open(
     _esp8266Open = true;
     _localPort = _esp8266Udp.localPort();
     return FLPROG_SOCKET_RESULT_SUCCESS;
+#elif FLPROG_NETWORK_HAS_RP_WIFI_UDP
+    if (_transportId != FLPROG_TRANSPORT_WIFI)
+    {
+        return FLPROG_SOCKET_RESULT_UNSUPPORTED;
+    }
+
+    if (_rpOpen)
+    {
+        return FLPROG_SOCKET_RESULT_SUCCESS;
+    }
+
+    uint8_t opened = 0;
+    if (_multicastEnabled)
+    {
+        if (
+            !flprogUdpIpIsMulticast(_multicastGroup) ||
+            _multicastPort == 0 ||
+            flprogUdpIpIsZero(_localAddress))
+        {
+            return FLPROG_SOCKET_RESULT_ERROR;
+        }
+
+        opened = _rpUdp.beginMulticast(
+            _localAddress,
+            _multicastGroup,
+            _multicastPort);
+        if (opened)
+        {
+            _multicastJoined = true;
+            _joinedMulticastGroup = _multicastGroup;
+            _joinedMulticastInterface = _localAddress;
+        }
+    }
+    else
+    {
+        opened = _rpUdp.begin(endpoint.localPort);
+    }
+
+    if (!opened)
+    {
+        return FLPROG_SOCKET_RESULT_ERROR;
+    }
+
+    _rpOpen = true;
+    _localPort = _rpUdp.localPort();
+    return FLPROG_SOCKET_RESULT_SUCCESS;
 #elif FLPROG_NETWORK_HAS_POSIX_UDP
     if (_socketFd >= 0)
     {
@@ -1345,6 +1391,12 @@ uint8_t FLProgPosixUdpBackend::close()
         _esp8266Udp.stop();
         _esp8266Open = false;
     }
+#elif FLPROG_NETWORK_HAS_RP_WIFI_UDP
+    if (_rpOpen)
+    {
+        _rpUdp.stop();
+        _rpOpen = false;
+    }
 #elif FLPROG_NETWORK_HAS_POSIX_UDP
     if (_socketFd >= 0)
     {
@@ -1408,6 +1460,23 @@ int FLProgPosixUdpBackend::beginPacket(
     {
         return 0;
     }
+#elif FLPROG_NETWORK_HAS_RP_WIFI_UDP
+    int opened = 0;
+    if (flprogUdpIpIsMulticast(ip) && !flprogUdpIpIsZero(_localAddress))
+    {
+        opened = _rpUdp.beginPacketMulticast(
+            ip,
+            port,
+            _localAddress);
+    }
+    else
+    {
+        opened = _rpUdp.beginPacket(ip, port);
+    }
+    if (!opened)
+    {
+        return 0;
+    }
 #else
     if (!ensureTxBuffer())
     {
@@ -1445,6 +1514,10 @@ size_t FLProgPosixUdpBackend::packetWrite(
     const size_t written = _esp8266Udp.write(buffer, length);
     _txLength += written;
     return written;
+#elif FLPROG_NETWORK_HAS_RP_WIFI_UDP
+    const size_t written = _rpUdp.write(buffer, length);
+    _txLength += written;
+    return written;
 #else
     if (_txBuffer == nullptr)
     {
@@ -1464,6 +1537,18 @@ int FLProgPosixUdpBackend::endPacket()
         return 0;
     }
     const int result = _esp8266Udp.endPacket();
+    if (result)
+    {
+        _txLength = 0;
+        _txActive = false;
+    }
+    return result ? 1 : 0;
+#elif FLPROG_NETWORK_HAS_RP_WIFI_UDP
+    if (!isOpen() || !_txActive)
+    {
+        return 0;
+    }
+    const int result = _rpUdp.endPacket();
     if (result)
     {
         _txLength = 0;
@@ -1537,6 +1622,24 @@ int FLProgPosixUdpBackend::parsePacket()
     _rxRemoteIP = _esp8266Udp.remoteIP();
     _rxRemotePort = _esp8266Udp.remotePort();
     return received;
+#elif FLPROG_NETWORK_HAS_RP_WIFI_UDP
+    if (!isOpen())
+    {
+        return 0;
+    }
+
+    clearRxPacket();
+    const int received = _rpUdp.parsePacket();
+    if (received <= 0)
+    {
+        return 0;
+    }
+
+    _rxLength = (size_t)received;
+    _rxPosition = 0;
+    _rxRemoteIP = _rpUdp.remoteIP();
+    _rxRemotePort = _rpUdp.remotePort();
+    return received;
 #elif FLPROG_NETWORK_HAS_POSIX_UDP
     if (!isOpen() || !ensureRxBuffer())
     {
@@ -1583,6 +1686,12 @@ int FLProgPosixUdpBackend::packetAvailable()
         return 0;
     }
     return _esp8266Udp.available();
+#elif FLPROG_NETWORK_HAS_RP_WIFI_UDP
+    if (!isOpen())
+    {
+        return 0;
+    }
+    return _rpUdp.available();
 #else
     if (_rxPosition >= _rxLength)
     {
@@ -1596,6 +1705,13 @@ int FLProgPosixUdpBackend::packetRead()
 {
 #if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
     const int value = _esp8266Udp.read();
+    if (value >= 0 && _rxPosition < _rxLength)
+    {
+        _rxPosition++;
+    }
+    return value;
+#elif FLPROG_NETWORK_HAS_RP_WIFI_UDP
+    const int value = _rpUdp.read();
     if (value >= 0 && _rxPosition < _rxLength)
     {
         _rxPosition++;
@@ -1627,6 +1743,14 @@ int FLProgPosixUdpBackend::packetRead(
         if (_rxPosition > _rxLength) _rxPosition = _rxLength;
     }
     return result;
+#elif FLPROG_NETWORK_HAS_RP_WIFI_UDP
+    const int result = _rpUdp.read(buffer, length);
+    if (result > 0)
+    {
+        _rxPosition += (size_t)result;
+        if (_rxPosition > _rxLength) _rxPosition = _rxLength;
+    }
+    return result;
 #else
     if (_rxPosition >= _rxLength)
     {
@@ -1645,6 +1769,8 @@ int FLProgPosixUdpBackend::packetPeek()
 {
 #if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
     return _esp8266Udp.peek();
+#elif FLPROG_NETWORK_HAS_RP_WIFI_UDP
+    return _rpUdp.peek();
 #else
     if (_rxPosition >= _rxLength)
     {
@@ -1662,6 +1788,13 @@ void FLProgPosixUdpBackend::packetFlush()
     while (_esp8266Udp.available() > 0)
     {
         (void)_esp8266Udp.read();
+    }
+#elif FLPROG_NETWORK_HAS_RP_WIFI_UDP
+    // Arduino-Pico WiFiUDP::flush() is a TX flush; drain the active RX packet
+    // to preserve the FLProg backend's read-side flush semantics.
+    while (_rpUdp.available() > 0)
+    {
+        (void)_rpUdp.read();
     }
 #endif
     _rxPosition = _rxLength;

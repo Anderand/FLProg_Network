@@ -29,6 +29,10 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 #endif
+#if FLPROG_NETWORK_HAS_RP_WIFI_UDP
+#include <WiFi.h>
+#include <WiFiUdp.h>
+#endif
 #if FLPROG_NETWORK_HAS_STM32_ETHERNET
 #include <STM32Ethernet.h>
 #include <EthernetUdp.h>
@@ -51,7 +55,8 @@ class FLProgNetworkInterface;
 //
 // Backends:
 // - FLProgWiznetUdpBackend: direct W5100/W5100S/W5200/W5500 hardware socket.
-// - FLProgPosixUdpBackend: ESP32 POSIX/lwIP; ESP8266 WiFiUDP adapter.
+// - FLProgPosixUdpBackend: ESP32 POSIX/lwIP; ESP8266 and Arduino-Pico RP use
+//   their native WiFiUDP wrapper over raw lwIP.
 // - FLProgArduinoUdpBackend<T>: optional adapter for any Arduino UDP-compatible
 //   object, useful on platforms such as RP2040/Pico W.
 //
@@ -428,7 +433,7 @@ private:
 
 // -----------------------------------------------------------------------------
 // Built-in Wi-Fi UDP backend. ESP32 uses non-blocking POSIX/lwIP sockets;
-// ESP8266 core 3.x uses WiFiUDP because LWIP_SOCKET is disabled.
+// ESP8266 and Arduino-Pico use WiFiUDP because BSD socket APIs aren't enabled.
 // The backend remains bound to the selected transport's local IPv4 address.
 // -----------------------------------------------------------------------------
 
@@ -488,6 +493,8 @@ public:
     {
 #if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
         return _esp8266Open;
+#elif FLPROG_NETWORK_HAS_RP_WIFI_UDP
+        return _rpOpen;
 #else
         return _socketFd >= 0;
 #endif
@@ -544,6 +551,10 @@ private:
 #if defined(ESP8266) && FLPROG_NETWORK_COMPILE_WIFI
     WiFiUDP _esp8266Udp;
     bool _esp8266Open = false;
+#endif
+#if FLPROG_NETWORK_HAS_RP_WIFI_UDP
+    WiFiUDP _rpUdp;
+    bool _rpOpen = false;
 #endif
 
     IPAddress _localAddress = IPAddress(0, 0, 0, 0);

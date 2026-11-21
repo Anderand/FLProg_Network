@@ -225,11 +225,12 @@ const FLProgRmiiTransport &FLProgNetworkInterface::rmiiTransportRef() const
     #include <WiFi.h>
     #include <esp_wifi.h>
     #define FLPROG_NETWORK_HAS_WIFI 1
+#elif FLPROG_NETWORK_HAS_ARDUINO_PICO_WIFI
+    // Arduino-Pico only advertises PICO_CYW43_SUPPORTED for radio-equipped
+    // board selections. Wi-Fi-less RP variants never include this header.
+    #include <WiFi.h>
+    #define FLPROG_NETWORK_HAS_WIFI 1
 #elif defined(ARDUINO_ARCH_RP2040) || defined(ARDUINO_ARCH_RP2350)
-    // v0.9.2 compatibility closeout: do not silently use the Arduino-Pico
-    // high-level WiFi API. Per-interface route/socket ownership for Pico W is
-    // not implemented yet, so the built-in Wi-Fi backend stays explicitly
-    // unsupported until a raw-lwIP/owned adapter is added.
     #define FLPROG_NETWORK_HAS_WIFI 0
 #else
     #define FLPROG_NETWORK_HAS_WIFI 0
@@ -1314,6 +1315,15 @@ void FLProgNetworkInterface::setAccessPointSubnet(IPAddress value)
 
 void FLProgNetworkInterface::accessPointOn()
 {
+#if !FLPROG_NETWORK_COMPILED_WIFI_EXTENDED
+    // AP and scan are not exposed by the RP built-in Wi-Fi backend.
+    _apAllowed = false;
+    _apStartRequest = false;
+    _apStarted = false;
+    _apReady = false;
+    _apLastError = FLPROG_WIFI_AP_ERROR_START_FAILED;
+    return;
+#else
     // AP_RUNTIME_ON_FIX1:
     // Legacy/generated FLProg code may call apMode(true) on every scan while
     // the AP enable input remains HIGH.  Starting the AP is edge-driven: once
@@ -1324,6 +1334,7 @@ void FLProgNetworkInterface::accessPointOn()
 
     _apAllowed = true;
     if (_workMode && !_manualStop) _apStartRequest = true;
+#endif
 }
 
 void FLProgNetworkInterface::accessPointOff()
@@ -1331,7 +1342,7 @@ void FLProgNetworkInterface::accessPointOff()
     _apAllowed = false;
     _apConfigBlocked = false;
     _apStartRequest = false;
-#if FLPROG_NETWORK_HAS_WIFI
+#if FLPROG_NETWORK_HAS_WIFI && FLPROG_NETWORK_COMPILED_WIFI_EXTENDED
     WiFi.softAPdisconnect(false);
 #endif
     _apStarted = false;
@@ -1348,7 +1359,7 @@ void FLProgNetworkInterface::accessPointMode(bool value)
 
 IPAddress FLProgNetworkInterface::accessPointIP() const
 {
-#if FLPROG_NETWORK_HAS_WIFI
+#if FLPROG_NETWORK_HAS_WIFI && FLPROG_NETWORK_COMPILED_WIFI_EXTENDED
     if (_apReady) return WiFi.softAPIP();
 #endif
     return IPAddress(0, 0, 0, 0);
@@ -1356,7 +1367,7 @@ IPAddress FLProgNetworkInterface::accessPointIP() const
 
 bool FLProgNetworkInterface::startWifiScan(bool showHidden)
 {
-#if FLPROG_NETWORK_HAS_WIFI
+#if FLPROG_NETWORK_HAS_WIFI && FLPROG_NETWORK_COMPILED_WIFI_EXTENDED
     if (_wifiScanState == FLPROG_WIFI_SCAN_RUNNING ||
         _wifiScanState == FLPROG_WIFI_SCAN_QUEUED)
     {
@@ -1382,7 +1393,7 @@ bool FLProgNetworkInterface::startWifiScan(bool showHidden)
 
 bool FLProgNetworkInterface::cancelWifiScan()
 {
-#if FLPROG_NETWORK_HAS_WIFI
+#if FLPROG_NETWORK_HAS_WIFI && FLPROG_NETWORK_COMPILED_WIFI_EXTENDED
     if (_wifiScanState != FLPROG_WIFI_SCAN_RUNNING &&
         _wifiScanState != FLPROG_WIFI_SCAN_QUEUED)
     {
@@ -1397,7 +1408,7 @@ bool FLProgNetworkInterface::cancelWifiScan()
 
 void FLProgNetworkInterface::clearWifiScanResults()
 {
-#if FLPROG_NETWORK_HAS_WIFI
+#if FLPROG_NETWORK_HAS_WIFI && FLPROG_NETWORK_COMPILED_WIFI_EXTENDED
     _wifiScanClearRequest = true;
     if (_wifiScanState == FLPROG_WIFI_SCAN_RUNNING ||
         _wifiScanState == FLPROG_WIFI_SCAN_QUEUED)
@@ -1413,7 +1424,7 @@ void FLProgNetworkInterface::clearWifiScanResults()
 
 String FLProgNetworkInterface::wifiScanSsid(uint8_t index) const
 {
-#if FLPROG_NETWORK_HAS_WIFI
+#if FLPROG_NETWORK_HAS_WIFI && FLPROG_NETWORK_COMPILED_WIFI_EXTENDED
     if (_wifiScanState == FLPROG_WIFI_SCAN_DONE && index < (uint8_t)_wifiScanCount)
         return WiFi.SSID(index);
 #else
@@ -1424,7 +1435,7 @@ String FLProgNetworkInterface::wifiScanSsid(uint8_t index) const
 
 int32_t FLProgNetworkInterface::wifiScanRssi(uint8_t index) const
 {
-#if FLPROG_NETWORK_HAS_WIFI
+#if FLPROG_NETWORK_HAS_WIFI && FLPROG_NETWORK_COMPILED_WIFI_EXTENDED
     if (_wifiScanState == FLPROG_WIFI_SCAN_DONE && index < (uint8_t)_wifiScanCount)
         return WiFi.RSSI(index);
 #else
@@ -1435,7 +1446,7 @@ int32_t FLProgNetworkInterface::wifiScanRssi(uint8_t index) const
 
 int32_t FLProgNetworkInterface::wifiScanChannel(uint8_t index) const
 {
-#if FLPROG_NETWORK_HAS_WIFI
+#if FLPROG_NETWORK_HAS_WIFI && FLPROG_NETWORK_COMPILED_WIFI_EXTENDED
     if (_wifiScanState == FLPROG_WIFI_SCAN_DONE && index < (uint8_t)_wifiScanCount)
         return WiFi.channel(index);
 #else
@@ -1446,7 +1457,7 @@ int32_t FLProgNetworkInterface::wifiScanChannel(uint8_t index) const
 
 uint8_t FLProgNetworkInterface::wifiScanEncryption(uint8_t index) const
 {
-#if FLPROG_NETWORK_HAS_WIFI
+#if FLPROG_NETWORK_HAS_WIFI && FLPROG_NETWORK_COMPILED_WIFI_EXTENDED
     if (_wifiScanState == FLPROG_WIFI_SCAN_DONE && index < (uint8_t)_wifiScanCount)
         return (uint8_t)WiFi.encryptionType(index);
 #else
@@ -2317,14 +2328,22 @@ void FLProgNetworkInterface::startWifi()
         {
             dnsIp = gatewayIp;
         }
+#if FLPROG_NETWORK_HAS_ARDUINO_PICO_WIFI
+        // Arduino-Pico orders the optional tuple as local, DNS, gateway,
+        // subnet; ESP cores use local, gateway, subnet, DNS.
+        WiFi.config(_configuredIp, dnsIp, gatewayIp, _subnetIp);
+#else
         WiFi.config(_configuredIp, gatewayIp, _subnetIp, dnsIp);
+#endif
     }
 
 #if FLPROG_NETWORK_HAS_WIFI
     // FLProg_Network owns the reconnect policy and timing.
     // Native ESP auto-reconnect must stay disabled, otherwise
     // AUTO_RECONNECT=0 and RECONNECT_MS cannot be deterministic.
+#if !FLPROG_NETWORK_HAS_ARDUINO_PICO_WIFI
     WiFi.setAutoReconnect(false);
+#endif
 #endif
     if (restartingLiveTransport)
     {
@@ -2340,8 +2359,18 @@ void FLProgNetworkInterface::startWifi()
         _wifiSessionRestartStarted = millis();
         WiFi.disconnect();
     }
+#if FLPROG_NETWORK_HAS_ARDUINO_PICO_WIFI
+    // Arduino-Pico's begin() waits synchronously for association (up to twice
+    // its timeout). Use beginNoBlock() so network.pool() keeps its cooperative
+    // lifecycle; readiness is observed by updateWifi().
+    (void)WiFi.beginNoBlock(_clientSsid.c_str(), _clientPassword.c_str());
+    // beginNoBlock() commonly returns WL_IDLE_STATUS while association is
+    // still in progress; it does not indicate that the STA request failed.
+    _wifiStarted = true;
+#else
     WiFi.begin(_clientSsid.c_str(), _clientPassword.c_str());
     _wifiStarted = true;
+#endif
 #else
     _wifiStarted = false;
     _wifiReady = false;
@@ -2366,10 +2395,17 @@ void FLProgNetworkInterface::applyWifiRadioMode()
     }
     if (_wifiRadioMode == desiredMode) return;
 
+#if FLPROG_NETWORK_HAS_ARDUINO_PICO_WIFI
+    // FLProg_Network does not expose AP/scan for the RP backend. Arduino-Pico's
+    // mode() returns void, so track the STA request once issued.
+    WiFi.mode(WIFI_STA);
+    const bool applied = true;
+#else
     bool applied = false;
     if (desiredMode == 3U) applied = WiFi.mode(WIFI_AP_STA);
     else if (desiredMode == 2U) applied = WiFi.mode(WIFI_AP);
     else applied = WiFi.mode(WIFI_STA);
+#endif
 
     if (applied) _wifiRadioMode = desiredMode;
 #endif
@@ -2380,6 +2416,15 @@ void FLProgNetworkInterface::startAccessPoint()
     _apStartRequest = false;
     _lastApAttempt = millis();
 #if FLPROG_NETWORK_HAS_WIFI
+#if !FLPROG_NETWORK_COMPILED_WIFI_EXTENDED
+    _apStarted = false;
+    _apReady = false;
+    _apStationCount = 0;
+    _apLastError = FLPROG_WIFI_AP_ERROR_START_FAILED;
+    _apFailureCount++;
+    _wifiEvents |= FLPROG_WIFI_EVENT_AP_FAILED;
+    return;
+#else
     const bool restarting = _apStarted || _apReady;
     _apLastError = FLPROG_WIFI_AP_ERROR_NONE;
 
@@ -2484,6 +2529,7 @@ void FLProgNetworkInterface::startAccessPoint()
         _apRestartCount++;
         _wifiEvents |= FLPROG_WIFI_EVENT_AP_RESTARTED;
     }
+#endif
 #else
     _apStarted = false;
     _apReady = false;
@@ -2493,13 +2539,14 @@ void FLProgNetworkInterface::startAccessPoint()
 void FLProgNetworkInterface::updateWifiExtended()
 {
 #if FLPROG_NETWORK_HAS_WIFI
-    _apReady = _apStarted && WiFi.softAPIP() != IPAddress(0, 0, 0, 0);
-
     if (_wifiReady != _prevWifiReadyForEvents)
     {
         _wifiEvents |= _wifiReady ? FLPROG_WIFI_EVENT_STA_UP : FLPROG_WIFI_EVENT_STA_DOWN;
         _prevWifiReadyForEvents = _wifiReady;
     }
+
+#if FLPROG_NETWORK_COMPILED_WIFI_EXTENDED
+    _apReady = _apStarted && WiFi.softAPIP() != IPAddress(0, 0, 0, 0);
 
     if (_apReady != _prevApReady)
     {
@@ -2601,6 +2648,22 @@ void FLProgNetworkInterface::updateWifiExtended()
             _wifiEvents |= FLPROG_WIFI_EVENT_SCAN_FAILED;
         }
     }
+#else
+    // Keep unsupported AP/scan public state deterministic without invoking
+    // Arduino-Pico methods that this FLProg backend intentionally omits.
+    _apStarted = false;
+    _apReady = false;
+    _apStationCount = 0;
+    _wifiScanStartRequest = false;
+    _wifiScanCancelRequest = false;
+    _wifiScanClearRequest = false;
+    _wifiScanCount = 0;
+    if (_wifiScanState != FLPROG_WIFI_SCAN_IDLE)
+    {
+        _wifiScanState = FLPROG_WIFI_SCAN_ERROR;
+        _wifiScanLastError = FLPROG_WIFI_SCAN_ERROR_START;
+    }
+#endif
 #else
     _apReady = false;
 #endif
