@@ -1099,6 +1099,7 @@ IPAddress FLProgNetworkInterface::dnsServerForTransport(
 #else
     if (transportId == FLPROG_TRANSPORT_WIZNET)
     {
+#if FLPROG_NETWORK_COMPILE_WIZNET_DHCP
         if (_dhcp && wiznetDhcpRef().bound())
         {
             const IPAddress activeDns = wiznetDhcpRef().dnsIP();
@@ -1113,6 +1114,7 @@ IPAddress FLProgNetworkInterface::dnsServerForTransport(
                 return dhcpGateway;
             }
         }
+#endif
 
         if (_dnsIp != zero)
         {
@@ -1739,7 +1741,7 @@ void FLProgNetworkInterface::dhcpMode(bool value)
         return;
     }
 
-#if !FLPROG_NETWORK_PROFILE_WIFI_ONLY
+#if !FLPROG_NETWORK_PROFILE_WIFI_ONLY && FLPROG_NETWORK_COMPILE_WIZNET_DHCP
     // Wired DHCP owns its own lease state. When leaving the previous DHCP
     // mode, stop that state machine before changing the common addressing
     // flag. In a Wi-Fi-only profile there is no Wiznet DHCP object at all.
@@ -1991,7 +1993,9 @@ IPAddress FLProgNetworkInterface::activeGateway() const
     if (route == FLPROG_NETWORK_ACTIVE_WIFI) return WiFi.gatewayIP();
 #endif
     if (route == FLPROG_NETWORK_ACTIVE_WIZNET) {
+#if FLPROG_NETWORK_COMPILE_WIZNET_DHCP
         if (_dhcp && wiznetDhcpRef().bound()) return wiznetDhcpRef().gatewayIP();
+#endif
         return const_cast<FLProgWiznetHardware &>(wiznetRef()).getGatewayIp();
     }
     if (route == FLPROG_NETWORK_ACTIVE_RMII) return rmiiRef().currentGateway();
@@ -2011,7 +2015,9 @@ IPAddress FLProgNetworkInterface::activeSubnet() const
     if (route == FLPROG_NETWORK_ACTIVE_WIFI) return WiFi.subnetMask();
 #endif
     if (route == FLPROG_NETWORK_ACTIVE_WIZNET) {
+#if FLPROG_NETWORK_COMPILE_WIZNET_DHCP
         if (_dhcp && wiznetDhcpRef().bound()) return wiznetDhcpRef().subnetMask();
+#endif
         return const_cast<FLProgWiznetHardware &>(wiznetRef()).getSubnetMask();
     }
     if (route == FLPROG_NETWORK_ACTIVE_RMII) return rmiiRef().currentSubnet();
@@ -2265,7 +2271,9 @@ void FLProgNetworkInterface::disconnect()
 #endif
 #if !FLPROG_NETWORK_PROFILE_WIFI_ONLY
     rmiiRef().end();
+#if FLPROG_NETWORK_COMPILE_WIZNET_DHCP
     wiznetDhcpRef().end(_dhcp);
+#endif
 #endif
     _wifiStarted = false;
     _apStarted = false;
@@ -2707,6 +2715,7 @@ void FLProgNetworkInterface::startEthernet()
     _ethernetConfigured = false;
     _wiznetIpCache = IPAddress(0, 0, 0, 0);
 
+#if FLPROG_NETWORK_COMPILE_WIZNET_DHCP
     if (_dhcp)
     {
         wiznetDhcpRef().setAcquireTimeout(_dhcpTimeout);
@@ -2717,6 +2726,7 @@ void FLProgNetworkInterface::startEthernet()
     }
 
     wiznetDhcpRef().end(false);
+#endif
     _error = FLPROG_NETWORK_NOT_ERROR;
 }
 
@@ -2894,6 +2904,7 @@ void FLProgNetworkInterface::updateEthernet()
 
     const uint32_t now = millis();
 
+#if FLPROG_NETWORK_COMPILE_WIZNET_DHCP
     // Собственный DHCP выполняет шаг на каждом цикле FLProg. В отличие от старого
     // Ethernet.begin()/maintain() он не блокирует loop и работает через любой
     // FLProgSpiBackend и поддерживаемую SPI-шину.
@@ -2921,7 +2932,12 @@ void FLProgNetworkInterface::updateEthernet()
             _ethernetReady = false;
         }
     }
-    else if (!configureStaticEthernet())
+#endif
+    if (
+#if FLPROG_NETWORK_COMPILE_WIZNET_DHCP
+        !_dhcp &&
+#endif
+        !configureStaticEthernet())
     {
         if (wiznetRef().spiOperationStatus() != FLPROG_SPI_STATUS_BUSY)
         {
@@ -2932,10 +2948,12 @@ void FLProgNetworkInterface::updateEthernet()
 
     if ((uint32_t)(now - _lastEthernetCheck) < _checkStatusPeriod)
     {
+#if FLPROG_NETWORK_COMPILE_WIZNET_DHCP
         if (_dhcp && wiznetDhcpRef().bound())
         {
             _ethernetReady = true;
         }
+#endif
         return;
     }
 
@@ -3351,10 +3369,14 @@ uint8_t FLProgNetworkInterface::pool()
 #endif
 
 #if !FLPROG_NETWORK_PROFILE_WIFI_ONLY
+#if FLPROG_NETWORK_COMPILE_WIZNET_DHCP
         const bool nativeDhcpOwnsWiznetLifecycle =
             _dhcp &&
             wiznetDhcpRef().active() &&
             !wiznetDhcpRef().failed();
+#else
+        const bool nativeDhcpOwnsWiznetLifecycle = false;
+#endif
 
         if (usesWiznet() && !_ethernetReady && !_ethernetStartRequest &&
             !nativeDhcpOwnsWiznetLifecycle &&

@@ -61,9 +61,24 @@
   #endif
 #endif
 
-// ArduinoOTA is Wi-Fi-specific on ESP8266. ESP32 core 3.x uses the unified
-// NetworkUDP/NetworkClient stack and can also serve native RMII. External
-// SPI Ethernet (for example W5500) is not covered. Override to 0 to omit OTA.
+// Optional ESP32 internal-MAC/RMII backend gate. Keep the historical default;
+// external SPI Ethernet and the Arduino-Pico Wi-Fi backends are independent.
+#ifndef FLPROG_NETWORK_COMPILE_RMII
+  #define FLPROG_NETWORK_COMPILE_RMII 1
+#endif
+
+// Optional compile-time exclusion for the full Wiznet/W5500 DHCP client.
+// Keep the default for source and behavior compatibility; static-IP builds
+// may set this to 0. Built-in Wi-Fi and RMII DHCP are independent.
+#ifndef FLPROG_NETWORK_COMPILE_WIZNET_DHCP
+  #define FLPROG_NETWORK_COMPILE_WIZNET_DHCP 1
+#endif
+
+// This switch gates ESP-family OTA (ArduinoOTA and ESP32 Update backends).
+// ArduinoOTA is Wi-Fi-specific on ESP8266; ESP32 core 3.x uses the unified
+// NetworkUDP/NetworkClient stack and can also serve native RMII. External SPI
+// Ethernet (for example W5500) is not covered. STM32 staged OTA has its own
+// board/layout switch and is intentionally independent of this option.
 #ifndef FLPROG_NETWORK_COMPILE_OTA
   #if defined(ESP8266)
     #define FLPROG_NETWORK_COMPILE_OTA FLPROG_NETWORK_COMPILE_WIFI

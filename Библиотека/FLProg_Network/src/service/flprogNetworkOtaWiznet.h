@@ -16,9 +16,16 @@ class FLProgNetworkInterface;
 class FLProgNetworkUdp;
 class FLProgNetworkTcpClient;
 
-#ifndef FLPROG_NETWORK_COMPILE_WIZNET_OTA
-// Compile only where ESP32 + a wired backend are available. Link-time section
-// garbage collection removes the implementation when the service is unused.
+#if !FLPROG_NETWORK_COMPILE_OTA
+// The application-wide switch is authoritative, even if a build also sets
+// the Wiznet-specific option explicitly.
+#ifdef FLPROG_NETWORK_COMPILE_WIZNET_OTA
+#undef FLPROG_NETWORK_COMPILE_WIZNET_OTA
+#endif
+#define FLPROG_NETWORK_COMPILE_WIZNET_OTA 0
+#elif !defined(FLPROG_NETWORK_COMPILE_WIZNET_OTA)
+// Compile only where ESP32 + a wired backend + the global ESP OTA switch are
+// available. Link-time section garbage collection removes an unused service.
 #if defined(ESP32) && !FLPROG_NETWORK_PROFILE_WIFI_ONLY && FLPROG_NETWORK_COMPILE_WIRED
 #define FLPROG_NETWORK_COMPILE_WIZNET_OTA 1
 #else

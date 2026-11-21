@@ -81,7 +81,7 @@
 // RMII is available only on ESP32 SoCs that expose the internal EMAC,
 // and only when the wired backend family is compiled by the selected profile.
 // Arduino-ESP32 currently provides this path for classic ESP32 and ESP32-P4.
-#if FLPROG_NETWORK_COMPILE_WIRED && \
+#if FLPROG_NETWORK_COMPILE_WIRED && FLPROG_NETWORK_COMPILE_RMII && \
     defined(CONFIG_ETH_ENABLED) && defined(CONFIG_ETH_USE_ESP32_EMAC) && \
     CONFIG_ETH_USE_ESP32_EMAC && \
     (defined(CONFIG_IDF_TARGET_ESP32) || defined(CONFIG_IDF_TARGET_ESP32P4))
@@ -194,7 +194,8 @@
 
 
 
-#if FLPROG_NETWORK_COMPILE_WIFI && (defined(ESP8266) || defined(ESP32))
+#if FLPROG_NETWORK_COMPILE_OTA && FLPROG_NETWORK_COMPILE_WIFI && \
+    (defined(ESP8266) || defined(ESP32))
 #define FLPROG_NETWORK_COMPILED_ARDUINO_OTA 1
 #else
 #define FLPROG_NETWORK_COMPILED_ARDUINO_OTA 0

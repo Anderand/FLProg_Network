@@ -23,6 +23,7 @@ class FLProgOTA : public FLProgNetworkOta
 public:
     void pool() override
     {
+#if FLPROG_NETWORK_COMPILE_OTA
         if (!_legacyBound)
         {
             // Respect a generated block disabled before its first pool().
@@ -38,6 +39,11 @@ public:
         }
 
         FLProgNetworkOta::pool();
+#else
+        // Keep the legacy class and its unsupported state observable, but do
+        // not perform lazy network binding when OTA is globally disabled.
+        FLProgNetworkOta::pool();
+#endif
     }
 
 private:

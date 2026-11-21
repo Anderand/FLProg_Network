@@ -19,6 +19,7 @@
  */
 #pragma once
 
+#include "../flprogNetworkProfile.h"
 #include <Arduino.h>
 #include <IPAddress.h>
 #include "flprogNetworkUdp.h"
@@ -160,6 +161,7 @@ typedef bool (*FLProgDhcpAddressConflictProbe)(void *context);
 // Standalone non-blocking DHCP client for the Wiznet transport.
 // It is deliberately driven by FLProgNetworkInterface::pool() before the
 // Wiznet transport becomes READY, so it does not use FLProgNetworkSocket.
+#if FLPROG_NETWORK_COMPILE_WIZNET_DHCP
 class FLProgWiznetDhcp
 {
 public:
@@ -402,3 +404,86 @@ private:
 
     uint8_t _packet[FLPROG_DHCP_MAX_PACKET_SIZE] = {0};
 };
+#else
+// Static-IP profile compatibility facade. It deliberately carries no packet
+// buffers, transport state, ARP monitors or DHCP client implementation.
+class FLProgWiznetDhcp
+{
+public:
+    FLProgWiznetDhcp() {}
+    ~FLProgWiznetDhcp() {}
+
+    bool begin(FLProgNetworkInterface &) { return false; }
+    void end(bool = false) {}
+    void restart() {}
+    bool release() { return false; }
+    void pool() {}
+
+    bool active() const { return false; }
+    bool bound() const { return false; }
+    bool failed() const { return false; }
+    uint8_t state() const { return FLPROG_DHCP_STATE_DISABLED; }
+    uint8_t error() const { return FLPROG_DHCP_ERROR_NONE; }
+    uint8_t lastMessageType() const { return 0; }
+
+    IPAddress leasedIP() const { return IPAddress(0, 0, 0, 0); }
+    IPAddress serverIP() const { return IPAddress(0, 0, 0, 0); }
+    IPAddress gatewayIP() const { return IPAddress(0, 0, 0, 0); }
+    IPAddress subnetMask() const { return IPAddress(0, 0, 0, 0); }
+    IPAddress dnsIP() const { return IPAddress(0, 0, 0, 0); }
+
+    uint32_t leaseTime() const { return 0; }
+    uint32_t renewalTime() const { return 0; }
+    uint32_t rebindingTime() const { return 0; }
+    uint32_t leaseAge() const { return 0; }
+    uint32_t discoverCount() const { return 0; }
+    uint32_t requestCount() const { return 0; }
+    uint32_t renewCount() const { return 0; }
+    uint32_t rebindCount() const { return 0; }
+    uint32_t nakCount() const { return 0; }
+    uint32_t retryCount() const { return 0; }
+    uint32_t declineCount() const { return 0; }
+    uint32_t releaseCount() const { return 0; }
+
+    void setAcquireTimeout(uint32_t) {}
+    uint32_t acquireTimeout() const { return 15000; }
+    void setResponseTimeout(uint32_t) {}
+    uint32_t responseTimeout() const { return 1000; }
+    void setUdpBackend(FLProgUdpBackend *) {}
+    void setConflictProbe(FLProgDhcpConflictProbe, void * = nullptr) {}
+    void setConflictProbeTimeout(uint32_t) {}
+    uint32_t conflictProbeTimeout() const { return 10000; }
+
+    void setBuiltInArpProbeEnabled(bool) {}
+    bool builtInArpProbeEnabled() const { return true; }
+    void setArpAnnouncementEnabled(bool) {}
+    bool arpAnnouncementEnabled() const { return true; }
+    void setArpAddressDefenseEnabled(bool) {}
+    bool arpAddressDefenseEnabled() const { return true; }
+    void setAcdMode(uint8_t) {}
+    uint8_t acdMode() const { return FLPROG_ACD_MODE_LIGHTWEIGHT; }
+    bool strictAcdActive() const { return false; }
+    bool strictAcdSocketReserved() const { return false; }
+    bool strictAcdResourceBlocked() const { return false; }
+    uint32_t strictAcdResourceBlockedCount() const { return 0; }
+    uint32_t strictAcdConflictCount() const { return 0; }
+
+    uint8_t arpProbesSent() const { return 0; }
+    uint32_t arpConflictCount() const { return 0; }
+    uint32_t arpAnnouncementCount() const { return 0; }
+    uint32_t arpDefenseCount() const { return 0; }
+    uint32_t arpDefenseConflictCount() const { return 0; }
+    uint32_t arpRateLimitCount() const { return 0; }
+    uint8_t arpConflictSeriesCount() const { return 0; }
+    bool hasArpConflictMac() const { return false; }
+    const uint8_t *arpConflictMac() const
+    {
+        static const uint8_t empty[6] = {0, 0, 0, 0, 0, 0};
+        return empty;
+    }
+
+    void setArpProbeBackend(FLProgMacRawBackend *) {}
+    void setStrictAcdBackend(FLProgMacRawBackend *) {}
+    void setAddressConflictProbe(FLProgDhcpAddressConflictProbe, void * = nullptr) {}
+};
+#endif

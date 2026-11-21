@@ -23,7 +23,7 @@
 #include "flprogRmiiEthernet.h"
 #include "../flprogNetworkPlatform.h"
 
-#if defined(ESP32)
+#if FLPROG_NETWORK_COMPILE_RMII && defined(ESP32)
     #include "sdkconfig.h"
     #if __has_include(<esp_arduino_version.h>)
         #include <esp_arduino_version.h>
@@ -41,7 +41,8 @@
 #define ESP_ARDUINO_VERSION_MAJOR 2
 #endif
 
-#if defined(ESP32) && defined(CONFIG_ETH_ENABLED) && CONFIG_ETH_ENABLED && \
+#if FLPROG_NETWORK_COMPILE_RMII && defined(ESP32) && \
+    defined(CONFIG_ETH_ENABLED) && CONFIG_ETH_ENABLED && \
     defined(CONFIG_ETH_USE_ESP32_EMAC) && CONFIG_ETH_USE_ESP32_EMAC && \
     (defined(CONFIG_IDF_TARGET_ESP32) || defined(CONFIG_IDF_TARGET_ESP32P4))
 #define FLPROG_RMII_RUNTIME_ESP32 1

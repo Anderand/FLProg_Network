@@ -19,7 +19,7 @@
  */
 #include "../flprogNetworkProfile.h"
 
-#if FLPROG_NETWORK_COMPILE_WIRED
+#if FLPROG_NETWORK_COMPILE_WIRED && FLPROG_NETWORK_COMPILE_WIZNET_DHCP
 #include "flprogNetworkDhcp.h"
 #include "../flprogNetwork.h"
 #include <string.h>

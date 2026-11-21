@@ -5,6 +5,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include "flprogNetworkProfile.h"
 #include <flprogOtaBoardIdentity.h>
 
 #if defined(ARDUINO_ARCH_STM32)
@@ -16,7 +17,7 @@ static_assert(VECT_TAB_OFFSET == FlprogOtaFlash::app - FlprogOtaFlash::base,
 #include <flprogNetwork.h>
 #include <device/flprogNetworkDeviceRegistry.h>
 
-#if defined(ESP8266) || defined(ESP32)
+#if FLPROG_NETWORK_COMPILE_OTA && (defined(ESP8266) || defined(ESP32))
 #define FLPROG_OTA_BLOCK_BACKEND_ESP 1
 #include <service/flprogNetworkOta.h>
 #elif defined(ARDUINO_ARCH_STM32)
