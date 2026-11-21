@@ -9,7 +9,8 @@ assert real.count(anchor)==1, 'typed getter implementation missing'
 actual=real.split(anchor,1)[1]
 with tempfile.TemporaryDirectory(prefix='flprog_typed_') as tmp:
  p=Path(tmp)
- src='''#include <cassert>\n#include <cstdint>\n#include <iostream>\n#include "device/flprogNetworkDeviceRegistry.h"\n
+ src='''#define FLPROG_NETWORK_HAS_RMII_INTERFACE 1
+#include <cassert>\n#include <cstdint>\n#include <iostream>\n#include "device/flprogNetworkDeviceRegistry.h"\n
 class FLProgNetworkInterface {
 public:
     FLProgNetworkDeviceKind deviceKind() const { return kind_; }
@@ -27,16 +28,21 @@ public:FLProgWiznetInterface(){setDeviceKind(FLPROG_NETWORK_DEVICE_KIND_WIZNET);
 class FLProgOnBoardWifiInterface:public FLProgNetworkInterface {
 public:FLProgOnBoardWifiInterface(){setDeviceKind(FLPROG_NETWORK_DEVICE_KIND_WIFI);networkMode(0);}
 };
+class FLProgRmiiInterface:public FLProgNetworkInterface {
+public:FLProgRmiiInterface(){setDeviceKind(FLPROG_NETWORK_DEVICE_KIND_RMII);networkMode(1);}
+};
 // The following definitions are copied verbatim from the actual shipped header.
 '''+ '// Safe typed NET NUM lookups:'+actual + r'''
 int main(){
     FLProgWiznetInterface wz;
     FLProgOnBoardWifiInterface wf;
+    FLProgRmiiInterface rm;
     FLProgNetworkInterface base;
     auto &registry=flprogNetworkDevices;
     registry.clear();
     assert(!registry.existsWiznet(1));
     assert(!registry.existsWifi(1));
+    assert(!registry.existsRmii(1));
     assert(!registry.existsWiznet(255));
     assert(!registry.existsWifi(255));
     assert(registry.getDevice(1)==nullptr);
@@ -49,7 +55,17 @@ int main(){
     assert(registry.registerDevice(1,wz)==FLPROG_NETWORK_DEVICE_OK);
     assert(registry.registerDevice(2,wf)==FLPROG_NETWORK_DEVICE_OK);
     assert(registry.registerDevice(3,base)==FLPROG_NETWORK_DEVICE_OK);
-    assert(registry.exists(1) && registry.exists(2) && registry.exists(3));
+    assert(registry.registerDevice(4,rm)==FLPROG_NETWORK_DEVICE_OK);
+    assert(registry.exists(1) && registry.exists(2) && registry.exists(3) && registry.exists(4));
+    assert(registry.getRmii(4)==&rm);
+    assert(registry.existsRmii(4));
+    assert(!registry.existsRmii(1) && !registry.existsRmii(2) && !registry.existsRmii(3));
+    assert(registry.getRmii(1)==nullptr);
+    assert(registry.lastResult()==FLPROG_NETWORK_DEVICE_TYPE_MISMATCH);
+    assert(registry.getRmii(100)==nullptr);
+    assert(registry.lastResult()==FLPROG_NETWORK_DEVICE_NOT_FOUND);
+    assert(registry.getRmii(255)==nullptr);
+    assert(registry.lastResult()==FLPROG_NETWORK_DEVICE_INVALID_ID);
     assert(registry.existsWiznet(1));
     assert(!registry.existsWifi(1));
     assert(registry.existsWifi(2));
@@ -70,7 +86,9 @@ int main(){
     assert(registry.getWiznet(3)==nullptr);
     assert(registry.lastResult()==FLPROG_NETWORK_DEVICE_TYPE_MISMATCH);
     // Changing routing mode must not forge the C++ dynamic wrapper type.
-    wz.networkMode(0); wf.networkMode(1);
+    wz.networkMode(0); wf.networkMode(1); rm.networkMode(0);
+    assert(registry.existsRmii(4));
+    assert(registry.getRmii(4)==&rm);
     assert(registry.existsWiznet(1) && registry.existsWifi(2));
     assert(!registry.existsWifi(1) && !registry.existsWiznet(2));
     assert(registry.getWiznet(1)==&wz);
@@ -80,6 +98,8 @@ int main(){
     assert(!c.existsWifi(1) && !c.existsWiznet(2));
     assert(c.getWiznet(1)==&wz);
     assert(c.getWifi(2)==&wf);
+    assert(c.getRmii(4)==&rm);
+    assert(c.existsRmii(4));
     assert(c.getWiznet(2)==nullptr);
     assert(c.lastResult()==FLPROG_NETWORK_DEVICE_TYPE_MISMATCH);
     assert(c.getDevice(100)==nullptr);
@@ -92,6 +112,9 @@ int main(){
     assert(registry.getWiznet(1)==nullptr);
     assert(registry.lastResult()==FLPROG_NETWORK_DEVICE_NOT_FOUND);
     assert(registry.unregisterDevice(2,&wf)==FLPROG_NETWORK_DEVICE_OK);
+    assert(registry.unregisterDevice(4,&rm)==FLPROG_NETWORK_DEVICE_OK);
+    assert(!registry.existsRmii(4));
+    assert(registry.getRmii(4)==nullptr);
     registry.clear();
     assert(!registry.existsWiznet(1) && !registry.existsWifi(2));
     std::cout << "TYPED_REGISTRY_AND_EXISTS_PASS" << std::endl;

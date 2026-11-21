@@ -2247,10 +2247,10 @@ void FLProgNetworkInterface::connect()
 void FLProgNetworkInterface::disconnect()
 {
 #if FLPROG_NETWORK_HAS_WIFI
-    WiFi.disconnect();
-#endif
-#if FLPROG_NETWORK_HAS_WIFI
-    WiFi.softAPdisconnect(false);
+    // Do not tear down another independently registered Wi-Fi object when a
+    // standalone RMII/Wiznet interface is disconnected.
+    if (usesWifi() || _wifiStarted) WiFi.disconnect();
+    if (_apAllowed || _apStarted) WiFi.softAPdisconnect(false);
 #endif
 #if !FLPROG_NETWORK_PROFILE_WIFI_ONLY
     rmiiRef().end();

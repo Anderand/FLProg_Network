@@ -60,6 +60,12 @@
 #define FLPROG_NETWORK_API_LEVEL 10006UL
 #define FLPROG_NETWORK_HAS_TYPED_DEVICE_LOOKUP 1
 #define FLPROG_NETWORK_HAS_TYPED_DEVICE_EXISTS 1
+#if FLPROG_NETWORK_COMPILE_WIRED && !FLPROG_NETWORK_PROFILE_WIFI_ONLY
+#define FLPROG_NETWORK_HAS_RMII_INTERFACE 1
+#else
+#define FLPROG_NETWORK_HAS_RMII_INTERFACE 0
+#endif
+#define FLPROG_NETWORK_HAS_TYPED_DEVICE_RMII FLPROG_NETWORK_HAS_RMII_INTERFACE
 #define FLPROG_NETWORK_HIGH_LEVEL_API_FROZEN 1
 
 // W5500 compile-gate profile: wired implementation is enabled.
@@ -1695,6 +1701,144 @@ public:
 };
 
 
+#if FLPROG_NETWORK_HAS_RMII_INTERFACE
+// Independent public RMII device for the FLProg generator. The existing
+// FLProgRmiiEthernet MAC/PHY driver remains embedded in the common network
+// implementation; this class only exposes an isolated, typed RMII interface.
+// Configure PHY and IP before the first pool() call. No SPI CS/bus is needed.
+// Hardware support is board/core-dependent (ESP32 EMAC or STM32Ethernet).
+class FLProgRmiiInterface : public FLProgNetworkInterface
+{
+public:
+    FLProgRmiiInterface()
+    {
+        setDeviceKind(FLPROG_NETWORK_DEVICE_KIND_RMII);
+        networkMode(FLPROG_NETWORK_MODE_ETHERNET);
+        wiznetMode(false);
+        rmiiMode(true);
+        workMode(true);
+    }
+
+    // Convenience overload: PHY address, MDC, MDIO. All other PHY options
+    // can be configured by the setters below, before the first pool().
+    FLProgRmiiInterface(int32_t phyAddress, int mdcPin, int mdioPin)
+        : FLProgRmiiInterface()
+    {
+        setPhyAddress(phyAddress);
+        setMdcPin(mdcPin);
+        setMdioPin(mdioPin);
+    }
+
+    void setPhyAddress(int32_t value) { setRmiiPhyAddress(value); }
+    int32_t phyAddress() const { return rmiiHardware().phyAddress(); }
+    void setMdcPin(int value) { setRmiiMdcPin(value); }
+    int mdcPin() const { return rmiiHardware().mdcPin(); }
+    void setMdioPin(int value) { setRmiiMdioPin(value); }
+    int mdioPin() const { return rmiiHardware().mdioPin(); }
+    void setPowerPin(int value) { setRmiiPowerPin(value); }
+    int powerPin() const { return rmiiHardware().powerPin(); }
+    void setResetPin(int value) { setRmiiResetPin(value); }
+    int resetPin() const { return rmiiHardware().resetPin(); }
+    void setClockMode(uint8_t value) { setRmiiClockMode(value); }
+    uint8_t clockMode() const { return rmiiHardware().clockMode(); }
+    void setHostname(const String &value) { setRmiiHostname(value); }
+    String hostname() const { return rmiiHardware().hostname(); }
+
+    // Keep both the base network configuration and the actual RMII PHY
+    // driver in sync. Base setters are non-virtual in the frozen API, so
+    // configuration must use a typed FLProgRmiiInterface reference/pointer.
+    void dhcpMode(bool value)
+    {
+        FLProgNetworkInterface::dhcpMode(value);
+        rmiiDhcpMode(value);
+    }
+    void setDhcp() { dhcpMode(true); }
+    void resetDhcp() { dhcpMode(false); }
+
+    void localIP(IPAddress value)
+    {
+        FLProgNetworkInterface::localIP(value);
+        rmiiLocalIP(value);
+    }
+    void localIP(uint32_t value) { localIP(IPAddress(value)); }
+    void localIP(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+    { localIP(IPAddress(a, b, c, d)); }
+    IPAddress localIP() const { return FLProgNetworkInterface::localIP(); }
+
+    void gateway(IPAddress value)
+    {
+        FLProgNetworkInterface::gateway(value);
+        rmiiGateway(value);
+    }
+    void gateway(uint32_t value) { gateway(IPAddress(value)); }
+    void gateway(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+    { gateway(IPAddress(a, b, c, d)); }
+    IPAddress gateway() const { return FLProgNetworkInterface::gateway(); }
+
+    void subnet(IPAddress value)
+    {
+        FLProgNetworkInterface::subnet(value);
+        rmiiSubnet(value);
+    }
+    void subnet(uint32_t value) { subnet(IPAddress(value)); }
+    void subnet(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+    { subnet(IPAddress(a, b, c, d)); }
+    IPAddress subnet() const { return FLProgNetworkInterface::subnet(); }
+
+    void dns(IPAddress value)
+    {
+        FLProgNetworkInterface::dns(value);
+        rmiiDns(value);
+    }
+    void dns(uint32_t value) { dns(IPAddress(value)); }
+    void dns(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+    { dns(IPAddress(a, b, c, d)); }
+    IPAddress dns() const { return FLProgNetworkInterface::dns(); }
+
+    void dns2(IPAddress value) { rmiiDns2(value); }
+    void dns2(uint32_t value) { dns2(IPAddress(value)); }
+    void dns2(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+    { dns2(IPAddress(a, b, c, d)); }
+    IPAddress dns2() const { return rmiiHardware().configuredDns2(); }
+
+    bool supported() const { return rmiiHardware().supported(); }
+    bool phyReady() const { return rmiiHardware().isReady(); }
+    bool phyLinkUp() const { return rmiiHardware().linkUp(); }
+    uint8_t phyError() const { return rmiiHardware().error(); }
+    uint16_t linkSpeedMbps() const { return rmiiHardware().linkSpeed(); }
+    bool fullDuplex() const { return rmiiHardware().fullDuplex(); }
+
+    // Arduino-style optional static-IP startup overloads, like Wiznet.
+    uint8_t begin()
+    {
+        connect();
+        return pool();
+    }
+    uint8_t begin(IPAddress ip)
+    {
+        resetDhcp(); localIP(ip); return begin();
+    }
+    uint8_t begin(IPAddress ip, IPAddress dnsIp)
+    {
+        resetDhcp(); localIP(ip); dns(dnsIp); return begin();
+    }
+    uint8_t begin(IPAddress ip, IPAddress dnsIp, IPAddress gatewayIp)
+    {
+        resetDhcp(); localIP(ip); dns(dnsIp); gateway(gatewayIp); return begin();
+    }
+    uint8_t begin(IPAddress ip, IPAddress dnsIp, IPAddress gatewayIp, IPAddress subnetIp)
+    {
+        resetDhcp(); localIP(ip); dns(dnsIp); gateway(gatewayIp); subnet(subnetIp);
+        return begin();
+    }
+
+    // RMII MAC address is owned by the native MAC/PHY stack. The inherited
+    // mac(...) setters are not a portable way to override ESP32/STM32 RMII MAC.
+    String phyMacAddress() const { return rmiiHardware().macAddress(); }
+};
+
+#endif // FLPROG_NETWORK_HAS_RMII_INTERFACE
+
 // Safe typed NET NUM lookups: class identity is set by the actual wrapper
 // constructor, not inferred from a mutable networkMode()/active transport.
 // They do not allocate memory and require no RTTI / dynamic_cast.
@@ -1776,3 +1920,70 @@ inline bool FLProgNetworkDeviceRegistry::existsWifi(
     return device != nullptr &&
         device->deviceKind() == FLPROG_NETWORK_DEVICE_KIND_WIFI;
 }
+
+#if FLPROG_NETWORK_HAS_RMII_INTERFACE
+// Typed RMII device lookup follows the existing Wi-Fi/Wiznet contract:
+// absent/invalid -> nullptr with NOT_FOUND/INVALID_ID; different type ->
+// nullptr with TYPE_MISMATCH. No RTTI and no unsafe cast before kind check.
+inline FLProgRmiiInterface *FLProgNetworkDeviceRegistry::getRmii(
+    FLProgNetworkDeviceId id)
+{
+    FLProgNetworkInterface *base = getDevice(id);
+    if (!base) return nullptr;
+    if (base->deviceKind() != FLPROG_NETWORK_DEVICE_KIND_RMII)
+    {
+        setLast(FLPROG_NETWORK_DEVICE_TYPE_MISMATCH, id);
+        return nullptr;
+    }
+    return static_cast<FLProgRmiiInterface *>(base);
+}
+
+inline const FLProgRmiiInterface *FLProgNetworkDeviceRegistry::getRmii(
+    FLProgNetworkDeviceId id) const
+{
+    const FLProgNetworkInterface *base = getDevice(id);
+    if (!base) return nullptr;
+    if (base->deviceKind() != FLPROG_NETWORK_DEVICE_KIND_RMII)
+    {
+        setLast(FLPROG_NETWORK_DEVICE_TYPE_MISMATCH, id);
+        return nullptr;
+    }
+    return static_cast<const FLProgRmiiInterface *>(base);
+}
+
+// Read-only predicate: like existsWiznet()/existsWifi(), leaves lastResult.
+inline bool FLProgNetworkDeviceRegistry::existsRmii(
+    FLProgNetworkDeviceId id) const
+{
+    if (id == FLPROG_NETWORK_DEVICE_INVALID) return false;
+    const int8_t index = findById(id);
+    if (index < 0) return false;
+    const FLProgNetworkInterface *device = _entries[(uint8_t)index].device;
+    return device != nullptr &&
+        device->deviceKind() == FLPROG_NETWORK_DEVICE_KIND_RMII;
+}
+
+#else
+// Wi-Fi-only profile: the RMII class is unavailable, but the registry ABI and
+// typed calls still have deterministic failure semantics (no unsafe downcast).
+inline FLProgRmiiInterface *FLProgNetworkDeviceRegistry::getRmii(
+    FLProgNetworkDeviceId id)
+{
+    FLProgNetworkInterface *base = getDevice(id);
+    if (base) setLast(FLPROG_NETWORK_DEVICE_TYPE_MISMATCH, id);
+    return nullptr;
+}
+inline const FLProgRmiiInterface *FLProgNetworkDeviceRegistry::getRmii(
+    FLProgNetworkDeviceId id) const
+{
+    const FLProgNetworkInterface *base = getDevice(id);
+    if (base) setLast(FLPROG_NETWORK_DEVICE_TYPE_MISMATCH, id);
+    return nullptr;
+}
+inline bool FLProgNetworkDeviceRegistry::existsRmii(
+    FLProgNetworkDeviceId id) const
+{
+    (void)id;
+    return false;
+}
+#endif // FLPROG_NETWORK_HAS_RMII_INTERFACE

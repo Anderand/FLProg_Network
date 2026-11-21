@@ -32,13 +32,15 @@
 class FLProgNetworkInterface;
 class FLProgOnBoardWifiInterface;
 class FLProgWiznetInterface;
+class FLProgRmiiInterface;
 
 // Describes the C++ wrapper type, NOT networkMode() or active interface.
 enum FLProgNetworkDeviceKind : uint8_t
 {
     FLPROG_NETWORK_DEVICE_KIND_BASE = 0,
     FLPROG_NETWORK_DEVICE_KIND_WIFI = 1,
-    FLPROG_NETWORK_DEVICE_KIND_WIZNET = 2
+    FLPROG_NETWORK_DEVICE_KIND_WIZNET = 2,
+    FLPROG_NETWORK_DEVICE_KIND_RMII = 3
 };
 
 typedef uint8_t FLProgNetworkDeviceId;
@@ -109,6 +111,8 @@ public:
     const FLProgWiznetInterface *getWiznet(FLProgNetworkDeviceId id) const;
     FLProgOnBoardWifiInterface *getWifi(FLProgNetworkDeviceId id);
     const FLProgOnBoardWifiInterface *getWifi(FLProgNetworkDeviceId id) const;
+    FLProgRmiiInterface *getRmii(FLProgNetworkDeviceId id);
+    const FLProgRmiiInterface *getRmii(FLProgNetworkDeviceId id) const;
 
     bool exists(FLProgNetworkDeviceId id) const;
 
@@ -118,6 +122,7 @@ public:
     // Invalid (255), absent, null, BASE and wrong-kind entries return false.
     bool existsWiznet(FLProgNetworkDeviceId id) const;
     bool existsWifi(FLProgNetworkDeviceId id) const;
+    bool existsRmii(FLProgNetworkDeviceId id) const;
 
     FLProgNetworkDeviceId idFor(const FLProgNetworkInterface *device) const;
 

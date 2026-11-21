@@ -1,0 +1,57 @@
+Native checks; g++ / clang++; RESET/SPI: clang++ via Zig-compatible argument wrapper.
+
+=== tests/check_esp8266_wiznet_ota_header.py
+ESP8266_OTA_HEADER_STANDALONE_PASS compiler=g++
+ESP8266_OTA_HEADER_STANDALONE_PASS compiler=clang++
+ESP8266_OTA_HEADER_TEST_PASS
+=== tests/check_keywords.py
+KEYWORDS PASS: 514 unique entries, valid tabs and groups, all names present in C++ source, required API indexed
+=== tests/check_rmii_interface.py
+RMII_PUBLIC_CLASS_CONTRACT_PASS
+RMII_PUBLIC_CLASS_CONTRACT_PASS
+RMII_PUBLIC_CLASS_CONTRACT_PASS
+RMII_PUBLIC_CLASS_CONTRACT_PASS
+ALL_RMII_CLASS_TESTS_PASS
+=== tests/check_rmii_wifi_only_profile.py
+WIFI_ONLY_TYPED_RMII_PASS g++
+WIFI_ONLY_TYPED_RMII_PASS clang++
+=== tests/check_rthw_spi.py
+COMPILER g++
+RTHW_SPI_PASS
+COMPILER clang++
+RTHW_SPI_PASS
+ALL_RTHW_SPI_TESTS_PASS
+=== tests/check_typed_registry.py
+COMPILER g++
+TYPED_REGISTRY_AND_EXISTS_PASS
+TYPED_REGISTRY_AND_EXISTS_PASS
+COMPILER clang++
+TYPED_REGISTRY_AND_EXISTS_PASS
+TYPED_REGISTRY_AND_EXISTS_PASS
+ALL_TYPED_REGISTRY_TESTS_PASS
+
+=== tests/check_setters.py (profiles 0, 1, 2) ===
+PASS: exact pr1 calls, deferred application, pin 255 without GPIO; runtime SPI without reset and busy rejection
+PASS: invalid frequency and WiFi/RMII transport isolation
+PASS: real RT_HW backend configuration remains passive; pin 255 accepted, implicit GPIO writer rejected
+PASS: managed reset once, 2 ms pulse + 500 ms recovery, micros/millis wrap, CS collision and invalid-pin refusal
+PASS: deferred RT_HW factory, managed RT_HW reset, explicit Arduino selection, factory failure
+ALL HOST SETTER CHECKS PASSED
+/tmp/flmerge/setter_test/setters_test.cpp:65:26: warning: unused function 'testFactory' [-Wunused-function]
+   65 | static FLProgSpiBackend *testFactory() { ++factoryCalls; return &factoryBackend; }
+      |                          ^~~~~~~~~~~
+/tmp/flmerge/setter_test/setters_test.cpp:66:26: warning: unused function 'failedFactory' [-Wunused-function]
+   66 | static FLProgSpiBackend *failedFactory() { return nullptr; }
+      |                          ^~~~~~~~~~~~~
+/tmp/flmerge/setter_test/setters_test.cpp:67:16: warning: unused function 'testRtWriter' [-Wunused-function]
+   67 | static uint8_t testRtWriter(uint8_t pin,uint8_t level) {
+      |                ^~~~~~~~~~~~
+3 warnings generated.
+PASS: WiFi-only API compiles and rejects Ethernet settings without hardware access
+ALL HOST SETTER CHECKS PASSED
+PASS: exact pr1 calls, deferred application, pin 255 without GPIO; runtime SPI without reset and busy rejection
+PASS: invalid frequency and WiFi/RMII transport isolation
+PASS: real RT_HW backend configuration remains passive; pin 255 accepted, implicit GPIO writer rejected
+PASS: managed reset once, 2 ms pulse + 500 ms recovery, micros/millis wrap, CS collision and invalid-pin refusal
+PASS: deferred RT_HW factory, managed RT_HW reset, explicit Arduino selection, factory failure
+ALL HOST SETTER CHECKS PASSED

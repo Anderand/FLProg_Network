@@ -9,7 +9,7 @@
   },
   "C++/FLProg_Network/src/flprogNetwork.h": {
     "source": "Библиотека/FLProg_Network/src/flprogNetwork.h",
-    "sha256": "612287ea85689934a58cbd21799171153965fc2d578dd7f417f2d0688c9f040d"
+    "sha256": "cb2e09069439d97265752da7f5abff16fd3f76507ec9347bfff35183b47f0efd"
   },
   "C++/FLProg_Network/src/flprogNetworkOpticalStub.h": {
     "source": "Библиотека/FLProg_Network/src/flprogNetworkOpticalStub.h",
@@ -49,7 +49,7 @@
   },
   "C++/FLProg_Network/src/device/flprogNetworkDeviceRegistry.h": {
     "source": "Библиотека/FLProg_Network/src/device/flprogNetworkDeviceRegistry.h",
-    "sha256": "06d28aa3eccc7eafef129b3f79fab1f95583abccf9e68cc72c9e0cb760cefdfe"
+    "sha256": "fb663716d343bd8087fb07907b41b5f6c0bf3c4d6bbbe32862e1c7542e01eb27"
   },
   "C++/FLProg_Network/src/hardware/flprogRmiiEthernet.h": {
     "source": "Библиотека/FLProg_Network/src/hardware/flprogRmiiEthernet.h",
