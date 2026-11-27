@@ -22,6 +22,10 @@
 #include <Arduino.h>
 #include "flprogNetworkProfile.h"
 
+#if FLPROG_NETWORK_AVR_LITE
+#error "FLProg_Network: this API requires the full profile; set FLPROG_NETWORK_AVR_LITE=0 globally or use Arduino Ethernet APIs"
+#endif
+
 // -----------------------------------------------------------------------------
 // FLProg_Network v1.0.0-rc.6a.dev.2-fix2 - compile-time platform/backend capability map.
 //

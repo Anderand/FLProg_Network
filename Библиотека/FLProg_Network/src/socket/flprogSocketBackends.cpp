@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogSocketBackends.cpp
  * Назначение: Адаптеры socket-операций к конкретным transport backend.
@@ -1249,3 +1251,5 @@ uint16_t FLProgLwipSocketBackend::remotePort() const
         ? _callbacks.remotePort(_context)
         : _endpoint.remotePort;
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

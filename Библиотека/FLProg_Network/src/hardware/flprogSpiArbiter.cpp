@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogSpiArbiter.cpp
  * Назначение: Арбитр SPI-доступа между сетевыми операциями.
@@ -133,3 +135,5 @@ void FLProgSpiArbiter::resetStatistics(uint8_t bus)
 }
 
 #endif // FLPROG_NETWORK_COMPILE_WIRED
+
+#endif // !FLPROG_NETWORK_AVR_LITE

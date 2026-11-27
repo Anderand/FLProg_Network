@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 //==================================================================================================
 //                                  Доработка EIS 05.11.2026 v.02
 //==================================================================================================
@@ -1742,3 +1744,5 @@ void FLProgWiznetHardware::applyBroadcastBlocking(bool value)
   }
 
 #endif // FLPROG_NETWORK_COMPILE_WIRED
+
+#endif // !FLPROG_NETWORK_AVR_LITE

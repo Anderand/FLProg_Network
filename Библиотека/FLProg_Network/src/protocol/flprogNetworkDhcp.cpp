@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogNetworkDhcp.cpp
  * Назначение: DHCP state machine для wired transport.
@@ -1552,3 +1554,5 @@ void FLProgWiznetDhcp::pool()
 }
 
 #endif // FLPROG_NETWORK_COMPILE_WIRED
+
+#endif // !FLPROG_NETWORK_AVR_LITE

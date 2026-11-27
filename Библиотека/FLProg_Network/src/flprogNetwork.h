@@ -21,6 +21,59 @@
 
 #include "flprogNetworkProfile.h"
 
+#if FLPROG_NETWORK_AVR_LITE
+
+// User-facing compatibility surface for ATmega328P. This deliberately avoids
+// pulling in the unified Wi-Fi/RMII/socket implementation on 2 KB SRAM parts.
+#include "avr/flprogAvrWiznetLite.h"
+
+// Preserve names used by generated sketches while limiting the backing object
+// and registry to the single compact Wiznet interface.
+typedef FLProgWiznetInterface FLProgNetworkInterface;
+
+// Generated FLProg sketches keep a logical NET NUM registration call. The
+// compact build supports exactly one hardware interface and stores no heap
+// state; unsupported IDs and a second device are rejected deterministically.
+typedef uint8_t FLProgNetworkDeviceId;
+#ifndef FLPROG_NETWORK_DEVICE_INVALID
+#define FLPROG_NETWORK_DEVICE_INVALID ((FLProgNetworkDeviceId)0xFFU)
+#endif
+enum FLProgNetworkDeviceRegistryResult : uint8_t {
+    FLPROG_NETWORK_DEVICE_OK = 0,
+    FLPROG_NETWORK_DEVICE_ALREADY_REGISTERED = 1,
+    FLPROG_NETWORK_DEVICE_INVALID_ID = 10,
+    FLPROG_NETWORK_DEVICE_NULL = 11,
+    FLPROG_NETWORK_DEVICE_DUPLICATE_ID = 12,
+    FLPROG_NETWORK_DEVICE_ALREADY_BOUND = 13,
+    FLPROG_NETWORK_DEVICE_REGISTRY_FULL = 14
+};
+class FLProgNetworkLiteDeviceRegistry {
+public:
+    FLProgNetworkLiteDeviceRegistry() : _id(FLPROG_NETWORK_DEVICE_INVALID), _device(nullptr) {}
+    FLProgNetworkDeviceRegistryResult registerDevice(FLProgNetworkDeviceId id, FLProgWiznetInterface *device) {
+        if (id == FLPROG_NETWORK_DEVICE_INVALID) return FLPROG_NETWORK_DEVICE_INVALID_ID;
+        if (!device) return FLPROG_NETWORK_DEVICE_NULL;
+        if (_device == device && _id == id) return FLPROG_NETWORK_DEVICE_ALREADY_REGISTERED;
+        if (_device == device) return FLPROG_NETWORK_DEVICE_ALREADY_BOUND;
+        if (!_device) { _id = id; _device = device; return FLPROG_NETWORK_DEVICE_OK; }
+        return _id == id ? FLPROG_NETWORK_DEVICE_DUPLICATE_ID : FLPROG_NETWORK_DEVICE_REGISTRY_FULL;
+    }
+    FLProgNetworkInterface *getDevice(FLProgNetworkDeviceId id) const { return id == _id ? _device : nullptr; }
+    FLProgWiznetInterface *getWiznet(FLProgNetworkDeviceId id) const { return getDevice(id); }
+    bool existsWiznet(FLProgNetworkDeviceId id) const { return getWiznet(id) != nullptr; }
+    bool exists(FLProgNetworkDeviceId id) const { return existsWiznet(id); }
+private:
+    FLProgNetworkDeviceId _id;
+    FLProgWiznetInterface *_device;
+};
+inline FLProgNetworkLiteDeviceRegistry &flprogNetworkLiteRegistry() {
+    static FLProgNetworkLiteDeviceRegistry registry;
+    return registry;
+}
+#define flprogNetworkDevices (flprogNetworkLiteRegistry())
+
+#else
+
 #include <Arduino.h>
 #include <IPAddress.h>
 #include "flprogNetworkPlatform.h"
@@ -46,6 +99,24 @@
 #include "service/flprogNetworkOtaStm32Wiznet.h"
 #include "protocol/flprogNetworkTcpClient.h"
 #include "protocol/flprogNetworkTcpServer.h"
+
+// Arduino AVR's IPAddress does not provide toString(); format its IPv4 octets
+// directly while preserving native formatting on platforms that implement it.
+inline String flprogNetworkIpAddressToString(const IPAddress &address)
+{
+#if defined(ARDUINO_ARCH_AVR)
+    String result;
+    result.reserve(15);
+    for (uint8_t i = 0; i < 4; ++i)
+    {
+        if (i != 0) result += '.';
+        result += static_cast<unsigned int>(address[i]);
+    }
+    return result;
+#else
+    return address.toString();
+#endif
+}
 
 
 // Public version/API markers.
@@ -488,7 +559,7 @@ public:
     bool accessPointMode() const { return _apAllowed; }
     bool accessPointIsReady() const { return _apReady; }
     IPAddress accessPointIP() const;
-    String accessPointIPString() const { return accessPointIP().toString(); }
+    String accessPointIPString() const { return flprogNetworkIpAddressToString(accessPointIP()); }
     uint8_t accessPointStationCount() const { return _apStationCount; }
 
     // LEGACY FLProg_Ethernet SoftAP facade. FLProg 9.8.1 generated
@@ -1209,10 +1280,10 @@ public:
     IPAddress wiznetIP() const;
     IPAddress rmiiIP() const;
     IPAddress ethernetIP() const;
-    String wifiIPString() const { return wifiIP().toString(); }
-    String wiznetIPString() const { return wiznetIP().toString(); }
-    String rmiiIPString() const { return rmiiIP().toString(); }
-    String ethernetIPString() const { return ethernetIP().toString(); }
+    String wifiIPString() const { return flprogNetworkIpAddressToString(wifiIP()); }
+    String wiznetIPString() const { return flprogNetworkIpAddressToString(wiznetIP()); }
+    String rmiiIPString() const { return flprogNetworkIpAddressToString(rmiiIP()); }
+    String ethernetIPString() const { return flprogNetworkIpAddressToString(ethernetIP()); }
 
     uint16_t rmiiLinkSpeed() const { return rmiiRef().linkSpeed(); }
     bool rmiiFullDuplex() const { return rmiiRef().fullDuplex(); }
@@ -1225,7 +1296,7 @@ public:
     uint8_t getError() const { return _error; }
     bool isConnecting() const { return (_status == FLPROG_NETWORK_CONNECTING_STATUS) || (_status == FLPROG_NETWORK_RECONNECT_STATUS); }
     bool hasError() const { return _error != FLPROG_NETWORK_NOT_ERROR; }
-    String ipString() const { return localIP().toString(); }
+    String ipString() const { return flprogNetworkIpAddressToString(localIP()); }
 
     /** Return Wi-Fi RSSI in dBm; returns 0 when Ethernet is active. */
     int32_t rssi() const;
@@ -1987,3 +2058,4 @@ inline bool FLProgNetworkDeviceRegistry::existsRmii(
     return false;
 }
 #endif // FLPROG_NETWORK_HAS_RMII_INTERFACE
+#endif // FLPROG_NETWORK_AVR_LITE

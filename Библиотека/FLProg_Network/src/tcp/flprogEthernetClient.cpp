@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogEthernetClient.cpp
  * Назначение: Legacy FLProgEthernetClient adapter поверх FLProgNetworkTcpClient/A3.
@@ -306,3 +308,5 @@ void FLProgEthernetClient::setFlags()
         _isChangeError = true;
     }
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

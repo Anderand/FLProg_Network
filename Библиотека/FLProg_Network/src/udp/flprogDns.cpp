@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogDns.cpp
  * Реализация legacy FLProgDNSClient поверх FLProgNetworkDns.
@@ -368,3 +370,5 @@ void FLProgDNSClient::setFlags()
         _isChangeError = true;
     }
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

@@ -23,6 +23,19 @@
  */
 #pragma once
 
+// Compact Arduino Ethernet backend for the memory-constrained Uno/Nano class.
+// Select globally from the compiler's MCU target, so Arduino's generated
+// prototype translation unit and every library translation unit agree.
+// Set FLPROG_NETWORK_AVR_LITE=0 in the build flags to retain the full API.
+#ifndef FLPROG_NETWORK_AVR_LITE
+  #if defined(ARDUINO_ARCH_AVR) && defined(__AVR_ATmega328P__) && \
+      (defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_NANO))
+    #define FLPROG_NETWORK_AVR_LITE 1
+  #else
+    #define FLPROG_NETWORK_AVR_LITE 0
+  #endif
+#endif
+
 #define FLPROG_NETWORK_BUILD_UNIVERSAL  0
 #define FLPROG_NETWORK_BUILD_WIFI_ONLY  1
 #define FLPROG_NETWORK_BUILD_WIRED_ONLY 2

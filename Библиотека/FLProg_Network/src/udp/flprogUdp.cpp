@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogUdp.cpp
  * Назначение: Legacy FLProgUdpClient adapter поверх FLProgNetworkUdp/A3.
@@ -288,3 +290,5 @@ void FLProgUdpClient::setFlags()
         _isChangeError = true;
     }
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

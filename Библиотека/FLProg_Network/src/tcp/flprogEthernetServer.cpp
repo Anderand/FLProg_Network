@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogEthernetServer.cpp
  * Назначение: Legacy FLProgEthernetServer adapter поверх FLProgNetworkTcpServer/A3.
@@ -306,3 +308,5 @@ bool FLProgEthernetServer::statusForExtGetBitWithReset(uint8_t bit)
     bitWrite(_statusForExt, bit, 0);
     return value;
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

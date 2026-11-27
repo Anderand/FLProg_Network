@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogStm32TcpBackend.cpp
  * Назначение: STM32-specific TCP backend adapter.
@@ -628,3 +630,5 @@ int FLProgStm32TcpServerListener::acceptOne(
 }
 
 #endif // FLPROG_NETWORK_HAS_STM32_ETHERNET
+
+#endif // !FLPROG_NETWORK_AVR_LITE

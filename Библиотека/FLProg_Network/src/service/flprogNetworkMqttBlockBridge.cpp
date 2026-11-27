@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /* FLProg user-block bridge implementation; see flprogNetworkMqttBlockBridge.h. */
 #include "flprogNetworkMqttBlockBridge.h"
 #include "../flprogNetwork.h"
@@ -21,3 +23,5 @@ bool FLProgNetworkMqttBlockBridge::update(uint8_t route)
     _bound = _client.begin(*network, route);
     return _bound;
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

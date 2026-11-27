@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogNetworkTcpClient.cpp
  * Назначение: Native TCP client FLProg_Network.
@@ -1584,3 +1586,5 @@ void FLProgNetworkTcpClient::pool()
         scheduleReconnectFromFailure();
     }
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

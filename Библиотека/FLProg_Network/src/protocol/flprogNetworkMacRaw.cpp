@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogNetworkMacRaw.cpp
  * Назначение: MACRAW helper для низкоуровневых Wiznet кадров.
@@ -566,3 +568,5 @@ uint16_t FLProgNetworkMacRaw::frameSize() const
 }
 
 #endif // FLPROG_NETWORK_COMPILE_WIRED
+
+#endif // !FLPROG_NETWORK_AVR_LITE

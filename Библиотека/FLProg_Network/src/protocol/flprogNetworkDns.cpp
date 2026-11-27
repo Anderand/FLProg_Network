@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogNetworkDns.cpp
  * Назначение: DNS resolver с route-aware кэшированием.
@@ -1183,3 +1185,5 @@ void FLProgNetworkDns::pool()
         readResponseStep();
     }
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

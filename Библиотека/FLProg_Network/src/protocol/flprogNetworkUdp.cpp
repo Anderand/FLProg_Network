@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogNetworkUdp.cpp
  * Назначение: Native UDP transport FLProg_Network.
@@ -2385,3 +2387,5 @@ uint16_t FLProgNetworkUdp::packetSize() const
         ? backendValue->packetSize()
         : 0;
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

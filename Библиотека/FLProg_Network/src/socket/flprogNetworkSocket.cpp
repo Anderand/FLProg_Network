@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogNetworkSocket.cpp
  * Назначение: A3 socket manager/lease lifecycle.
@@ -1251,3 +1253,5 @@ uint16_t FLProgNetworkSocket::remotePort() const
 
     return _endpoint.remotePort;
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

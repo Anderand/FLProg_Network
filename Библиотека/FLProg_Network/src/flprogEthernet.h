@@ -22,6 +22,15 @@
  */
 #pragma once
 
+#include "flprogNetworkProfile.h"
+
+#if FLPROG_NETWORK_AVR_LITE
+// On ATmega328P the public Ethernet header resolves to the compact native
+// Wiznet facade. Full RT_HW and legacy service adapters remain available on
+// all other architectures and when the global lite profile is disabled.
+#include "flprogNetwork.h"
+#else
+
 //==================================================================================================
 //                                  Доработка EIS 05.11.2026 v.04
 // ОСНОВНОЙ ЗАГОЛОВОК Ethernet: #include <flprogEthernet.h> (кавычки также допустимы).
@@ -36,7 +45,6 @@
 #ifndef FLPROG_NETWORK_RT_HW_AUTO
   #define FLPROG_NETWORK_RT_HW_AUTO 1
 #endif
-
 // FLProg_Ethernet source-compatibility umbrella for FLProg_Network.
 // Existing generated projects may keep: #include <flprogEthernet.h>
 // All networking is implemented by FLProg_Network/A3; the legacy raw socket
@@ -169,3 +177,4 @@ namespace {
 }
 #endif
 
+#endif // FLPROG_NETWORK_AVR_LITE

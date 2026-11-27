@@ -7,6 +7,7 @@ source=(ROOT/'src/flprogNetwork.h').read_text()
 marker='#if FLPROG_NETWORK_HAS_RMII_INTERFACE\n// Typed RMII device lookup follows'
 assert source.count(marker)==1
 rmii_tail=source.split(marker,1)[1]
+rmii_tail=rmii_tail.rsplit('#endif // FLPROG_NETWORK_AVR_LITE',1)[0]
 code=r'''#define FLPROG_NETWORK_HAS_RMII_INTERFACE 0
 #include <cstdint>
 #include <cassert>

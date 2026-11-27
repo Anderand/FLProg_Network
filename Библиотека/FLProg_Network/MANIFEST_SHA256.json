@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-21",
+  "date": "2026-11-28",
   "files": [
     {
       "path": "0900_Развитие/0100_Развитие_Network.md",
@@ -103,8 +103,8 @@
     },
     {
       "path": "README_RU.md",
-      "bytes": 2154,
-      "sha256": "ab16164f6ada45c747003f9cefdb7224880631c35eda647db9fce86e63a1a1b2"
+      "bytes": 3522,
+      "sha256": "d3dd04aa868e81306cec6d8090af976e53104824f3e159e654da65d61b529363"
     },
     {
       "path": "docs/ARCHITECTURE_AUDIT_PR26_RU.md",
@@ -343,8 +343,8 @@
     },
     {
       "path": "library.properties",
-      "bytes": 428,
-      "sha256": "3573b8208af43d3949b949e1626942ef13b7ce57adcaff07b8aed1c7edc8ff87"
+      "bytes": 447,
+      "sha256": "17b9fe3cf14c16e3daa4ec7fbe084e0370bddc64f09b4ab14cacd981c95a62d2"
     },
     {
       "path": "src/FLProgMqttBridgeTransport.h",
@@ -355,6 +355,11 @@
       "path": "src/abstract/flprogAbstractTcpInterface.h",
       "bytes": 2080,
       "sha256": "85012bd4983129274c65be8f82e325d82553ea266980c8c7d11fac37d3459224"
+    },
+    {
+      "path": "src/avr/flprogAvrWiznetLite.h",
+      "bytes": 11006,
+      "sha256": "0a65d4ae9d169062cce931b690062fd9c03bbc62385dd8b6ff49489dd57c14f4"
     },
     {
       "path": "src/bridge/FLProgBridgeProtocol.h",
@@ -373,8 +378,8 @@
     },
     {
       "path": "src/device/flprogNetworkDeviceRegistry.cpp",
-      "bytes": 8097,
-      "sha256": "2c8e562c3a5cf0b300a62a17dc8be72f1db6f9f816e84d40990b5d77ebde6d2a"
+      "bytes": 8199,
+      "sha256": "91dc24efd28c0a3d723fe2cd4ba54dc092719a34ec640f690c711bbc0e4629f8"
     },
     {
       "path": "src/device/flprogNetworkDeviceRegistry.h",
@@ -383,8 +388,8 @@
     },
     {
       "path": "src/flprogEthernet.h",
-      "bytes": 12522,
-      "sha256": "858d16f20b67f7400097542677b84503a5a4890d39917f6f425fa13531aad933"
+      "bytes": 12878,
+      "sha256": "270cfac155176231516fab7896637f08905ec1d7b312571f0fd82bdc257f15da"
     },
     {
       "path": "src/flprogMqttUserBlocks.h",
@@ -398,13 +403,13 @@
     },
     {
       "path": "src/flprogNetwork.cpp",
-      "bytes": 94410,
-      "sha256": "e92de060ee5ec81a5dd78a28e7492e013efb30524f222964ada3673a785ea35d"
+      "bytes": 95047,
+      "sha256": "f32fb31ef13069a6bc83600be3afceee9c76c8d423a4c01794e66832a1856c87"
     },
     {
       "path": "src/flprogNetwork.h",
-      "bytes": 78143,
-      "sha256": "cb2e09069439d97265752da7f5abff16fd3f76507ec9347bfff35183b47f0efd"
+      "bytes": 81449,
+      "sha256": "fa020cd9fcfa27e2a593746bc0aa604e7feb3d388ea9ce3e4c8d279e398ceec3"
     },
     {
       "path": "src/flprogNetworkOpticalStub.h",
@@ -413,13 +418,13 @@
     },
     {
       "path": "src/flprogNetworkPlatform.h",
-      "bytes": 10969,
-      "sha256": "0bf7392162c6d92455a21278e70c4a5cd59458dee4074db540c8252183e0a63f"
+      "bytes": 11201,
+      "sha256": "4711e7637314c17f49c7bd7155c11fb9af23442ba41710ff89da7ebb2f0e8e85"
     },
     {
       "path": "src/flprogNetworkProfile.h",
-      "bytes": 3241,
-      "sha256": "b12cf585a82552a0610989ea19ec592cc08bc78767e82f7469c8192e140aacf5"
+      "bytes": 4512,
+      "sha256": "70e5423273e491f5941f4a9d327f73b83eb333abe24ff05c8b63577a29f1d1dc"
     },
     {
       "path": "src/flprogNtpUserBlocks.h",
@@ -428,8 +433,8 @@
     },
     {
       "path": "src/flprogOTA.h",
-      "bytes": 1978,
-      "sha256": "9f66e70f2153226c3ce8da9c97e6de7320699e032dbac60d71a25c2ee9bdadc5"
+      "bytes": 2209,
+      "sha256": "071487c835a7c7e88beed6ce11784fbd198fe9421257039ebf804bbc39dc8492"
     },
     {
       "path": "src/flprogOtaBoardIdentity.h",
@@ -438,8 +443,8 @@
     },
     {
       "path": "src/flprogOtaUniversalBlock.h",
-      "bytes": 7307,
-      "sha256": "0a23846c062d8324558053852bd087dfc001af57b23e2b8e6fd573f202a29317"
+      "bytes": 7374,
+      "sha256": "97cbcd7c1fbf515edb088cce7e8358f8d55c3501f2986a0de4e633d913b911f7"
     },
     {
       "path": "src/flprogRtHwEthernet.h",
@@ -453,8 +458,8 @@
     },
     {
       "path": "src/hardware/flprogRmiiEthernet.cpp",
-      "bytes": 15458,
-      "sha256": "ea54e5303564620be31333b980972209598f779cd48eebd3751317c577f9e99c"
+      "bytes": 15628,
+      "sha256": "eb3565f948428abc087a04872460f2969fe94ca614100862a6301420e2b734bf"
     },
     {
       "path": "src/hardware/flprogRmiiEthernet.h",
@@ -463,8 +468,8 @@
     },
     {
       "path": "src/hardware/flprogSpiArbiter.cpp",
-      "bytes": 4074,
-      "sha256": "a55a01c2fda6ecf84b940c5396c91533514c6d64f7566ecf48f262153595d14e"
+      "bytes": 4176,
+      "sha256": "f35d776a820c63c1f708b3d8ba3b650460ac70d7d736e49fbb9301edd1275b5e"
     },
     {
       "path": "src/hardware/flprogSpiArbiter.h",
@@ -473,8 +478,8 @@
     },
     {
       "path": "src/hardware/flprogSpiBackend.cpp",
-      "bytes": 9355,
-      "sha256": "84aabca1522152d3d376f83d234af6a3925e2232bf55ba4bc915b821160fd988"
+      "bytes": 9590,
+      "sha256": "c7b927d5a7dcfe92526d03271db50c6bf1e30bde773f9b0bfa837aee1a240c37"
     },
     {
       "path": "src/hardware/flprogSpiBackend.h",
@@ -483,8 +488,8 @@
     },
     {
       "path": "src/hardware/flprogWiznetHardware.cpp",
-      "bytes": 45582,
-      "sha256": "d5b375f2bf34d244fefee28920734ed461870313302c6d5b9db616d3b38d238d"
+      "bytes": 45684,
+      "sha256": "bb91c8a4f7f3a9eecb233d18783298744789bc4cc6c0492ab6dd75006434c307"
     },
     {
       "path": "src/hardware/flprogWiznetHardware.h",
@@ -493,8 +498,8 @@
     },
     {
       "path": "src/protocol/flprogNetworkArpProbe.cpp",
-      "bytes": 18903,
-      "sha256": "ef08bfcc6e7268a1579acdf3fd99d5da7009100aecb1c738b1d7e6429a81075e"
+      "bytes": 19005,
+      "sha256": "1ed74d40e860314b9a51cc74a0a7239d101d895b24190d6fe78b299e754c4af1"
     },
     {
       "path": "src/protocol/flprogNetworkArpProbe.h",
@@ -503,18 +508,18 @@
     },
     {
       "path": "src/protocol/flprogNetworkDhcp.cpp",
-      "bytes": 38230,
-      "sha256": "0c23c9c2e523d98e59db6bf13a4839ac1bc27312f6575c26eec871b10f496e72"
+      "bytes": 38370,
+      "sha256": "45bb725d670817c3a547bf930301237652fcb18419c305f938f05b93877687eb"
     },
     {
       "path": "src/protocol/flprogNetworkDhcp.h",
-      "bytes": 15568,
-      "sha256": "3c5541f88a543cc5fd65e23c132d71b486df092e50384036dacf5abc02ae2451"
+      "bytes": 19131,
+      "sha256": "4f55c0cf1e469646b95b5a81e1902d7447d35afe30e383347b4a670c2894cb93"
     },
     {
       "path": "src/protocol/flprogNetworkDns.cpp",
-      "bytes": 26408,
-      "sha256": "f47bc244404f399ae58bb946d3801d192c2a79bed87681d3a29526ee2d5bff51"
+      "bytes": 26510,
+      "sha256": "f31ab51cf366aa556c848494eda42286dfaf1d02762cd7beadb45296a0f373e6"
     },
     {
       "path": "src/protocol/flprogNetworkDns.h",
@@ -523,8 +528,8 @@
     },
     {
       "path": "src/protocol/flprogNetworkMacRaw.cpp",
-      "bytes": 15027,
-      "sha256": "4c4bc63f0f1dec84d1c2bd954100a0034dd3caea2b49eb48ecaa3f4231a87873"
+      "bytes": 15129,
+      "sha256": "8a1bf17664664a45f1934a3b21b5a7fbfde63649a9712e348c41d18b8119fc69"
     },
     {
       "path": "src/protocol/flprogNetworkMacRaw.h",
@@ -533,8 +538,8 @@
     },
     {
       "path": "src/protocol/flprogNetworkTcpClient.cpp",
-      "bytes": 41871,
-      "sha256": "e67fb221c23d4ac8d36824c8e950a2ee08661930ead52dc2f5386ceeec805996"
+      "bytes": 41973,
+      "sha256": "433d4b4d8138f1b01e472b608c293e4a091a2e1b32c7a36f30898d9e0da1eb7f"
     },
     {
       "path": "src/protocol/flprogNetworkTcpClient.h",
@@ -543,8 +548,8 @@
     },
     {
       "path": "src/protocol/flprogNetworkTcpServer.cpp",
-      "bytes": 49817,
-      "sha256": "3ebb2bc296405386e6b23a85463dd0f0a56f4fd62c726fc3d31faac4d48243ae"
+      "bytes": 49919,
+      "sha256": "3a15d01044a59c7e46930552ff7711b3b3bdf9bc85e9910e5248d358f7e3e0be"
     },
     {
       "path": "src/protocol/flprogNetworkTcpServer.h",
@@ -553,8 +558,8 @@
     },
     {
       "path": "src/protocol/flprogNetworkUdp.cpp",
-      "bytes": 47727,
-      "sha256": "9384d5a387d1e871a2c3bfcd6d8fad4ef569392c99c30b262b695a9f6304d88a"
+      "bytes": 47829,
+      "sha256": "66421ab5f3f11e99d77c8f0c3cdfc92adc6f98a1c510e3850b15142017bfc76e"
     },
     {
       "path": "src/protocol/flprogNetworkUdp.h",
@@ -563,8 +568,8 @@
     },
     {
       "path": "src/protocol/flprogStm32TcpBackend.cpp",
-      "bytes": 15353,
-      "sha256": "a16adc7c046be7e63a0378919e599b0733f5e491336598bcd9e229a78e766174"
+      "bytes": 15455,
+      "sha256": "2b32f3715879ad6848b52f463e5f45a4abde549e84650b80abfdcc495b555521"
     },
     {
       "path": "src/protocol/flprogStm32TcpBackend.h",
@@ -573,13 +578,13 @@
     },
     {
       "path": "src/protocol/flprogStm32UdpBackend.cpp",
-      "bytes": 4554,
-      "sha256": "cd1c44bcc2d31653b7995181f3db6520c4f717599591987686c64589975ba9f1"
+      "bytes": 4656,
+      "sha256": "1944b55c75cb386118d7e53196fb49fb3411efe093303bfeec4b4b399ee54495"
     },
     {
       "path": "src/service/flprogNetworkHttpClient.cpp",
-      "bytes": 29245,
-      "sha256": "e75883bfbd12de3bdc581d5ad0735755569725acd844e529cdd541d888b1dafe"
+      "bytes": 29368,
+      "sha256": "408aa7be2ecb442b8bb91ba1b565da650142e8e68eee3e82efcab7459a1b1598"
     },
     {
       "path": "src/service/flprogNetworkHttpClient.h",
@@ -588,8 +593,8 @@
     },
     {
       "path": "src/service/flprogNetworkHttpServer.cpp",
-      "bytes": 66926,
-      "sha256": "c00fbd7feccea3d65f82492193fbd11dc007b5d8213728c4a528dca64e95f2e4"
+      "bytes": 66861,
+      "sha256": "4f549ccc5b7d56d063d6e34631f182c417cae136af64335c5801ed4d804cff91"
     },
     {
       "path": "src/service/flprogNetworkHttpServer.h",
@@ -598,8 +603,8 @@
     },
     {
       "path": "src/service/flprogNetworkMqttBlockBridge.cpp",
-      "bytes": 700,
-      "sha256": "d31c2fad90ad965a60ba258604709263f2d9114eed1152532af9f05db3764d52"
+      "bytes": 802,
+      "sha256": "e1fc6b584546dea14dca5f799f2afc48ec586593518f4f603618aa5cb74dda90"
     },
     {
       "path": "src/service/flprogNetworkMqttBlockBridge.h",
@@ -608,8 +613,8 @@
     },
     {
       "path": "src/service/flprogNetworkMqttClient.cpp",
-      "bytes": 36247,
-      "sha256": "1800015a42d37d5a25c28bc82ca7628bca33593813e5af5994f61b0deb47c81b"
+      "bytes": 36349,
+      "sha256": "d1236d58a69c757894d8129d65d44629021db7789ce48d4fbe03240b61866522"
     },
     {
       "path": "src/service/flprogNetworkMqttClient.h",
@@ -618,8 +623,8 @@
     },
     {
       "path": "src/service/flprogNetworkNtp.cpp",
-      "bytes": 18787,
-      "sha256": "1a61d6d9861f4c3af724fa21cf43ca867b55cbcca98943554bdf5eaa5e9365e4"
+      "bytes": 18889,
+      "sha256": "d798680a42cc71f8bc8f932ebdbe60be94ff72dbb519e3618d86eb13107fc4ec"
     },
     {
       "path": "src/service/flprogNetworkNtp.h",
@@ -628,8 +633,8 @@
     },
     {
       "path": "src/service/flprogNetworkOta.cpp",
-      "bytes": 12726,
-      "sha256": "3ed11b4662679a2f3fe32d6c988cbc922d3f97f702169a5bfe3f65aa34cf0dc0"
+      "bytes": 12828,
+      "sha256": "ff2185e5fa8121bc28ee7571eebb21411db0b10c6e516f07208199e42d309abc"
     },
     {
       "path": "src/service/flprogNetworkOta.h",
@@ -643,8 +648,8 @@
     },
     {
       "path": "src/service/flprogNetworkOtaStm32Wiznet.cpp",
-      "bytes": 22048,
-      "sha256": "99c83c0d970994d76908e31a5afdf816359b9987e5555d2aa7873da9af5277cb"
+      "bytes": 22150,
+      "sha256": "e41f8c1e2f81ced35ab62941107b532ae355afd310159882f24a3171d5ab2c60"
     },
     {
       "path": "src/service/flprogNetworkOtaStm32Wiznet.h",
@@ -653,18 +658,18 @@
     },
     {
       "path": "src/service/flprogNetworkOtaWiznet.cpp",
-      "bytes": 12774,
-      "sha256": "acfa884ea5d1d78da2621d89419cb5a1156ed1fe3b38e5060cfd0e0efed5ce39"
+      "bytes": 12876,
+      "sha256": "ed681b9972bfa958f431097c5286c25373e4b3ff2d4c9f8dd3701e669825c9b7"
     },
     {
       "path": "src/service/flprogNetworkOtaWiznet.h",
-      "bytes": 2392,
-      "sha256": "f2f519a30f781413b71ab06755ec0b453a796cf8b5942df7cdeffab77cdb9437"
+      "bytes": 2682,
+      "sha256": "26084f622dc01c1e51cbf64c36b08aca6aadb8973f0a2f1bb5643f6399eae88a"
     },
     {
       "path": "src/service/flprogNetworkService.cpp",
-      "bytes": 2316,
-      "sha256": "ee3c8537c89b1bb43bac96c2363fd0b182a78d9903ea53e82e505b6c9f34fa0d"
+      "bytes": 2418,
+      "sha256": "5047898424add8650e5f0037e219cbd139d7c31e6985b61c57049bb6766685e5"
     },
     {
       "path": "src/service/flprogNetworkService.h",
@@ -683,8 +688,8 @@
     },
     {
       "path": "src/socket/flprogNetworkSocket.cpp",
-      "bytes": 30789,
-      "sha256": "53985ae7e8a13e9348a92d4a1574cc4ccdc29973b5a5b0dd19d7beb7fce5582c"
+      "bytes": 30891,
+      "sha256": "979b43818ca3ae1813a83299ab3caed6f4781eb03aed5ddb16089a8bdfe7ceec"
     },
     {
       "path": "src/socket/flprogNetworkSocket.h",
@@ -693,8 +698,8 @@
     },
     {
       "path": "src/socket/flprogSocketBackends.cpp",
-      "bytes": 28733,
-      "sha256": "d1b17b2668ea2f7f63655d52381829250a283529218b6c10a9528c7dc2ab5bb4"
+      "bytes": 28835,
+      "sha256": "d4a816a91aa8fb7fe83b696180e7e365df98629263eece6316537274d908146f"
     },
     {
       "path": "src/socket/flprogSocketBackends.h",
@@ -703,8 +708,8 @@
     },
     {
       "path": "src/tcp/flprogEthernetClient.cpp",
-      "bytes": 9646,
-      "sha256": "f04b4906335a518980053e34e29a60348da6bcd603272fa2c5a15b87eb5d59fd"
+      "bytes": 9748,
+      "sha256": "de0883ac443af9aa0ff3f39826377fab92bea9acc9532fa4b5af28a5089c4bb7"
     },
     {
       "path": "src/tcp/flprogEthernetClient.h",
@@ -713,8 +718,8 @@
     },
     {
       "path": "src/tcp/flprogEthernetServer.cpp",
-      "bytes": 8450,
-      "sha256": "3ec0e95c5983f197099e87591eddb186ea771c5900786b53cd246d16c10eb163"
+      "bytes": 8552,
+      "sha256": "d1ebf7a9325afee27074ca23e913a6bf4a338f54c24dfe5296284bcaf7f56fd7"
     },
     {
       "path": "src/tcp/flprogEthernetServer.h",
@@ -728,8 +733,8 @@
     },
     {
       "path": "src/transport/flprogNetworkTransport.cpp",
-      "bytes": 22189,
-      "sha256": "fd1432c8b9b576427368b52da3301a02bb1c7217831ab83d63ea083165dca4b3"
+      "bytes": 22291,
+      "sha256": "4dbf323e717978905894e65599aeb0734926e2d356b8d60d40e450212a6434ae"
     },
     {
       "path": "src/transport/flprogNetworkTransport.h",
@@ -738,8 +743,8 @@
     },
     {
       "path": "src/udp/flprogDns.cpp",
-      "bytes": 11586,
-      "sha256": "02928c211de369e227c35545582e26c511ea30bff88eef612049541d7615102b"
+      "bytes": 11688,
+      "sha256": "bbfa70d0dd002558ed5897f39768e5c53555fae12453756567f0a2ea7c5b4050"
     },
     {
       "path": "src/udp/flprogDns.h",
@@ -748,13 +753,48 @@
     },
     {
       "path": "src/udp/flprogUdp.cpp",
-      "bytes": 8682,
-      "sha256": "ce0e899bafb823f2696c722908de3454473b5afbf22cc5ccf48b6737974c9735"
+      "bytes": 8784,
+      "sha256": "cbca7d9702f21c2aa52e40f8b970bf49f2f58fd1f11e6414ee4a711ef7db1eee"
     },
     {
       "path": "src/udp/flprogUdp.h",
       "bytes": 6250,
       "sha256": "d0bf0860c3f0a9bc9eb01c21e588996e5ae94ffb4dcc7dc60cc841c41db08e9e"
+    },
+    {
+      "path": "tests/avr_lite/GeneratedTemplateSmoke/GeneratedTemplateSmoke.ino",
+      "bytes": 333,
+      "sha256": "99d5b53ad51f987c2a64c6b5e418f3c9ab857a1ed3fa5d844cc530a7567ee275"
+    },
+    {
+      "path": "tests/avr_lite/README.md",
+      "bytes": 1931,
+      "sha256": "25b6e842da943fa716afe1cc47184064ab4d406a016ffd83872f500cde45efb1"
+    },
+    {
+      "path": "tests/avr_lite/StaticSocketSmoke/StaticSocketSmoke.ino",
+      "bytes": 923,
+      "sha256": "23ef5791e8279b09825dd3d4eb0e5aa2c7a6f6a05bf343d16c727653e37b2e40"
+    },
+    {
+      "path": "tests/avr_lite/build_acceptance.ps1",
+      "bytes": 1333,
+      "sha256": "ae325fd1058d8a0a92a2c96fe1f22965f1df6d5a88f6898ddc01581298135d4b"
+    },
+    {
+      "path": "tests/avr_lite/fake/include/Arduino.h",
+      "bytes": 594,
+      "sha256": "6695652d48536307553a498706c3f4a39a0f9d0a160d7d9999c27cf181e83a44"
+    },
+    {
+      "path": "tests/avr_lite/fake/include/Ethernet.h",
+      "bytes": 1485,
+      "sha256": "e4eb88bb2d61fd3b050d7d2c19ea5daeec4a5776bd6b2071408be35b555b980c"
+    },
+    {
+      "path": "tests/avr_lite/fake/src/avr_lite_fake_test.cpp",
+      "bytes": 3218,
+      "sha256": "3830f3610b92c4294cf084ef55077e072bb0190b60acdfa54df59765be05641e"
     },
     {
       "path": "tests/check_esp8266_wiznet_ota_header.py",
@@ -773,8 +813,8 @@
     },
     {
       "path": "tests/check_rmii_wifi_only_profile.py",
-      "bytes": 1826,
-      "sha256": "9500be392c2fde6e616ed9819c8aef5a652161c0c8c3f360affb7af10058f9d4"
+      "bytes": 1895,
+      "sha256": "5eb7870fd84c977857786b2198d4fbe156391ff2dc92f6742f84ab2e0a0e16ad"
     },
     {
       "path": "tests/check_rthw_spi.py",
@@ -788,8 +828,8 @@
     },
     {
       "path": "tests/check_typed_registry.py",
-      "bytes": 6707,
-      "sha256": "ccd1946808a8b7d17697d37321ed59f91176b150e3590e6f5ce3ae010176ccf6"
+      "bytes": 6770,
+      "sha256": "598bcacfe9c282149c3a87b561eac8adf42f8a1cc6fa8b5ad59cc398ed8e33f7"
     },
     {
       "path": "tests/compile/NetworkCompile/NetworkCompile.ino",

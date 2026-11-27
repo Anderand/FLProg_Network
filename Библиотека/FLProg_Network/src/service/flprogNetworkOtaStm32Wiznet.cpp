@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 #include "flprogNetworkOtaStm32Wiznet.h"
 
 #if FLPROG_NETWORK_COMPILE_STM32_W5500_OTA
@@ -646,3 +648,5 @@ bool FLProgNetworkOtaStm32Wiznet::sendAck(uint32_t received)
 #endif
 }
 
+
+#endif // !FLPROG_NETWORK_AVR_LITE

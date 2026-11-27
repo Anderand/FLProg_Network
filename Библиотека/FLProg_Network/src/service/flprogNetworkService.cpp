@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogNetworkService.cpp
  * Назначение: Базовый lifecycle сетевых сервисов FLProg_Network.
@@ -54,3 +56,5 @@ void FLProgNetworkService::detach()
     _serviceNetwork = nullptr;
     network->unregisterManagedService(this);
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

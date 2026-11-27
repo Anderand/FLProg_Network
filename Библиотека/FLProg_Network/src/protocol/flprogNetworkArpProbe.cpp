@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogNetworkArpProbe.cpp
  * Назначение: ARP probe/проверка адреса для wired Ethernet.
@@ -674,3 +676,5 @@ bool FLProgWiznetArpMonitor::takeConflict()
 }
 
 #endif // FLPROG_NETWORK_COMPILE_WIRED
+
+#endif // !FLPROG_NETWORK_AVR_LITE

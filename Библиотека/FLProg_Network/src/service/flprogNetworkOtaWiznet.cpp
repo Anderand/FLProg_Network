@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 #include "flprogNetworkOtaWiznet.h"
 
 #if FLPROG_NETWORK_COMPILE_WIZNET_OTA
@@ -450,3 +452,5 @@ void FLProgNetworkOtaWiznet::fail(uint8_t code)
     _state = WIZNET_OTA_IDLE;
     _updateErrorCount++;
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

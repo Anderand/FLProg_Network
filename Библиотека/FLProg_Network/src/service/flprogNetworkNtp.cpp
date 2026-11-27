@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogNetworkNtp.cpp
  * Назначение: NTP client/service поверх UDP.
@@ -848,3 +850,5 @@ void FLProgNetworkNtp::pool()
         startTransaction();
     }
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

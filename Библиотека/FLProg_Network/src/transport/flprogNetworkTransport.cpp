@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogNetworkTransport.cpp
  * Назначение: A3 transport layer: идентичность transport и generation.
@@ -900,3 +902,5 @@ uint8_t FLProgSocketManager::freeLeaseCount(
     const uint8_t nativeFree = wiznet->nativeSocketAvailableCount();
     return globalFree < nativeFree ? globalFree : nativeFree;
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

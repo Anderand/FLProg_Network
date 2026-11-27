@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogNetworkMqttClient.cpp
  * Назначение: MQTT client core поверх native TCP.
@@ -1200,3 +1202,5 @@ void FLProgNetworkMqttClient::resetStatistics()
     _oversizedPacketCount = 0;
     _unknownPacketCount = 0;
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

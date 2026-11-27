@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogSpiBackend.cpp
  * Назначение: Платформенно-зависимый SPI backend для Wiznet/W5500.
@@ -22,6 +24,7 @@
 
 #if FLPROG_NETWORK_COMPILE_WIRED
 #include "flprogSpiBackend.h"
+#if defined(ARDUINO_ARCH_RP2040) || defined(ARDUINO_ARCH_RP2350) || defined(ARDUINO_ARCH_STM32)
 #include <type_traits>
 #include <utility>
 
@@ -122,6 +125,7 @@ flprogApplyStm32SpiPins(T *, int, int, int)
 {
     return false;
 }
+#endif // RP/STM32 pin-remap helpers
 
 #if defined(ESP32) && defined(HSPI)
 static SPIClass flprogNetworkBackendSecondSpi(HSPI);
@@ -369,3 +373,5 @@ uint8_t FLProgArduinoSpiBackend::transfer(uint8_t value)
 }
 
 #endif // FLPROG_NETWORK_COMPILE_WIRED
+
+#endif // !FLPROG_NETWORK_AVR_LITE

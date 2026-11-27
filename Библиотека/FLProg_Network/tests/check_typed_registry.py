@@ -7,6 +7,7 @@ real=(ROOT/'src/flprogNetwork.h').read_text()
 anchor='// Safe typed NET NUM lookups:'
 assert real.count(anchor)==1, 'typed getter implementation missing'
 actual=real.split(anchor,1)[1]
+actual=actual.rsplit('#endif // FLPROG_NETWORK_AVR_LITE',1)[0]
 with tempfile.TemporaryDirectory(prefix='flprog_typed_') as tmp:
  p=Path(tmp)
  src='''#define FLPROG_NETWORK_HAS_RMII_INTERFACE 1

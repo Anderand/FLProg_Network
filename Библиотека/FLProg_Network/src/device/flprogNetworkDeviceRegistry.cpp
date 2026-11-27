@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogNetworkDeviceRegistry.cpp
  * Назначение: Реестр NetworkDevice: привязка NET NUM к живому FLProgNetworkInterface.
@@ -256,3 +258,5 @@ const FLProgNetworkDeviceEntry *FLProgNetworkDeviceRegistry::entryAt(
     }
     return &_entries[index];
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

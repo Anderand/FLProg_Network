@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogRmiiEthernet.cpp
  * Назначение: RMII/LAN8720 transport backend.
@@ -609,3 +611,5 @@ bool FLProgRmiiEthernet::fullDuplex() const
 }
 
 #endif // FLPROG_NETWORK_COMPILE_WIRED
+
+#endif // !FLPROG_NETWORK_AVR_LITE

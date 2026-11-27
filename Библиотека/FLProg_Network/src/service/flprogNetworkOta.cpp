@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogNetworkOta.cpp
  * Назначение: OTA service, привязанный к состоянию NetworkDevice.
@@ -467,3 +469,5 @@ void FLProgNetworkOta::platformOnError(uint8_t errorValue)
     _platformOwner->_state = FLPROG_OTA_STATE_READY;
 }
 #endif
+
+#endif // !FLPROG_NETWORK_AVR_LITE

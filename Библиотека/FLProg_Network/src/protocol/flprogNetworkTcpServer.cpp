@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogNetworkTcpServer.cpp
  * Назначение: Native TCP server FLProg_Network.
@@ -1942,3 +1944,5 @@ void FLProgNetworkTcpServer::resetStatistics()
     _idleTimeoutCount = 0;
     _shutdownCount = 0;
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

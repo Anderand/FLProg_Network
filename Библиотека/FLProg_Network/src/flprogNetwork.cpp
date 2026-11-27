@@ -1,3 +1,5 @@
+#include "flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogNetwork.cpp
  * Назначение: Реализация жизненного цикла FLProgNetworkInterface.
@@ -3459,3 +3461,5 @@ uint8_t FLProgNetworkInterface::linkStatus() const
 
     return FLPROG_WIZNET_LINK_UNKNOWN;
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

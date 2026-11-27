@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogNetworkHttpServer.cpp
  * Назначение: HTTP server поверх native TCP server.
@@ -20,9 +22,8 @@
 #include <new>
 #include "flprogNetworkHttpServer.h"
 #include "../flprogNetwork.h"
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
+#include <stdio.h>
+#include <string.h>
 
 FLProgNetworkHttpServer *FLProgNetworkHttpServer::_legacyGroupMasters[4] = {nullptr, nullptr, nullptr, nullptr};
 
@@ -186,9 +187,9 @@ void FLProgNetworkHttpServer::copyBounded(char *destination, size_t capacity, co
 {
     if (destination == nullptr || capacity == 0) return;
     if (source == nullptr) source = "";
-    size_t length = std::strlen(source);
+    size_t length = strlen(source);
     if (length >= capacity) length = capacity - 1;
-    if (length != 0) std::memcpy(destination, source, length);
+    if (length != 0) memcpy(destination, source, length);
     destination[length] = 0;
 }
 
@@ -405,15 +406,15 @@ bool FLProgNetworkHttpServer::addHandler(
     }
     else if (uriValue[0] == '/')
     {
-        if (std::strlen(uriValue) > FLPROG_HTTP_SERVER_MAX_URI_LENGTH) return false;
+        if (strlen(uriValue) > FLPROG_HTTP_SERVER_MAX_URI_LENGTH) return false;
         copyBounded(normalized, sizeof(normalized), uriValue);
     }
     else
     {
-        const size_t length = std::strlen(uriValue);
+        const size_t length = strlen(uriValue);
         if (length + 1 > FLPROG_HTTP_SERVER_MAX_URI_LENGTH) return false;
         normalized[0] = '/';
-        std::memcpy(normalized + 1, uriValue, length + 1);
+        memcpy(normalized + 1, uriValue, length + 1);
     }
 
     Handler &handler = _handlers[_handlerCount++];
@@ -435,7 +436,7 @@ bool FLProgNetworkHttpServer::addHandler(
 
 void FLProgNetworkHttpServer::resetContext(ClientContext &ctx, bool usedValue)
 {
-    std::memset(&ctx, 0, sizeof(ctx));
+    memset(&ctx, 0, sizeof(ctx));
     ctx.used = usedValue;
     ctx.state = usedValue ? FLPROG_HTTP_SERVER_STATE_REQUEST_LINE : FLPROG_HTTP_SERVER_STATE_IDLE;
     ctx.method = FLPROG_WEB_SERVER_UNKNOWN;
@@ -907,11 +908,11 @@ bool FLProgNetworkHttpServer::consumeLine(uint8_t slot, ClientContext &ctx)
 
 bool FLProgNetworkHttpServer::parseRequestLine(ClientContext &ctx)
 {
-    char *firstSpace = std::strchr(ctx.line, ' ');
+    char *firstSpace = strchr(ctx.line, ' ');
     if (firstSpace == nullptr) return false;
     *firstSpace = 0;
     char *target = firstSpace + 1;
-    char *secondSpace = std::strchr(target, ' ');
+    char *secondSpace = strchr(target, ' ');
     if (secondSpace == nullptr) return false;
     *secondSpace = 0;
     const char *version = secondSpace + 1;
@@ -919,7 +920,7 @@ bool FLProgNetworkHttpServer::parseRequestLine(ClientContext &ctx)
     // A request line has exactly one HTTP-version token. Do not let atoi()
     // silently accept a valid prefix such as "HTTP/1.1 trailing-data": that
     // would make malformed requests indistinguishable from HTTP/1.1.
-    if (std::strncmp(version, "HTTP/", 5) != 0 ||
+    if (strncmp(version, "HTTP/", 5) != 0 ||
         version[5] < '0' || version[5] > '9' ||
         version[6] != '.' ||
         version[7] < '0' || version[7] > '9' ||
@@ -935,11 +936,11 @@ bool FLProgNetworkHttpServer::parseRequestLine(ClientContext &ctx)
     ctx.httpMajor = (uint8_t)major;
     ctx.httpMinor = (uint8_t)minor;
 
-    const size_t targetLength = std::strlen(target);
+    const size_t targetLength = strlen(target);
     if (targetLength == 0 || targetLength > FLPROG_HTTP_SERVER_MAX_URI_LENGTH) return false;
     char targetCopy[FLPROG_HTTP_SERVER_MAX_URI_LENGTH + 1];
     copyBounded(targetCopy, sizeof(targetCopy), target);
-    char *query = std::strchr(targetCopy, '?');
+    char *query = strchr(targetCopy, '?');
     if (query != nullptr)
     {
         *query++ = 0;
@@ -952,7 +953,7 @@ bool FLProgNetworkHttpServer::parseRequestLine(ClientContext &ctx)
 
 bool FLProgNetworkHttpServer::parseHeaderLine(ClientContext &ctx)
 {
-    char *colon = std::strchr(ctx.line, ':');
+    char *colon = strchr(ctx.line, ':');
     if (colon == nullptr)
     {
         ctx.error = FLPROG_HTTP_SERVER_ERROR_BAD_HEADER;
@@ -962,11 +963,11 @@ bool FLProgNetworkHttpServer::parseHeaderLine(ClientContext &ctx)
     char *value = colon + 1;
     while (*value == ' ' || *value == '\t') ++value;
 
-    size_t keyLength = std::strlen(ctx.line);
+    size_t keyLength = strlen(ctx.line);
     while (keyLength > 0 && (ctx.line[keyLength - 1] == ' ' || ctx.line[keyLength - 1] == '\t'))
         ctx.line[--keyLength] = 0;
 
-    size_t valueLength = std::strlen(value);
+    size_t valueLength = strlen(value);
     while (valueLength > 0 && (value[valueLength - 1] == ' ' || value[valueLength - 1] == '\t'))
         value[--valueLength] = 0;
 
@@ -1151,8 +1152,8 @@ bool FLProgNetworkHttpServer::parseArguments(ClientContext &ctx, const char *que
     const char *cursor = query;
     while (*cursor != 0)
     {
-        const char *amp = std::strchr(cursor, '&');
-        const char *end = amp == nullptr ? cursor + std::strlen(cursor) : amp;
+        const char *amp = strchr(cursor, '&');
+        const char *end = amp == nullptr ? cursor + strlen(cursor) : amp;
         const char *equal = nullptr;
         for (const char *p = cursor; p < end; ++p)
         {
@@ -1267,7 +1268,7 @@ void FLProgNetworkHttpServer::queueProtocolError(
     ctx.responseOffset = 0;
     ctx.responseOverflow = false;
     const char *reason = reasonPhrase(statusCode);
-    (void)buildStructuredResponse(ctx, statusCode, "text/plain", reason, (uint32_t)std::strlen(reason), false);
+    (void)buildStructuredResponse(ctx, statusCode, "text/plain", reason, (uint32_t)strlen(reason), false);
     // Give even a 408 response its own write-progress window.
     ctx.lastActivityAt = millis();
     ctx.state = FLPROG_HTTP_SERVER_STATE_SENDING;
@@ -1327,7 +1328,7 @@ bool FLProgNetworkHttpServer::appendResponse(
         ctx.responseOverflow = true;
         return false;
     }
-    std::memcpy(ctx.response + ctx.responseLength, data, length);
+    memcpy(ctx.response + ctx.responseLength, data, length);
     ctx.responseLength = (uint16_t)(ctx.responseLength + length);
     ctx.response[ctx.responseLength] = 0;
     return true;
@@ -1350,7 +1351,7 @@ bool FLProgNetworkHttpServer::appendResponseProgmem(
         ctx.response[ctx.responseLength + index] = (char)pgm_read_byte(data + index);
     }
 #else
-    std::memcpy(ctx.response + ctx.responseLength, data, length);
+    memcpy(ctx.response + ctx.responseLength, data, length);
 #endif
     ctx.responseLength = (uint16_t)(ctx.responseLength + length);
     ctx.response[ctx.responseLength] = 0;
@@ -1374,7 +1375,7 @@ bool FLProgNetworkHttpServer::buildStructuredResponse(
     ctx.responseStructured = true;
 
     char header[320];
-    const int headerLength = std::snprintf(
+    const int headerLength = snprintf(
         header,
         sizeof(header),
         "HTTP/1.1 %d %s\r\nContent-Type: %s\r\nContent-Length: %lu\r\nConnection: close\r\n\r\n",
@@ -1412,7 +1413,7 @@ bool FLProgNetworkHttpServer::buildStructuredResponseProgmem(
     ctx.responseStructured = true;
 
     char header[320];
-    const int headerLength = std::snprintf(
+    const int headerLength = snprintf(
         header,
         sizeof(header),
         "HTTP/1.1 %d %s\r\nContent-Type: %s\r\nContent-Length: %lu\r\nConnection: close\r\n\r\n",
@@ -1606,7 +1607,7 @@ bool FLProgNetworkHttpServer::send(
 {
     ClientContext *ctx = currentContext();
     if (ctx == nullptr) return false;
-    const uint32_t length = bodyValue == nullptr ? 0 : (uint32_t)std::strlen(bodyValue);
+    const uint32_t length = bodyValue == nullptr ? 0 : (uint32_t)strlen(bodyValue);
     const bool headRequest = ctx->method == FLPROG_WEB_SERVER_HEAD;
     return buildStructuredResponse(*ctx, statusCode, contentTypeValue, bodyValue, length, headRequest);
 }
@@ -1621,7 +1622,7 @@ bool FLProgNetworkHttpServer::sendProgmem(
 #if defined(ESP8266)
     const uint32_t length = bodyValue == nullptr ? 0 : (uint32_t)strlen_P(bodyValue);
 #else
-    const uint32_t length = bodyValue == nullptr ? 0 : (uint32_t)std::strlen(bodyValue);
+    const uint32_t length = bodyValue == nullptr ? 0 : (uint32_t)strlen(bodyValue);
 #endif
     const bool headRequest = ctx->method == FLPROG_WEB_SERVER_HEAD;
     return buildStructuredResponseProgmem(*ctx, statusCode, contentTypeValue, bodyValue, length, headRequest);
@@ -1633,13 +1634,13 @@ bool FLProgNetworkHttpServer::sendStreamProgmem(
 {
     ClientContext *ctx = currentContext();
     if (!ctx || _legacyAutoStart || (length && !data)) return false;
-    if (encoding && std::strcmp(encoding, "gzip") != 0) return false;
+    if (encoding && strcmp(encoding, "gzip") != 0) return false;
     if (!type || !*type) type = "application/octet-stream";
     ctx->responseLength = ctx->responseOffset = 0;
     ctx->responseOverflow = false;
     ctx->responseStructured = 1;
     const size_t headerCapacity = sizeof(ctx->response) < 320U ? sizeof(ctx->response) : 320U;
-    const int count = std::snprintf(ctx->response, headerCapacity,
+    const int count = snprintf(ctx->response, headerCapacity,
         "HTTP/1.1 %d %s\r\nContent-Type: %s\r\nContent-Length: %lu\r\n%sCache-Control: %s\r\nConnection: close\r\n\r\n",
         statusCode, reasonPhrase(statusCode), type, (unsigned long)length,
         encoding ? "Content-Encoding: gzip\r\nVary: Accept-Encoding\r\n" : "",
@@ -1849,34 +1850,34 @@ size_t FLProgNetworkHttpServer::write(const uint8_t *buffer, size_t size)
 size_t FLProgNetworkHttpServer::print(const char *value)
 {
     if (value == nullptr) return 0;
-    return write(reinterpret_cast<const uint8_t *>(value), std::strlen(value));
+    return write(reinterpret_cast<const uint8_t *>(value), strlen(value));
 }
 
 size_t FLProgNetworkHttpServer::print(int value)
 {
     char buffer[24];
-    const int count = std::snprintf(buffer, sizeof(buffer), "%d", value);
+    const int count = snprintf(buffer, sizeof(buffer), "%d", value);
     return count > 0 ? print(buffer) : 0;
 }
 
 size_t FLProgNetworkHttpServer::print(unsigned int value)
 {
     char buffer[24];
-    const int count = std::snprintf(buffer, sizeof(buffer), "%u", value);
+    const int count = snprintf(buffer, sizeof(buffer), "%u", value);
     return count > 0 ? print(buffer) : 0;
 }
 
 size_t FLProgNetworkHttpServer::print(long value)
 {
     char buffer[32];
-    const int count = std::snprintf(buffer, sizeof(buffer), "%ld", value);
+    const int count = snprintf(buffer, sizeof(buffer), "%ld", value);
     return count > 0 ? print(buffer) : 0;
 }
 
 size_t FLProgNetworkHttpServer::print(unsigned long value)
 {
     char buffer[32];
-    const int count = std::snprintf(buffer, sizeof(buffer), "%lu", value);
+    const int count = snprintf(buffer, sizeof(buffer), "%lu", value);
     return count > 0 ? print(buffer) : 0;
 }
 
@@ -1953,3 +1954,5 @@ uint8_t FLProgNetworkHttpServer::getHttpMethodCode(const char *methodValue)
     if (equalsIgnoreCase(methodValue, "UNLINK")) return FLPROG_WEB_SERVER_UNLINK;
     return FLPROG_WEB_SERVER_UNKNOWN;
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

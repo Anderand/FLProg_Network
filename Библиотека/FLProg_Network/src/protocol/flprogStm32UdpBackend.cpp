@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogStm32UdpBackend.cpp
  * Назначение: STM32-specific UDP backend adapter.
@@ -168,3 +170,5 @@ uint16_t FLProgStm32UdpBackend::packetRemotePort() const
 }
 
 #endif // FLPROG_NETWORK_HAS_STM32_ETHERNET
+
+#endif // !FLPROG_NETWORK_AVR_LITE

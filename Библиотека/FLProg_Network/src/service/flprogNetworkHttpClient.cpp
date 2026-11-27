@@ -1,3 +1,5 @@
+#include "../flprogNetworkProfile.h"
+#if !FLPROG_NETWORK_AVR_LITE
 /*
  * FLProg_Network — flprogNetworkHttpClient.cpp
  * Назначение: HTTP client поверх native TCP/DNS.
@@ -274,7 +276,7 @@ bool FLProgNetworkHttpClient::buildStructuredRequest(
     }
     else if (_hostMode == FLPROG_HTTP_HOST_IP)
     {
-        out += _hostIp.toString();
+        out += flprogNetworkIpAddressToString(_hostIp);
     }
     else
     {
@@ -1049,3 +1051,5 @@ void FLProgNetworkHttpClient::pool()
         break;
     }
 }
+
+#endif // !FLPROG_NETWORK_AVR_LITE

@@ -38,3 +38,18 @@ ESP8266: HTTP `200` на Wi-Fi `.217` и W5500 `.218`/`.219`, OTA upload и
 
 - Изменения поведения проходят отдельный gate и фиксируются в документации.
 - Platform-specific обходы сопровождаются назначением и границами применения.
+
+## Компактный профиль Uno/Nano
+
+Для Arduino AVR Uno/Nano на `__AVR_ATmega328P__` автоматически включается
+`FLPROG_NETWORK_AVR_LITE`: оба публичных заголовка `flprogEthernet.h` и
+`flprogNetwork.h` открывают компактный Wiznet API на стандартной Arduino
+библиотеке Ethernet. Lite реализует один Wiznet интерфейс; legacy
+`FLProgEthernetClient/Server`, DNS и прочие сетевые службы недоступны. Для
+TCP/UDP используйте обычные классы `EthernetClient`, `EthernetServer` и
+`EthernetUDP`, установив Arduino Ethernet 2.0.0 или совместимую 2.x версию.
+DHCP выполняется синхронно при первом `pool()`; поддержание/повторная попытка
+обслуживается последующими вызовами `pool()`. Чтобы сохранить полный API,
+глобально задайте `FLPROG_NETWORK_AVR_LITE=0` в build flags (не в скетче).
+На Mega, ESP и прочих целях поведение прежнее. Прямое подключение full-only
+`flprogNetworkPlatform.h` выдаёт понятную ошибку сборки с указанием override.
